@@ -1,15 +1,16 @@
 import {Injectable} from 'angular2/core';
 import {Http} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/share';
+import {Subscriber} from 'rxjs/Subscriber';
+import {map} from 'rxjs/operator/map';
+import {share} from 'rxjs/operator/share';
 import {loopMatches} from '../helpers/matches'
 
 @Injectable()
 export class MatchesService {
-    observable$;
-    private _observer;
-    private _dataStore;
+    observable$ : Observable<Subscriber<IMatches>>;
+    private _observer : Subscriber<IMatches>;
+    private _dataStore : IMatchesDataStore;
 
     constructor(private _http: Http) {
         this._dataStore = { matches: {} };
@@ -21,7 +22,10 @@ export class MatchesService {
         this.load();
     }
 
-    load() {
+    /**
+     * Fetch matches data and calls next on observer
+     */
+    load() : void {
         let observable = this._http.get('/data/matches.json').map(response => response.json());
 
         observable.subscribe(data => {
@@ -32,8 +36,16 @@ export class MatchesService {
         });
     }
 
-    private _calculateAttrs(data) {
-        return loopMatches(data, (match) => {
+    /**
+     * Calculates team points and result if goals and points are supplied for both teams.
+     * Where a draw has occurred the result attr will be set to 'DRAW'
+     *
+     * @param data
+     * @returns {any|({}&any)}
+     * @private
+     */
+    private _calculateAttrs(data : IMatches) : IMatches {
+        return loopMatches(data, (match : IMatch) => {
             // Calculate Points
             if(typeof match.homeGoals !== 'undefined'
                 && typeof match.homeBehinds !== 'undefined'
@@ -57,7 +69,12 @@ export class MatchesService {
         });
     }
 
-    getAllMatches() {
+    /**
+     * Fetches matches in datastore
+     *
+     * @returns {IMatches}
+     */
+    getAllMatches() : IMatches {
         return this._dataStore.matches;
     }
 }

@@ -1,9 +1,9 @@
-import {loopObj, getDatastoreAttr} from './utils';
+import {loopObj, getDatastoreAttr, copy} from './utils';
 
 declare const moment;
 
 function generateMatches(matches, teams, venues) {
-    const _matches = Object.assign({}, matches);
+    const _matches = copy(matches);
 
     return _addAttrs(_matches, teams, venues);
 }
@@ -30,7 +30,14 @@ function _addAttrs(matches, teams, venues) {
     });
 }
 
-function loopMatches(data, callback) {
+/**
+ * Provides the ability to loop through all matches in the format provided by matches.json
+ *
+ * @param data
+ * @param callback
+ * @returns {IBasicObj}
+ */
+function loopMatches(data : IMatches, callback : Function) {
     return loopObj(data, (round) => {
         round.forEach((match) => {
             callback(match);

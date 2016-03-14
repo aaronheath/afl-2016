@@ -16,15 +16,15 @@ TODO
 
 ## TODO's
 
-- Initial Refactor
-- Git
-- Interfaces & Comment
-- Tests
-- Linting
-- Automation & Packaging & JS mapping
-- Data Objects
-- About Page
-- Readme
-- Git (again)
-- Deploy
-- UI Improvements
+- [x] Initial Refactor
+- [x] Git
+- [ ] Interfaces & Comment
+- [ ] Tests
+- [ ] Linting
+- [ ] Automation & Packaging & JS mapping
+- [ ] Data Objects
+- [ ] About Page
+- [ ] Readme
+- [ ] Git (again)
+- [ ] Deploy
+- [ ] UI Improvements

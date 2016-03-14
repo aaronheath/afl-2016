@@ -1,8 +1,8 @@
-import {loopObj, objectToArray, getDatastoreAttr} from './utils';
+import {loopObj, objectToArray, getDatastoreAttr, copy} from './utils';
 import {loopMatches} from './matches';
 
 function generateLadder(teams, matches) {
-    const _matches = Object.assign({}, matches);
+    const _matches = copy(matches);
 
     const ladderObj = _initLadder(teams);
 

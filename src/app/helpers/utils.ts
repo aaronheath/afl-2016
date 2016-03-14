@@ -1,5 +1,12 @@
-export function loopObj(data, callback) {
-    const _data = Object.assign({}, data);
+/**
+ * Provides the ability to loop through a simple 1 layer object
+ *
+ * @param data
+ * @param callback
+ * @returns {any|({}&IBasicObj)}
+ */
+function loopObj(data : IBasicObj, callback : Function) : IBasicObj {
+    const _data = copy(data);
 
     for(const key in _data) {
         if (!_data.hasOwnProperty(key)) {
@@ -12,7 +19,7 @@ export function loopObj(data, callback) {
     return _data;
 }
 
-export function objectToArray(obj) {
+function objectToArray(obj) {
     const response = [];
 
     loopObj(obj, (value) => {
@@ -22,10 +29,27 @@ export function objectToArray(obj) {
     return response;
 }
 
-export function getDatastoreAttr(datastore, key, attr) {
+function getDatastoreAttr(datastore, key, attr) {
     if(!datastore[key]) {
         return;
     }
 
     return datastore[key][attr];
 }
+
+/**
+ * Simple copy of an object
+ *
+ * @param obj
+ * @returns {any|({}&U)}
+ */
+function copy<T>(obj : T) : T {
+    return Object.assign({}, obj);
+}
+
+export {
+    loopObj,
+    objectToArray,
+    getDatastoreAttr,
+    copy,
+};
