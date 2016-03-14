@@ -1,0 +1,6 @@
+.idea
+.vagrant
+node_modules
+public/app
+public/data
+typings
