@@ -22,7 +22,7 @@ TODO
 - [ ] Tests
 - [ ] Linting
 - [ ] Automation & Packaging & JS mapping
-- [ ] Data Objects
+- [x] Data Objects
 - [ ] About Page
 - [ ] Readme
 - [ ] Git (again)
