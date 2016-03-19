@@ -18,9 +18,9 @@ TODO
 
 - [x] Initial Refactor
 - [x] Git
-- [ ] Interfaces & Comment
+- [x] Interfaces & Comment
+- [x] Linting
 - [ ] Tests
-- [ ] Linting
 - [ ] Automation & Packaging & JS mapping
 - [x] Data Objects
 - [ ] About Page

@@ -2,13 +2,41 @@ import {loopObj, getDatastoreAttr, copy} from './utils';
 
 declare const moment;
 
-function generateMatches(matches, teams, venues) {
+/**
+ * Parses provided matches and adds calculated attributes using matches, team and venues data.
+ *
+ * @param matches
+ * @param teams
+ * @param venues
+ * @returns {IMatches}
+ */
+function generateMatches(matches : IMatches, teams : ITeams, venues : IVenues) : IMatches {
     const _matches = copy(matches);
 
     return _addAttrs(_matches, teams, venues);
 }
 
-function _addAttrs(matches, teams, venues) {
+/**
+ * Adds calculated attributes
+ *
+ * Attributes:
+ * - h_home: Full name of the home team
+ * - h_away: Full name of the away team
+ * - h_venue: Full name of the venue
+ * - venue_moment: Moment (momentjs) of match start time in the venues local time
+ * - local_moment: Moment (momentjs) of match start time in the users local time
+ * - local_datetime: String datetime of match start time
+ * - h_date: Date of the match
+ * - h_venue_time: Human readable match start time in the venue local time
+ * - h_local_time: Human readable match start time in the users local time
+ *
+ * @param matches
+ * @param teams
+ * @param venues
+ * @returns {IMatches}
+ * @private
+ */
+function _addAttrs(matches : IMatches, teams : ITeams, venues : IVenues) : IMatches {
     return loopMatches(matches, (match) => {
         match.h_home = getDatastoreAttr(teams, match.home, 'fullName');
         match.h_away = getDatastoreAttr(teams, match.away, 'fullName');
@@ -37,7 +65,7 @@ function _addAttrs(matches, teams, venues) {
  * @param callback
  * @returns {IBasicObj}
  */
-function loopMatches(data : IMatches, callback : Function) {
+function loopMatches(data : IMatches, callback : Function) : IMatches {
     return loopObj(data, (round) => {
         round.forEach((match) => {
             callback(match);
@@ -45,4 +73,7 @@ function loopMatches(data : IMatches, callback : Function) {
     });
 }
 
-export {generateMatches, loopMatches};
+export {
+    generateMatches,
+    loopMatches,
+};

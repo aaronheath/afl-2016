@@ -1,12 +1,12 @@
 import {Component, OnInit} from 'angular2/core';
 
 import {StatsService} from '../../services/stats';
-import {ArrayObjSortPipe} from '../../pipes/array-obj-sort';
+import {SortMatches} from '../../pipes/sort-matches';
 
 @Component({
     selector: 'list-matches',
     directives: [],
-    pipes: [ArrayObjSortPipe],
+    pipes: [SortMatches],
     inputs: ['matches'],
     template: `
     <table class="ui celled table">
@@ -28,7 +28,7 @@ import {ArrayObjSortPipe} from '../../pipes/array-obj-sort';
             </tr>
         </thead>
         <tbody *ngIf="matches">
-            <tr *ngFor="#match of matches | arrayObjSort">
+            <tr *ngFor="#match of matches | sortMatches">
                 <td>{{ match.h_date }}</td>
                 <td [class.positive]="match.result === match.home">{{ match.h_home }}</td>
                 <td>{{ match.homeGoals }}</td>
@@ -49,7 +49,7 @@ import {ArrayObjSortPipe} from '../../pipes/array-obj-sort';
 })
 
 export class ListMatchesComponent implements OnInit {
-    matches;
+    matches : IMatch[];
 
     constructor() {}
 

@@ -1,12 +1,19 @@
 import {loopObj, objectToArray, getDatastoreAttr, copy} from './utils';
 import {loopMatches} from './matches';
 
-function generateLadder(teams, matches) {
+/**
+ * Generates the Ladder.
+ *
+ * @param teams
+ * @param matches
+ * @returns {any}
+ */
+function generateLadder(teams : ITeams, matches : IMatches) : ILadderTeam[] {
     const _matches = copy(matches);
 
     const ladderObj = _initLadder(teams);
 
-    if(!ladderObj) {
+    if(!Object.keys(teams).length) {
         return [];
     }
 
@@ -19,29 +26,43 @@ function generateLadder(teams, matches) {
     return _sortLadder(ladder);
 }
 
-function _initLadder(teams) {
-    if(!Object.keys(teams).length) {
-        return false;
-    }
+/**
+ * Seed the ladderObj variable that will be used later
+ *
+ * @param teams
+ * @returns {ILadderTeamObj}
+ * @private
+ */
+function _initLadder(teams : ITeams) : ILadderTeamObj {
+    const response : ILadderTeamObj = {};
 
-    const response = {};
+    if(!Object.keys(teams).length) {
+        return response;
+    }
 
     loopObj(teams, (data, key) => {
         response[key] = {
-            wins: 0,
-            losses: 0,
-            draws: 0,
-            goalsFor: 0,
-            behindsFor: 0,
-            goalsAgainst: 0,
             behindsAgainst: 0,
+            behindsFor: 0,
+            draws: 0,
+            goalsAgainst: 0,
+            goalsFor: 0,
+            losses: 0,
+            wins: 0,
         };
     });
 
     return response;
 }
 
-function _parseMatches(ladderObj, matches) {
+/**
+ * Loops through matches and updates ladderObj depending of match results
+ *
+ * @param ladderObj
+ * @param matches
+ * @private
+ */
+function _parseMatches(ladderObj : ILadderTeamObj, matches : IMatches) : void {
     loopMatches(matches, (match) => {
         if(typeof match.result === 'undefined') {
             return;
@@ -72,7 +93,23 @@ function _parseMatches(ladderObj, matches) {
     });
 }
 
-function _parseLadder(ladderObj, teams) {
+/**
+ * Loops through ladderObj and adds calculated attributes using data provided by _parseMatches.
+ *
+ * Attributes:
+ * - h_name: Teams full name
+ * - played: Matches played
+ * - pointsFor: Points scored by team
+ * - pointsAgainst: Points score against team
+ * - percentage: Percentage used during ladder ordering
+ *   - for / against * 100
+ * - points: Points obtained by team
+ *
+ * @param ladderObj
+ * @param teams
+ * @private
+ */
+function _parseLadder(ladderObj : ILadderTeamObj, teams : ITeams) : void {
     loopObj(ladderObj, (data, team) => {
         ladderObj[team].h_name = getDatastoreAttr(teams, team, 'fullName');
 
@@ -88,7 +125,23 @@ function _parseLadder(ladderObj, teams) {
     });
 }
 
-function _sortLadder(ladder) {
+/**
+ * Sorts ladder
+ *
+ * Teams are ranked by the AFL using the following criteria:
+ *
+ * 1. Most match result points
+ * 2. Highest percentage
+ * 3. Points scored
+ *
+ * If those are both equal (typically when teams are yet to play a game), we'll also sort by the teams full name in
+ * ascending order.
+ *
+ * @param ladder
+ * @returns {ILadderTeam[]}
+ * @private
+ */
+function _sortLadder(ladder : ILadderTeam[]) : ILadderTeam[] {
     ladder.sort((a, b) => {
         let compare;
 

@@ -17,8 +17,8 @@ import {ListMatchesComponent} from '../list-matches/list-matches';
 })
 
 export class PageRoundComponent implements OnInit {
-    matches;
-    roundNumber;
+    matches : IMatch[];
+    roundNumber : number;
 
     constructor(
         private _routeParams: RouteParams,
@@ -27,7 +27,8 @@ export class PageRoundComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.roundNumber = this._routeParams.get('roundNumber');
+        const roundNumber = this._routeParams.get('roundNumber');
+        this.roundNumber = parseInt(roundNumber, 10);
 
         this.matches = this._statsService.getMatchesByRound(this.roundNumber);
 
@@ -36,7 +37,12 @@ export class PageRoundComponent implements OnInit {
         });
     }
 
-    getMatches() {
+    /**
+     * Returns matches
+     *
+     * @returns {any}
+     */
+    getMatches() : IMatch[] {
         return this.matches;
     }
 }

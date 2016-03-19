@@ -2,9 +2,9 @@ import {Injectable} from 'angular2/core';
 import {Http} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
 import {Subscriber} from 'rxjs/Subscriber';
-import {map} from 'rxjs/operator/map';
-import {share} from 'rxjs/operator/share';
-import {loopMatches} from '../helpers/matches'
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/share';
+import {loopMatches} from '../helpers/matches';
 
 @Injectable()
 export class MatchesService {
@@ -16,7 +16,7 @@ export class MatchesService {
         this._dataStore = { matches: {} };
 
         this.observable$ = new Observable((observer) => {
-            this._observer = observer
+            this._observer = observer;
         }).share();
 
         this.load();
@@ -32,7 +32,7 @@ export class MatchesService {
             this._dataStore.matches = this._calculateAttrs(data);
             this._observer.next(this._dataStore.matches);
         }, (error) => {
-            console.error('Could not load matches.', error)
+            console.error('Could not load matches.', error);
         });
     }
 
@@ -70,7 +70,7 @@ export class MatchesService {
     }
 
     /**
-     * Fetches matches in datastore
+     * Returns matches in datastore
      *
      * @returns {IMatches}
      */

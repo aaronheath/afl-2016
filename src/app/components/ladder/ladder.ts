@@ -51,12 +51,11 @@ import {StatsService} from '../../services/stats';
 })
 
 export class LadderComponent implements OnInit {
-    ladder;
+    ladder : ILadderTeam[];
 
     constructor(
         private _statsService: StatsService
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         this.ladder = this._statsService.getLadder();

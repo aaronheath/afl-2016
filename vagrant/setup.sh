@@ -39,3 +39,7 @@ cp /vagrant/vagrant/apache-site-config.conf /etc/apache2/sites-available/default
 sudo a2enmod rewrite
 service apache2 restart
 exit
+
+# NPM
+cd /vagrant
+npm set progress=false
