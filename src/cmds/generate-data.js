@@ -1,7 +1,7 @@
 const fs = require('fs');
-const matches = require('./matches');
-const teams = require('./teams');
-const venues = require('./venues');
+const matches = require('./data/matches');
+const teams = require('./data/teams');
+const venues = require('./data/venues');
 
 const outputs = [
     {

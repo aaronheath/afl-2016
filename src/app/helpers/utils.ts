@@ -13,7 +13,7 @@ function loopObj(data : IBasicObj, callback : Function) : IBasicObj {
             continue;
         }
 
-        callback(_data[key], key);
+        _data[key] = callback(_data[key], key);
     }
 
     return _data;

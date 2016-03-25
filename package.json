@@ -1,23 +1,21 @@
 {
   "name": "afl-2016",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "scripts": {
     "start": "concurrently \"npm run tsc\" \"npm run templates\" \"npm run data\" ",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "lite": "lite-server",
     "typings": "typings",
-    "postinstall": "typings install",
-    "templates": "rsync -a --prune-empty-dirs --include '*/' --include '*.html' --exclude '*' src/app/ public/app/",
-    "data": "node src/data/main.js",
-    "lint": "tslint src/app/**/*.ts"
+    "templates": "node src/cmds/templates.js",
+    "data": "node src/cmds/generate-data.js",
+    "lint": "tslint src/app/**/*.ts",
+    "test": "",
+    "watch": "node src/cmds/watch.js"
   },
-  "license": "ISC",
   "dependencies": {
     "angular2": "2.0.0-beta.9",
     "systemjs": "0.19.24",
     "semantic-ui": "^2.1.8",
-    "lodash": "^4.6.1",
     "es6-promise": "^3.0.2",
     "es6-shim": "^0.33.3",
     "reflect-metadata": "0.1.2",
@@ -25,10 +23,19 @@
     "zone.js": "^0.5.15"
   },
   "devDependencies": {
+    "babel-es6-polyfill": "^1.0.1",
+    "colors": "^1.1.2",
     "concurrently": "^2.0.0",
-    "lite-server": "^2.1.0",
+    "fs-extra": "^0",
+    "tslint": "^3.6.0",
     "typescript": "^1.8.9",
     "typings": "^0.7.9",
-    "tslint": "^3.6.0"
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.19",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-jasmine": "^0.3.7",
+    "karma-jasmine-diff-reporter": "^0.3.4",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "phantomjs-prebuilt": "^2.1.3"
   }
 }

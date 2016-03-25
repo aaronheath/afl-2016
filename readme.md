@@ -20,9 +20,9 @@ TODO
 - [x] Git
 - [x] Interfaces & Comment
 - [x] Linting
-- [ ] Tests
-- [ ] Automation & Packaging & JS mapping
 - [x] Data Objects
+- [ ] Automation & Packaging & JS mapping
+- [ ] Tests
 - [ ] About Page
 - [ ] Readme
 - [ ] Git (again)
