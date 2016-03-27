@@ -110,6 +110,10 @@ export class StatsService {
 
         this._dataStore.teams = this._tempDataStore.teams;
 
+        if(!Object.keys(this._tempDataStore.matches).length) {
+            return;
+        }
+
         this._dataStore.matches = generateMatches(
             this._tempDataStore.matches,
             this._dataStore.teams,

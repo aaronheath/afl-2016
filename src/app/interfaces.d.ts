@@ -134,6 +134,10 @@ declare type IDataLoaders =
     | ITeams
     | IVenues;
 
+interface IReadmeDataStore {
+    readme: string;
+}
+
 /**
  * Helpers
  */

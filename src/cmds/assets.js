@@ -6,7 +6,10 @@ const colors = require('colors');
 const appSrcDir = __dirname + '/../app/';
 const publicDataDir = __dirname + '/../../public/app/';
 
+const assetsTest = /.+\.htm(l)?$/;
+
 startLoop();
+handleOthers();
 
 function startLoop(pathToAppend) {
     pathToAppend = !pathToAppend ? '' : pathToAppend;
@@ -51,7 +54,7 @@ function startLoop(pathToAppend) {
 
     function copy(_append) {
         fs.copy(`${appSrcDir}${_append}`, `${publicDataDir}${_append}`, {
-            filter: /.+\.htm(l)?$/,
+            filter: assetsTest,
             clobber: true,
         }, (err) => {
             if(err) {
@@ -59,9 +62,18 @@ function startLoop(pathToAppend) {
                 return;
             }
 
-            console.log('Template file copy successful'.green, _append);
+            if(_append.match(assetsTest)) {
+                console.log('Template file copy successful'.green, _append);
+            }
         });
     }
 }
 
-
+function handleOthers() {
+    console.log('dirname', __dirname);
+    fs.copy(__dirname + '/../../readme.md', __dirname + '/../../public/data/readme.md', (err) => {
+        if(err) {
+            console.error('Unable to copy readme'.red, err);
+        }
+    });
+}

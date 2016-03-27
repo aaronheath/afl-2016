@@ -6,11 +6,13 @@ import {MatchesService} from '../../services/matches';
 import {TeamsService} from '../../services/teams';
 import {VenuesService} from '../../services/venues';
 import {StatsService} from '../../services/stats';
+import {ReadmeService} from '../../services/readme';
 
 import {ListMatchesComponent} from '../list-matches/list-matches';
 import {PageLadderComponent} from '../page-ladder/page-ladder';
 import {PageRoundComponent} from '../page-round/page-round';
 import {LadderComponent} from '../ladder/ladder';
+import {PageReadmeComponent} from '../page-readme/page-readme';
 
 import {SortMatches} from '../../pipes/sort-matches';
 import {OnInit} from "angular2/core";
@@ -28,6 +30,7 @@ declare const $;
         TeamsService,
         VenuesService,
         StatsService,
+        ReadmeService,
         SortMatches,
     ],
     styles: [`
@@ -38,16 +41,20 @@ declare const $;
     template: `
         <div id="header" class="ui fixed menu inverted">
             <div class="ui container">
-                <a class="header item">AFL 2016</a>
+                <a href="{{ getPathToRoute('Ladder') }}"  class="header item" (click)="goToRoute($event, 'Ladder')">
+                    AFL 2016
+                </a>
 
-                <a class="item">Dashboard</a>
+                <!--<a class="item">Dashboard</a>-->
+
+                <a href="{{ getPathToRoute('Ladder') }}" class="item" (click)="goToRoute($event, 'Ladder')">Ladder</a>
 
                 <div id="popup-rounds-trigger" class="item dropdown">
                     Round
                     <i class="dropdown icon"></i>
                 </div>
 
-                <a href="{{ getPathToRoute('Ladder') }}" class="item" (click)="goToRoute($event, 'Ladder')">Ladder</a>
+                <a href="{{ getPathToRoute('Readme') }}" class="item" (click)="goToRoute($event, 'Readme')">Readme</a>
 
                 <div class="right menu"><!-- --></div>
             </div>
@@ -95,12 +102,17 @@ declare const $;
         path: '/round/:roundNumber',
         name: 'Round',
         component: PageRoundComponent,
-        useAsDefault: true,
     },
     {
         path: '/ladder',
         name: 'Ladder',
         component: PageLadderComponent,
+        useAsDefault: true,
+    },
+    {
+        path: '/readme',
+        name: 'Readme',
+        component: PageReadmeComponent,
     }
 ])
 export class AppComponent implements OnInit, OnChanges {

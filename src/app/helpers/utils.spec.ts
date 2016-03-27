@@ -1,4 +1,4 @@
-import {loopObj, objectToArray, getDatastoreAttr, copy, applyMixins} from './utils';
+import {loopObj} from './utils';
 
 describe('Utils.loopObj', function() {
     beforeEach(() => {

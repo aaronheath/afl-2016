@@ -15,26 +15,26 @@
         }
     </style>
 
-    <!-- 1. Load libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
-    <script src="semantic/semantic.min.js"></script>
+    <!-- Generic Libraries -->
+    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="/semantic/semantic.min.js"></script>
+    <script src="/node_modules/moment/min/moment.min.js"></script>
+    <script src="/node_modules/moment-timezone/builds/moment-timezone-with-data-2010-2020.min.js"></script>
 
-    <!-- IE required polyfills, in this exact order -->
-    <script src="node_modules/es6-shim/es6-shim.min.js"></script>
-    <script src="node_modules/systemjs/dist/system-polyfills.js"></script>
-    <script src="node_modules/angular2/es6/dev/src/testing/shims_for_IE.js"></script>
+    <!-- Polyfills -->
+    <script src="/node_modules/es6-shim/es6-shim.min.js"></script>
+    <script src="/node_modules/systemjs/dist/system-polyfills.js"></script>
+    <script src="/node_modules/angular2/es6/dev/src/testing/shims_for_IE.js"></script>
+    <script src="/node_modules/angular2/bundles/angular2-polyfills.js"></script>
+    <script src="/node_modules/systemjs/dist/system.src.js"></script>
+    <script src="/node_modules/rxjs/bundles/Rx.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.1/moment-timezone-with-data-2010-2020.min.js"></script>
+    <!-- Angular -->
+    <script src="/node_modules/angular2/bundles/angular2.dev.js"></script>
+    <script src="/node_modules/angular2/bundles/router.dev.js"></script>
+    <script src="/node_modules/angular2/bundles/http.dev.js"></script>
 
-    <script src="node_modules/angular2/bundles/angular2-polyfills.js"></script>
-    <script src="node_modules/systemjs/dist/system.src.js"></script>
-    <script src="node_modules/rxjs/bundles/Rx.js"></script>
-    <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
-    <script src="node_modules/angular2/bundles/router.dev.js"></script>
-    <script src="node_modules/angular2/bundles/http.dev.js"></script>
-
-    <!-- 2. Configure SystemJS -->
+    <!-- Configure SystemJS -->
     <script>
         System.config({
             packages: {
@@ -42,19 +42,17 @@
                     format: 'register',
                     defaultExtension: 'js'
                 }
+            },
+            paths: {
+                'marked': 'node_modules/marked/lib/marked.js',
             }
         });
-        System.import('/app/main')
-                .then(null, console.error.bind(console));
-    </script>
 
-    <!--<script src="semantic/semantic.min.js"></script>-->
+        System.import('/app/main').then(null, console.error.bind(console));
+    </script>
 </head>
 
-<!-- 3. Display the application -->
 <body>
-
-<my-app>Loading...</my-app>
-
+    <my-app>Loading...</my-app>
 </body>
 </html>

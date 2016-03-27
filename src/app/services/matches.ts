@@ -66,6 +66,8 @@ export class MatchesService {
                     match.result = 'DRAW';
                 }
             }
+
+            return match;
         });
     }
 

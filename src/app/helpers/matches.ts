@@ -55,6 +55,8 @@ function _addAttrs(matches : IMatches, teams : ITeams, venues : IVenues) : IMatc
         match.h_date = match.venue_moment.format('ddd D MMM');
         match.h_venue_time = match.venue_moment.format('HH:mm');
         match.h_local_time = match.local_moment.format('HH:mm');
+
+        return match;
     });
 }
 
@@ -67,8 +69,8 @@ function _addAttrs(matches : IMatches, teams : ITeams, venues : IVenues) : IMatc
  */
 function loopMatches(data : IMatches, callback : Function) : IMatches {
     return loopObj(data, (round) => {
-        round.forEach((match) => {
-            callback(match);
+        return round.map((match, i) => {
+            return callback(match);
         });
     });
 }
