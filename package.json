@@ -8,7 +8,7 @@
   "description": "An example Angular 2 app to track the 2016 AFL Season.",
   "scripts": {
     "start": "npm run typings-install ; npm run tsc ; npm run assets ; npm run data",
-    "test": "nodejs src/cmds/tests.js",
+    "test": "node src/cmds/tests.js",
     "tsc": "tsc",
     "typings": "typings",
     "assets": "node src/cmds/assets.js",
