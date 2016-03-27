@@ -70,10 +70,11 @@ function startLoop(pathToAppend) {
 }
 
 function handleOthers() {
-    console.log('dirname', __dirname);
-    fs.copy(__dirname + '/../../readme.md', __dirname + '/../../public/data/readme.md', (err) => {
+    fs.copy(__dirname + '/../../README.md', __dirname + '/../../public/data/README.md', (err) => {
         if(err) {
             console.error('Unable to copy readme'.red, err);
         }
+
+        console.log('README.MD copied'.green);
     });
 }

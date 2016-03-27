@@ -26,7 +26,7 @@ export class ReadmeService {
      * Fetch readme.md and calls next on observer
      */
     load() {
-        let observable = this._http.get('/data/readme.md')
+        let observable = this._http.get('/data/README.md')
             .map(response => response.text());
 
         observable.subscribe(data => {
