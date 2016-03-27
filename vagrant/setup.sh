@@ -42,4 +42,4 @@ exit
 
 # NPM
 cd /vagrant
-npm set progress=false
+sudo npm set progress=false

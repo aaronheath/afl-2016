@@ -8,7 +8,7 @@ Alpha (as of 27/3/2016)
 
 ## Why?
 
-As with a lot of developers in the Angular family at the moment, we're developing little apps with the intention of playing with the new toy that is Angular 2. I've taken this opportunity to play with a number of technologies I don't necessarily play with during my day to day development. Top of this list is of cause Angular 2.0 but this project is also using [systemjs](https://github.com/systemjs/systemjs) and [RxJS](http://reactivex.io/rxjs/).
+As with a lot of developers in the Angular family at the moment, we're developing little apps with the intention of playing with the new toy that is Angular 2. I've taken this opportunity to play with a number of technologies I don't necessarily play with during my day to day development. Top of this list is of cause Angular 2.0 but this project is also using [Semantic UI](http://semantic-ui.com/), [systemjs](https://github.com/systemjs/systemjs) and [RxJS](http://reactivex.io/rxjs/).
 
 ## Instructions
 
@@ -84,7 +84,7 @@ This is not a complete project. Here's my (very) rough TODO's.
 - ~~Testing Framework~~
 - ~~Initial Readme Page~~
 - ~~Initial Readme~~
-- Github repo
+- ~~Github repo~~
 - Remote testing framework (travis-ci)
 - Deploy
 - Many more tests

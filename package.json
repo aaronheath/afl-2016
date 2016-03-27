@@ -1,8 +1,13 @@
 {
   "name": "afl-2016",
   "version": "0.0.1",
+  "contributors": [
+    "Aaron Heath <aaron@aaronheath.com>"
+  ],
+  "license": "MIT",
+  "description": "An example Angular 2 app to track the 2016 AFL Season.",
   "scripts": {
-    "start": "npm run tsc ; npm run assets ; npm run data",
+    "start": "npm run typings-install ; npm run tsc ; npm run assets ; npm run data",
     "test": "npm run tsc ; npm run tests-only ; npm run lint",
     "tsc": "tsc",
     "typings": "typings",
@@ -12,7 +17,8 @@
     "tests-only": "node_modules/karma/bin/karma start",
     "dev-tests": "node src/cmds/watch-tests.js",
     "dev": "node src/cmds/watch-dev.js",
-    "postinstall": "npm start"
+    "postinstall": "npm start",
+    "typings-install": "./node_modules/.bin/typings install"
   },
   "dependencies": {
     "angular2": "2.0.0-beta.9",
