@@ -2,11 +2,15 @@ import {Component, OnInit} from 'angular2/core';
 
 import {StatsService} from '../../services/stats';
 import {SortMatches} from '../../pipes/sort-matches';
+import {FormatNumber} from '../../pipes/format-number';
 
 @Component({
     selector: 'list-matches',
     directives: [],
-    pipes: [SortMatches],
+    pipes: [
+        SortMatches,
+        FormatNumber,
+    ],
     inputs: ['matches'],
     template: `
     <table class="ui celled table">
@@ -41,7 +45,7 @@ import {SortMatches} from '../../pipes/sort-matches';
                 <td>{{ match.h_venue }}</td>
                 <td>{{ match.h_venue_time }}</td>
                 <td>{{ match.h_local_time }}</td>
-                <td>{{ match.attendance }}</td>
+                <td>{{ match.attendance | formatNumber }}</td>
             </tr>
         </tbody>
     </table>

@@ -4,6 +4,7 @@
     "jasmine": "github:DefinitelyTyped/DefinitelyTyped/jasmine/jasmine.d.ts#bc92442c075929849ec41d28ab618892ba493504",
     "moment": "github:DefinitelyTyped/DefinitelyTyped/moment/moment.d.ts#ce8ae773688d2244ba11fdf3378fcd68f773e1c4",
     "moment-timezone": "github:DefinitelyTyped/DefinitelyTyped/moment-timezone/moment-timezone.d.ts#ce8ae773688d2244ba11fdf3378fcd68f773e1c4",
-    "marked": "github:DefinitelyTyped/DefinitelyTyped/marked/marked.d.ts#a44529fcb1e1cdc0355e71c42a6048de99b57c34"
+    "marked": "github:DefinitelyTyped/DefinitelyTyped/marked/marked.d.ts#a44529fcb1e1cdc0355e71c42a6048de99b57c34",
+    "numeraljs": "github:DefinitelyTyped/DefinitelyTyped/numeraljs/numeraljs.d.ts#a44529fcb1e1cdc0355e71c42a6048de99b57c34"
   }
 }

@@ -1,4 +1,4 @@
-import {Component} from 'angular2/core';
+import {Component, OnInit, OnChanges} from 'angular2/core';
 import {Router, RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router';
 import {HTTP_PROVIDERS} from 'angular2/http';
 
@@ -15,23 +15,27 @@ import {LadderComponent} from '../ladder/ladder';
 import {PageReadmeComponent} from '../page-readme/page-readme';
 
 import {SortMatches} from '../../pipes/sort-matches';
-import {OnInit} from "angular2/core";
-import {OnChanges} from "angular2/core";
+import {FormatNumber} from '../../pipes/format-number';
 
 declare const $;
 
 @Component({
     selector: 'my-app',
-    directives: [ROUTER_DIRECTIVES],
+    directives: [
+        ROUTER_DIRECTIVES,
+    ],
     providers: [
         ROUTER_PROVIDERS,
         HTTP_PROVIDERS,
+        // Services
         MatchesService,
         TeamsService,
         VenuesService,
         StatsService,
         ReadmeService,
+        // Pipes
         SortMatches,
+        FormatNumber,
     ],
     styles: [`
         #popup-rounds .ui.link.list {
