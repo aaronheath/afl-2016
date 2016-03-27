@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/aaronheath/afl-2016.svg?branch=master)](https://travis-ci.org/aaronheath/afl-2016) 
+
 # AFL Season 2016 Tracker
 
 An example [Angular 2](https://angular.io/) app to track the 2016 [AFL](http://afl.com.au) Season.

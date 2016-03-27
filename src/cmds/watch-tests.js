@@ -78,7 +78,7 @@ function lint() {
 function test() {
     console.log('Starting tests'.green);
 
-    shell.exec('npm run tests-only', {async: true}, (code, stdout, stderr) => {
+    shell.exec('npm run karma', {async: true}, (code, stdout, stderr) => {
         if(code === 0) {
             console.log(`Tested successfully`.green);
         } else {
