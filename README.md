@@ -87,7 +87,7 @@ This is not a complete project. Here's my (very) rough TODO's.
 - ~~Initial Readme Page~~
 - ~~Initial Readme~~
 - ~~Github repo~~
-- Remote testing framework (travis-ci)
+- ~~Remote testing framework (travis-ci)~~
 - Deploy
 - Many more tests
 - UI Improvements
