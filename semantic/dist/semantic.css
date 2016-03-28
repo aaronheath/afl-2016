@@ -22012,7 +22012,7 @@ Floated Menu / Item
 /* Positive */
 
 .ui.positive.message {
-  background-color: #FCFFF5;
+  background-color: #EFFBD3;
   color: #2C662D;
 }
 
@@ -22092,7 +22092,7 @@ Floated Menu / Item
 /* Success */
 
 .ui.success.message {
-  background-color: #FCFFF5;
+  background-color: #EFFBD3;
   color: #2C662D;
 }
 
@@ -22571,7 +22571,7 @@ Floated Menu / Item
 
 .ui.table tr.positive,
 .ui.table td.positive {
-  background: #FCFFF5 !important;
+  background: #EFFBD3 !important;
   color: #2C662D !important;
 }
 
@@ -22814,7 +22814,7 @@ Floated Menu / Item
 .ui.selectable.table tr.positive:hover,
 .ui.table tr td.selectable.positive:hover,
 .ui.selectable.table tr:hover td.positive {
-  background: #f7ffe6 !important;
+  background: #eafac5 !important;
   color: #275b28 !important;
 }
 

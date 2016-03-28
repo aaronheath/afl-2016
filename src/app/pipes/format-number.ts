@@ -7,7 +7,7 @@ export class FormatNumber implements PipeTransform {
         if(typeof value === 'undefined') {
             return;
         }
-        
+
         return numeral(value).format('0,0');
     }
 }
