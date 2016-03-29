@@ -28,6 +28,7 @@
     "marked": "^0.3.5",
     "moment": "^2.12.0",
     "moment-timezone": "^0.5.3",
+    "numeral": "^1.5.3",
     "reflect-metadata": "0.1.2",
     "rxjs": "5.0.0-beta.2",
     "semantic-ui": "^2.1.8",

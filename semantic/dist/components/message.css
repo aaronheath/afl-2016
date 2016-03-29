@@ -270,7 +270,7 @@
 
 /* Positive */
 .ui.positive.message {
-  background-color: #FCFFF5;
+  background-color: #EFFBD3;
   color: #2C662D;
 }
 .ui.positive.message,
@@ -335,7 +335,7 @@
 
 /* Success */
 .ui.success.message {
-  background-color: #FCFFF5;
+  background-color: #EFFBD3;
   color: #2C662D;
 }
 .ui.success.message,

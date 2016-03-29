@@ -1,4 +1,4 @@
-import {Component} from 'angular2/core';
+import {Component, OnInit, OnChanges} from 'angular2/core';
 import {Router, RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router';
 import {HTTP_PROVIDERS} from 'angular2/http';
 
@@ -7,35 +7,50 @@ import {TeamsService} from '../../services/teams';
 import {VenuesService} from '../../services/venues';
 import {StatsService} from '../../services/stats';
 import {ReadmeService} from '../../services/readme';
+import {TimeService} from '../../services/time';
 
 import {ListMatchesComponent} from '../list-matches/list-matches';
 import {PageLadderComponent} from '../page-ladder/page-ladder';
 import {PageRoundComponent} from '../page-round/page-round';
 import {LadderComponent} from '../ladder/ladder';
 import {PageReadmeComponent} from '../page-readme/page-readme';
+import {FooterComponent} from '../footer/footer';
 
 import {SortMatches} from '../../pipes/sort-matches';
-import {OnInit} from "angular2/core";
-import {OnChanges} from "angular2/core";
+import {FormatNumber} from '../../pipes/format-number';
+import {FormatPercentage} from '../../pipes/format-percentage';
 
 declare const $;
 
 @Component({
     selector: 'my-app',
-    directives: [ROUTER_DIRECTIVES],
+    directives: [
+        ROUTER_DIRECTIVES,
+        FooterComponent,
+    ],
     providers: [
         ROUTER_PROVIDERS,
         HTTP_PROVIDERS,
+        // Services
         MatchesService,
         TeamsService,
         VenuesService,
         StatsService,
         ReadmeService,
+        TimeService,
+        // Pipes
         SortMatches,
+        FormatNumber,
+        FormatPercentage,
     ],
     styles: [`
         #popup-rounds .ui.link.list {
             white-space: nowrap;
+        }
+
+        .ui.main.container {
+            margin-top: 6em;
+            margin-bottom: 4em;
         }
     `],
     template: `
@@ -94,6 +109,8 @@ declare const $;
         <div class="ui main container">
             <router-outlet></router-outlet>
         </div>
+
+        <site-footer></site-footer>
     `,
 })
 
@@ -120,7 +137,8 @@ export class AppComponent implements OnInit, OnChanges {
 
     constructor(
         private _router : Router,
-        private _statsService: StatsService
+        private _statsService: StatsService,
+        private _timeService: TimeService
     ) {}
 
     ngOnInit() {
