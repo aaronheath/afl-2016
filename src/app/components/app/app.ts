@@ -18,6 +18,7 @@ import {FooterComponent} from '../footer/footer';
 
 import {SortMatches} from '../../pipes/sort-matches';
 import {FormatNumber} from '../../pipes/format-number';
+import {FormatPercentage} from '../../pipes/format-percentage';
 
 declare const $;
 
@@ -40,6 +41,7 @@ declare const $;
         // Pipes
         SortMatches,
         FormatNumber,
+        FormatPercentage,
     ],
     styles: [`
         #popup-rounds .ui.link.list {
