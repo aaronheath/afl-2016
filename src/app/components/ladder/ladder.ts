@@ -1,11 +1,15 @@
 import {Component, OnInit} from 'angular2/core';
 
 import {StatsService} from '../../services/stats';
+import {FormatPercentage} from '../../pipes/format-percentage';
 
 @Component({
     selector: 'ladder',
     directives: [],
     inputs: [],
+    pipes: [
+        FormatPercentage
+    ],
     template: `
         <table class="ui celled table structured">
             <thead>
@@ -42,7 +46,7 @@ import {StatsService} from '../../services/stats';
                     <td>{{ team.goalsAgainst }}</td>
                     <td>{{ team.behindsAgainst }}</td>
                     <td>{{ team.pointsAgainst }}</td>
-                    <td><strong>{{ team.percentage }}</strong></td>
+                    <td><strong>{{ team.percentage | formatPercentage }}</strong></td>
                     <td><strong>{{ team.points }}</strong></td>
                 </tr>
             </tbody>

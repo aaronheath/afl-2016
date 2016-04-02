@@ -10,10 +10,10 @@ declare const moment;
  * @param venues
  * @returns {IMatches}
  */
-function generateMatches(matches : IMatches, teams : ITeams, venues : IVenues) : IMatches {
+function generateMatches(matches : IMatches, teams : ITeams, venues : IVenues, timezone : ITimezone) : IMatches {
     const _matches = copy(matches);
 
-    return _addAttrs(_matches, teams, venues);
+    return _addAttrs(_matches, teams, venues, timezone);
 }
 
 /**
@@ -36,7 +36,7 @@ function generateMatches(matches : IMatches, teams : ITeams, venues : IVenues) :
  * @returns {IMatches}
  * @private
  */
-function _addAttrs(matches : IMatches, teams : ITeams, venues : IVenues) : IMatches {
+function _addAttrs(matches : IMatches, teams : ITeams, venues : IVenues, timezone : ITimezone) : IMatches {
     return loopMatches(matches, (match) => {
         match.h_home = getDatastoreAttr(teams, match.home, 'fullName');
         match.h_away = getDatastoreAttr(teams, match.away, 'fullName');
@@ -49,7 +49,7 @@ function _addAttrs(matches : IMatches, teams : ITeams, venues : IVenues) : IMatc
             getDatastoreAttr(venues, match.venue, 'timezone')
         );
 
-        match.local_moment = match.venue_moment.clone().tz('Australia/Adelaide');
+        match.local_moment = match.venue_moment.clone().tz(timezone);
         match.local_datetime = match.local_moment.format('YYYY-MM-DD HH:mm:ss');
 
         match.h_date = match.venue_moment.format('ddd D MMM');

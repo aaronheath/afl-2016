@@ -11,6 +11,7 @@ declare const moment;
 import {MatchesService} from './matches';
 import {TeamsService} from './teams';
 import {VenuesService} from './venues';
+import {TimeService} from './time';
 
 @Injectable()
 export class StatsService {
@@ -22,7 +23,8 @@ export class StatsService {
     constructor(
         private _matchesService: MatchesService,
         private _teamsService: TeamsService,
-        private _venuesService: VenuesService
+        private _venuesService: VenuesService,
+        private _timeService: TimeService
     ) {
         this._dataStore = {
             ladder: [],
@@ -117,7 +119,8 @@ export class StatsService {
         this._dataStore.matches = generateMatches(
             this._tempDataStore.matches,
             this._dataStore.teams,
-            this._tempDataStore.venues
+            this._tempDataStore.venues,
+            this._timeService.getTimezone()
         );
 
         this._dataStore.ladder = generateLadder(

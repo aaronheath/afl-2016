@@ -138,6 +138,8 @@ interface IReadmeDataStore {
     readme: string;
 }
 
+declare type ITimezone = string;
+
 /**
  * Helpers
  */

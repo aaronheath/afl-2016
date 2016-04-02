@@ -7,15 +7,18 @@ import {TeamsService} from '../../services/teams';
 import {VenuesService} from '../../services/venues';
 import {StatsService} from '../../services/stats';
 import {ReadmeService} from '../../services/readme';
+import {TimeService} from '../../services/time';
 
 import {ListMatchesComponent} from '../list-matches/list-matches';
 import {PageLadderComponent} from '../page-ladder/page-ladder';
 import {PageRoundComponent} from '../page-round/page-round';
 import {LadderComponent} from '../ladder/ladder';
 import {PageReadmeComponent} from '../page-readme/page-readme';
+import {FooterComponent} from '../footer/footer';
 
 import {SortMatches} from '../../pipes/sort-matches';
 import {FormatNumber} from '../../pipes/format-number';
+import {FormatPercentage} from '../../pipes/format-percentage';
 
 declare const $;
 
@@ -23,6 +26,7 @@ declare const $;
     selector: 'my-app',
     directives: [
         ROUTER_DIRECTIVES,
+        FooterComponent,
     ],
     providers: [
         ROUTER_PROVIDERS,
@@ -33,9 +37,11 @@ declare const $;
         VenuesService,
         StatsService,
         ReadmeService,
+        TimeService,
         // Pipes
         SortMatches,
         FormatNumber,
+        FormatPercentage,
     ],
     styles: [`
         #popup-rounds .ui.link.list {
@@ -43,6 +49,10 @@ declare const $;
         }
         #popup-rounds .ui.three.column {
             width: 350px;
+        }
+        .ui.main.container {
+            margin-top: 6em;
+            margin-bottom: 4em;
         }
     `],
     template: `
@@ -101,6 +111,8 @@ declare const $;
         <div class="ui main container">
             <router-outlet></router-outlet>
         </div>
+
+        <site-footer></site-footer>
     `,
 })
 
@@ -127,7 +139,8 @@ export class AppComponent implements OnInit, OnChanges {
 
     constructor(
         private _router : Router,
-        private _statsService: StatsService
+        private _statsService: StatsService,
+        private _timeService: TimeService
     ) {}
 
     ngOnInit() {
