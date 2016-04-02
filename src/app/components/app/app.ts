@@ -41,6 +41,9 @@ declare const $;
         #popup-rounds .ui.link.list {
             white-space: nowrap;
         }
+        #popup-rounds .ui.three.column {
+            width: 350px;
+        }
     `],
     template: `
         <div id="header" class="ui fixed menu inverted">
@@ -65,7 +68,7 @@ declare const $;
         </div>
 
         <div id="popup-rounds" class="ui flowing popup top left transition hidden inverted">
-            <div class="ui three column divided center aligned grid">
+            <div class="ui three column divided center aligned grid inverted">
                 <div class="column">
                     <div class="ui link list inverted">
                         <a *ngFor="#item of rounds[0]"
