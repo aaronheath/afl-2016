@@ -1,3 +1,11 @@
 /*******************************
          Site Overrides
 *******************************/
+
+.ui.inverted.menu .item.router-link-active {
+  color: @linkHoverColor !important;
+}
+
+.ui.inverted.menu .item.router-link-active.nohighlight {
+  color: @invertedItemTextColor !important;
+}

@@ -6,6 +6,9 @@
     <link rel="stylesheet" type="text/css" href="semantic/semantic.css">
 
     <style>
+        html, body {
+            height: auto;
+        }
         my-app {
             display: block;
         }
@@ -50,6 +53,10 @@
 </head>
 
 <body>
-    <my-app>Loading...</my-app>
+    <my-app>
+        <div class="ui active inverted dimmer">
+            <div class="ui text loader">Loading</div>
+        </div>
+    </my-app>
 </body>
 </html>

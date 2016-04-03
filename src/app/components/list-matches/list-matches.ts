@@ -13,7 +13,7 @@ import {FormatNumber} from '../../pipes/format-number';
     ],
     inputs: ['matches'],
     template: `
-    <table class="ui celled table">
+    <table class="ui celled table striped">
         <thead>
             <tr>
                 <th>Date</th>
