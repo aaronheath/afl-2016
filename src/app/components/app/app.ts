@@ -47,60 +47,56 @@ declare const $;
         #popup-rounds .ui.link.list {
             white-space: nowrap;
         }
-
+        #popup-rounds .ui.three.column {
+            width: 350px;
+        }
         .ui.main.container {
             margin-top: 6em;
             margin-bottom: 4em;
+            min-height: calc(100vh - 232px);
         }
     `],
     template: `
         <div id="header" class="ui fixed menu inverted">
             <div class="ui container">
-                <a href="{{ getPathToRoute('Ladder') }}"  class="header item" (click)="goToRoute($event, 'Ladder')">
-                    AFL 2016
-                </a>
+                <a [routerLink]="['Ladder']"  class="header item nohighlight">AFL 2016</a>
 
-                <!--<a class="item">Dashboard</a>-->
-
-                <a href="{{ getPathToRoute('Ladder') }}" class="item" (click)="goToRoute($event, 'Ladder')">Ladder</a>
+                <a [routerLink]="['Ladder']" class="item">Ladder</a>
 
                 <div id="popup-rounds-trigger" class="item dropdown">
                     Round
                     <i class="dropdown icon"></i>
                 </div>
 
-                <a href="{{ getPathToRoute('Readme') }}" class="item" (click)="goToRoute($event, 'Readme')">Readme</a>
+                <a [routerLink]="['Readme']" class="item">Readme</a>
 
                 <div class="right menu"><!-- --></div>
             </div>
         </div>
 
         <div id="popup-rounds" class="ui flowing popup top left transition hidden inverted">
-            <div class="ui three column divided center aligned grid">
+            <div class="ui three column divided center aligned grid inverted">
                 <div class="column">
                     <div class="ui link list inverted">
-                        <a *ngFor="#item of rounds[0]"
-                            href="{{ getPathToRound(item) }}"
-                            (click)="goToRound($event, item)"
-                            class="item">Round {{ item }}</a>
+                        <div *ngFor="#item of rounds[0]" class="item">
+                            <a [routerLink]="['Round', {roundNumber: item}]" class="inverted">Round {{ item }}</a>
+                        </div>
                     </div>
                 </div>
 
                 <div class="column">
                     <div class="ui link list inverted">
-                        <a *ngFor="#item of rounds[1]"
-                            href="{{ getPathToRound(item) }}"
-                            (click)="goToRound($event, item)"
-                            class="item">Round {{ item }}</a>
+                        <div *ngFor="#item of rounds[1]" class="item">
+                            <a [routerLink]="['Round', {roundNumber: item}]" class="inverted">Round {{ item }}</a>
+                        </div>
                     </div>
                 </div>
 
                 <div class="column">
                     <div class="ui link list inverted">
-                        <a *ngFor="#item of rounds[2]"
-                            href="{{ getPathToRound(item) }}"
-                            (click)="goToRound($event, item)"
-                            class="item">Round {{ item }}</a>
+                        <div *ngFor="#item of rounds[2]" class="item">
+                            <a [routerLink]="['Round', {roundNumber: item}]">Round {{ item }}</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -170,52 +166,5 @@ export class AppComponent implements OnInit, OnChanges {
 
     ngOnChanges() {
         $('#header .ui.dropdown').dropdown('refresh');
-    }
-
-    /**
-     * Returns path to route
-     *
-     * @param route
-     * @param params
-     * @returns {string}
-     */
-    getPathToRoute(route : string, params : IBasicObj = {}) : string {
-        const link = [route, params];
-
-        return this._router.generate(link).urlPath;
-    }
-
-    /**
-     * Returns path to specific round
-     *
-     * @param roundNumber
-     */
-    getPathToRound(roundNumber : number) : void {
-        this.getPathToRoute('Round', {roundNumber});
-    }
-
-    /**
-     * Invokes path change to route in the users browser
-     *
-     * @param e
-     * @param route
-     * @param params
-     */
-    goToRoute(e : Event, route : string, params : IBasicObj = {}) : void {
-        e.preventDefault();
-
-        const link = [route, params];
-
-        this._router.navigate(link);
-    }
-
-    /**
-     * Invokes path change in users browser to specific round
-     *
-     * @param e
-     * @param roundNumber
-     */
-    goToRound(e : Event, roundNumber : number) : void {
-        this.goToRoute(e, 'Round', {roundNumber});
     }
 }

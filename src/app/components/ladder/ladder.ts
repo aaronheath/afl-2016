@@ -11,16 +11,16 @@ import {FormatPercentage} from '../../pipes/format-percentage';
         FormatPercentage
     ],
     template: `
-        <table class="ui celled table structured">
-            <thead>
+        <table class="ui celled table structured compact striped">
+            <thead class="bottom aligned">
                 <tr>
                     <th rowspan="2">Team</th>
                     <th rowspan="2">Played</th>
                     <th rowspan="2">Won</th>
                     <th rowspan="2">Lost</th>
                     <th rowspan="2">Drawn</th>
-                    <th colspan="3">For</th>
-                    <th colspan="3">Against</th>
+                    <th colspan="3" class="center aligned">For</th>
+                    <th colspan="3" class="center aligned">Against</th>
                     <th rowspan="2">%</th>
                     <th rowspan="2">Points</th>
                 </tr>

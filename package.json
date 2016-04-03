@@ -7,7 +7,7 @@
   "license": "MIT",
   "description": "An example Angular 2 app to track the 2016 AFL Season.",
   "scripts": {
-    "start": "npm run typings-install ; npm run tsc ; npm run assets ; npm run data",
+    "start": "npm run typings-install ; npm run tsc ; npm run assets ; npm run build-ui ; npm run data",
     "test": "node src/cmds/tests.js",
     "tsc": "tsc",
     "typings": "typings",
@@ -18,7 +18,8 @@
     "dev-tests": "node src/cmds/watch-tests.js",
     "dev": "node src/cmds/watch-dev.js",
     "postinstall": "npm start",
-    "typings-install": "./node_modules/.bin/typings install"
+    "typings-install": "./node_modules/.bin/typings install",
+    "build-ui": "gulp --gulpfile semantic/gulpfile.js build"
   },
   "dependencies": {
     "angular2": "2.0.0-beta.9",

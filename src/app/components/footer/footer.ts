@@ -5,6 +5,12 @@ import {TimeService} from '../../services/time';
     selector: 'site-footer',
     directives: [],
     inputs: [],
+    styles: [`
+        .ui.vertical {
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+        }
+    `],
     template: `
         <div class="ui vertical inverted segment">
             <div class="ui container grid">

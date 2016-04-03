@@ -1,3 +1,7 @@
 /*******************************
     User Variable Overrides
 *******************************/
+
+.ui.inverted.list .item a.router-link-active:not(.ui) {
+  color: @invertedItemLinkHoverColor !important;
+}
