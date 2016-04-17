@@ -160,7 +160,9 @@ export class RoundSummaryComponent implements OnInit {
 
         const iconColor = this._iconColor(key);
 
-        return `<i class="angle double down icon ${iconColor}"></i> ${strings.join(', ')}`;
+        const direction = key === 'highestScore' ? 'up' : 'down';
+
+        return `<i class="angle double ${direction} icon ${iconColor}"></i> ${strings.join(', ')}`;
     }
 
     /**
