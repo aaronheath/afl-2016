@@ -47,8 +47,11 @@ interface IMatch {
     time: string;
     attendance?: number;
     h_home?: string;
+    h_home_abbr?: string;
     h_away?: string;
+    h_away_abbr?: string;
     h_venue?: string;
+    h_venue_abbr?: string;
     venue_moment?: Moment;
     local_moment?: Moment;
     local_datetime?: string;
@@ -114,6 +117,7 @@ interface ILadderTeam {
 
 interface IStatsDataStore {
     matches: IMatches;
+    summaries: ISummaries;
     teams: ITeams;
     venues: IVenues;
     ladder: ILadderTeam[];
@@ -140,6 +144,27 @@ interface IReadmeDataStore {
 
 declare type ITimezone = string;
 
+interface ISummaries {
+    rounds?: IRoundSummaries;
+}
+
+interface IRoundSummaries {
+    [roundNumber: number]: IRoundSummary;
+}
+
+interface IRoundSummary {
+    goals: number;
+    behinds: number;
+    totalPoints: number;
+    accuracy: number;
+    highestScore: IMatch[];
+    lowestScore: IMatch[];
+    attendance: number;
+    highestAttendance: IMatch[];
+    lowestAttendance: IMatch[];
+    matchPlayed: boolean;
+}
+
 /**
  * Helpers
  */
@@ -152,4 +177,23 @@ interface IBasicObjStr {
 
 interface IBasicObjNum {
     [x: number]: any;
+}
+
+/**
+ * ES6 & ES7 FEATURES UNKNOWN TO TYPESCRIPT (AT LEAST FOR NOW)
+ *
+ * Removes compile error for ES6 Object.assign()
+ * https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+ */
+
+/* tslint:disable:interface-name */
+
+interface ObjectConstructor {
+    assign(target: any, ...sources: any[]): any;
+    is(a: any, b: any);
+}
+
+interface Array<T> {
+    includes(x) : boolean;
+    find(x) : boolean | void;
 }

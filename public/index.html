@@ -9,7 +9,9 @@
         html, body {
             height: auto;
         }
-        my-app {
+        my-app,
+        round-summary,
+        list-matches {
             display: block;
         }
     </style>
@@ -43,6 +45,7 @@
                 }
             },
             paths: {
+                'lodash': 'node_modules/lodash/lodash.js',
                 'marked': 'node_modules/marked/lib/marked.js',
                 'numeral': 'node_modules/numeral/min/numeral.min.js',
             }
