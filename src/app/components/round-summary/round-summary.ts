@@ -175,21 +175,23 @@ export class RoundSummaryComponent implements OnInit {
      */
     private _getMatchesScoreStringArray(key : string, matches : IMatch[]) {
         return matches.map((match) => {
-            let winner, loser, score;
+            let winner, loser, highScore, lowScore;
 
             if(match.homePoints > match.awayPoints) {
                 winner = match.h_home_abbr;
                 loser = match.h_away_abbr;
-                score = match.awayPoints;
+                highScore = match.homePoints;
+                lowScore = match.awayPoints;
             }
 
             if(match.homePoints < match.awayPoints) {
                 winner = match.h_away_abbr;
                 loser = match.h_home_abbr;
-                score = match.homePoints;
+                highScore = match.awayPoints;
+                lowScore = match.homePoints;
             }
 
-            return this._getIndMatchScoreString(key, match, winner, loser, score);
+            return this._getIndMatchScoreString(key, match, winner, loser, highScore, lowScore);
         });
     }
 
@@ -200,7 +202,8 @@ export class RoundSummaryComponent implements OnInit {
      * @param match
      * @param winner
      * @param loser
-     * @param score
+     * @param highScore
+     * @param lowScore
      * @returns {any}
      * @private
      */
@@ -209,7 +212,8 @@ export class RoundSummaryComponent implements OnInit {
         match : IMatch,
         winner : string,
         loser : string,
-        score : string
+        highScore : number,
+        lowScore : number
     ) : string {
         if(match.homePoints === match.awayPoints) {
             return `${match.awayPoints} <small>by</small>
@@ -218,13 +222,16 @@ export class RoundSummaryComponent implements OnInit {
 
         let firstTeam;
         let secondTeam;
+        let score;
 
         if(key === 'highestScore') {
             firstTeam = winner;
             secondTeam = loser;
+            score = highScore;
         } else {
             firstTeam = loser;
             secondTeam = winner;
+            score = lowScore;
         }
 
         return `${score} <small>by</small> ${firstTeam} <small>v</small> ${secondTeam}`;
