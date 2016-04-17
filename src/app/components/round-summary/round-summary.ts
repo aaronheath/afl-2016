@@ -110,6 +110,12 @@ export class RoundSummaryComponent implements OnInit {
         });
     }
 
+    /**
+     * Returns summary attr by key
+     *
+     * @param key
+     * @returns {any}
+     */
     getSummaryOf(key : string) {
         if(!this.summary) {
             return;
@@ -118,14 +124,31 @@ export class RoundSummaryComponent implements OnInit {
         return this.summary[key];
     }
 
+    /**
+     * Returns generated string for highest scoring match(es)
+     *
+     * @returns {string}
+     */
     getHighestScore() : string {
         return this._getScoresSummary('highestScore');
     }
 
+    /**
+     * Returns generated string for lowest scoring match(es)
+     *
+     * @returns {string}
+     */
     getLowestScore() : string {
         return this._getScoresSummary('lowestScore');
     }
 
+    /**
+     * Generates string for highest and lowest scoring matches
+     *
+     * @param key
+     * @returns {any}
+     * @private
+     */
     private _getScoresSummary(key : string) : string {
         const matches = this.getSummaryOf(key);
 
@@ -140,6 +163,14 @@ export class RoundSummaryComponent implements OnInit {
         return `<i class="angle double down icon ${iconColor}"></i> ${strings.join(', ')}`;
     }
 
+    /**
+     * Assigns variables for use when generating string for individual match for use in high / low scores
+     *
+     * @param key
+     * @param matches
+     * @returns {string[]}
+     * @private
+     */
     private _getMatchesScoreStringArray(key : string, matches : IMatch[]) {
         return matches.map((match) => {
             let winner, loser, score;
@@ -160,6 +191,17 @@ export class RoundSummaryComponent implements OnInit {
         });
     }
 
+    /**
+     * Generates string for individual match for use in high / low scores
+     *
+     * @param key
+     * @param match
+     * @param winner
+     * @param loser
+     * @param score
+     * @returns {any}
+     * @private
+     */
     private _getIndMatchScoreString(
         key : string,
         match : IMatch,
@@ -186,14 +228,31 @@ export class RoundSummaryComponent implements OnInit {
         return `${score} <small>by</small> ${firstTeam} <small>v</small> ${secondTeam}`;
     }
 
+    /**
+     * Returns summary string for highest attended match(es)
+     *
+     * @returns {string}
+     */
     getHighestAttendance() : string {
         return this._getAttendance('highestAttendance');
     }
 
+    /**
+     * Returns summary string for lowest attended match(es)
+     *
+     * @returns {string}
+     */
     getLowestAttendance() : string {
         return this._getAttendance('lowestAttendance');
     }
 
+    /**
+     * Generates summary string for highest / lowest attended match(es)
+     *
+     * @param key
+     * @returns {any}
+     * @private
+     */
     private _getAttendance(key : string) : string {
         const matches = this.getSummaryOf(key);
 
@@ -219,10 +278,25 @@ export class RoundSummaryComponent implements OnInit {
         return `<i class="users icon ${iconColor}"></i> ${formattedAttendance} ${strings.join(' & ')}`;
     }
 
+    /**
+     * Formats number
+     * eg 23531 -> 23,531
+     *
+     * @param attendance
+     * @returns {string}
+     * @private
+     */
     private _formatAttendance(attendance : number) : string {
         return new FormatNumber().transform(attendance);
     }
 
+    /**
+     * Returns green or red depding on whether key is a known 'success' indicator
+     *
+     * @param key
+     * @returns {string}
+     * @private
+     */
     private _iconColor(key : string) : string {
         const beGreen = [
             'highestScore',
