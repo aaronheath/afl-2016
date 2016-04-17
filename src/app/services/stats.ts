@@ -5,6 +5,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 import {generateLadder} from '../helpers/ladder';
 import {generateMatches} from '../helpers/matches';
+import {generateSummaries} from '../helpers/summaries';
 
 declare const moment;
 
@@ -29,6 +30,7 @@ export class StatsService {
         this._dataStore = {
             ladder: [],
             matches: {},
+            summaries: {},
             teams: {},
             venues: {},
         };
@@ -127,6 +129,10 @@ export class StatsService {
             this._dataStore.teams,
             this._dataStore.matches
         );
+
+        this._dataStore.summaries = generateSummaries(
+            this._dataStore.matches
+        );
     }
 
     /**
@@ -159,5 +165,19 @@ export class StatsService {
      */
     getLadder() : ILadderTeam[] {
         return this._dataStore.ladder;
+    }
+
+    /**
+     * Returns calculated summary for individual round
+     *
+     * @param round
+     * @returns {any}
+     */
+    getSummaryForRound(round) : IRoundSummary {
+        if(!this._dataStore.summaries.rounds || !this._dataStore.summaries.rounds[round]) {
+            return;
+        }
+
+        return this._dataStore.summaries.rounds[round];
     }
 }

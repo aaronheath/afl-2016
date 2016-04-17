@@ -3,7 +3,7 @@ import 'numeral';
 
 @Pipe({name: 'formatNumber'})
 export class FormatNumber implements PipeTransform {
-    transform(value : any[], args : string[]) : any {
+    transform(value : string | number, args : string[] = []) : string {
         if(typeof value === 'undefined') {
             return;
         }

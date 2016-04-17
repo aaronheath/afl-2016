@@ -39,9 +39,12 @@ function generateMatches(matches : IMatches, teams : ITeams, venues : IVenues, t
 function _addAttrs(matches : IMatches, teams : ITeams, venues : IVenues, timezone : ITimezone) : IMatches {
     return loopMatches(matches, (match) => {
         match.h_home = getDatastoreAttr(teams, match.home, 'fullName');
+        match.h_home_abbr = getDatastoreAttr(teams, match.home, 'abbreviation');
         match.h_away = getDatastoreAttr(teams, match.away, 'fullName');
+        match.h_away_abbr = getDatastoreAttr(teams, match.away, 'abbreviation');
 
         match.h_venue = getDatastoreAttr(venues, match.venue, 'fullName');
+        match.h_venue_abbr = getDatastoreAttr(venues, match.venue, 'abbreviation');
 
         match.venue_moment = moment.tz(
             `${match.date}/2016 ${match.time}`,
