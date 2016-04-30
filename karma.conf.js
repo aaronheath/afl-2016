@@ -9,6 +9,11 @@ module.exports = function(config) {
 
         files: [
             // paths loaded by Karma
+            { pattern: 'node_modules/zone.js/dist/zone.js', included: true, watched: false },
+            { pattern: 'node_modules/zone.js/dist/long-stack-trace-zone.js', included: true, watched: false },
+            { pattern: 'node_modules/zone.js/dist/async-test.js', included: true, watched: false },
+            { pattern: 'node_modules/zone.js/dist/jasmine-patch.js', included: true, watched: false },
+
             {pattern: 'node_modules/es6-shim/es6-shim.min.js', included: true, watched: true},
             {pattern: 'node_modules/systemjs/dist/system-polyfills.js', included: true, watched: true},
             {pattern: 'node_modules/angular2/es6/dev/src/testing/shims_for_IE.js', included: true, watched: true},

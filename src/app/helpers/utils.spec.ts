@@ -1,3 +1,5 @@
+import {it, describe, beforeEach, expect} from 'angular2/testing';
+
 import {loopObj} from './utils';
 
 describe('Utils.loopObj', function() {
