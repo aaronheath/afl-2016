@@ -22,9 +22,9 @@
     "build-ui": "gulp --gulpfile semantic/gulpfile.js build"
   },
   "dependencies": {
-    "angular2": "2.0.0-beta.9",
+    "angular2": "2.0.0-beta.16",
     "es6-promise": "^3.0.2",
-    "es6-shim": "^0.33.3",
+    "es6-shim": "^0.35.0",
     "jquery": "^2.2.2",
     "lodash": "^4",
     "marked": "^0.3.5",
@@ -32,10 +32,10 @@
     "moment-timezone": "^0.5.3",
     "numeral": "^1.5.3",
     "reflect-metadata": "0.1.2",
-    "rxjs": "5.0.0-beta.2",
+    "rxjs": "5.0.0-beta.6",
     "semantic-ui": "^2.1.8",
     "systemjs": "0.19.24",
-    "zone.js": "^0.5.15"
+    "zone.js": "^0.6.12"
   },
   "devDependencies": {
     "babel-core": "^6.7.4",
