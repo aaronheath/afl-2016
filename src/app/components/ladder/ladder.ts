@@ -34,7 +34,7 @@ import {FormatPercentage} from '../../pipes/format-percentage';
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="#team of ladder; #i = index" [class.positive]="i < 8">
+                <tr *ngFor="let team of ladder; let i = index" [class.positive]="i < 8">
                     <td>{{ team.h_name }}</td>
                     <td>{{ team.played }}</td>
                     <td><strong>{{ team.wins }}</strong></td>

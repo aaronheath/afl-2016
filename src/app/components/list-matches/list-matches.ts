@@ -31,7 +31,7 @@ import {FormatNumber} from '../../pipes/format-number';
             </tr>
         </thead>
         <tbody *ngIf="matches">
-            <tr *ngFor="#match of matches | sortMatches">
+            <tr *ngFor="let match of matches | sortMatches">
                 <td>{{ match.h_date }}</td>
                 <td [class.positive]="match.result === match.home">{{ match.h_home }}</td>
                 <td>{{ match.homeGoals }}</td>
