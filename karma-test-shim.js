@@ -7,60 +7,34 @@ Error.stackTraceLimit = Infinity;
 // // we will call `__karma__.start()` later, once all the specs are loaded.
 __karma__.loaded = function() {};
 
-System.config({
-    packages: {
-        'base/public/app': {
-            defaultExtension: 'js',
-            format: 'register',
-            map: Object.keys(window.__karma__.files).filter(onlyAppFiles).reduce(createPathRecords, {})
-        }
-    },
-    paths: {
-        'lodash': 'base/node_modules/lodash/lodash.js',
-        'marked': 'base/node_modules/marked/lib/marked.js',
-        'numeral': 'base/node_modules/numeral/min/numeral.min.js',
+var afl2016 = Object.assign(window.afl2016);
+
+afl2016.packages['base/public/app'] = afl2016.packages.app;
+delete afl2016.packages.app;
+
+for(const key in afl2016.map) {
+    if(!afl2016.map.hasOwnProperty(key) || key === 'app') {
+        continue;
     }
-});
 
-//System.import('angular2/src/platform/browser/browser_adapter')
-System.import('angular2/platform/browser')
-    .then(function(browser_adapter) { browser_adapter.BrowserDomAdapter.makeCurrent(); })
-    .then(function() { return Promise.all(resolveTestFiles()); })
-    .then(function() { __karma__.start(); }, function(error) { __karma__.error(error.stack || error); });
-
-function createPathRecords(pathsMapping, appPath) {
-    // creates local module name mapping to global path with karma's fingerprint in path, e.g.:
-    // './vg-player/vg-player':
-    // '/base/dist/vg-player/vg-player.js?f4523daf879cfb7310ef6242682ccf10b2041b3e'
-    var moduleName = './' + resolveKeyPathForMapping('base/public/app/', appPath);
-    moduleName = moduleName.replace(/\.js$/, '');
-    pathsMapping[moduleName] = appPath + '?' + window.__karma__.files[appPath];
-    return pathsMapping;
+    afl2016.map[key] = `base/${afl2016.map[key]}`;
 }
 
-function onlyAppFiles(filePath) {
-    return /\/base\/public\/app\/(?!.*\.spec\.js$).*\.js$/.test(filePath);
-}
-
-function onlySpecFiles(path) {
-    return /\.spec\.js$/.test(path);
-}
-
-function resolveTestFiles() {
-    return Object.keys(window.__karma__.files)  // All files served by Karma.
-        .filter(onlySpecFiles)
-        .map(function(moduleName) {
-            // loads all spec files via their global module names (e.g.
-            // 'base/dist/vg-player/vg-player.spec')
-            return System.import(moduleName);
-        });
-}
-
-function resolveKeyPathForMapping(basePathWhereToStart, appPath) {
-    var location = appPath.indexOf(basePathWhereToStart);
-    if (location > -1) {
-        return appPath.substring(basePathWhereToStart.length + 1);
-    } else {
-        return appPath;
+for(const key in afl2016.paths) {
+    if(!afl2016.paths.hasOwnProperty(key)) {
+        continue;
     }
+
+    afl2016.paths[key] = `base/${afl2016.paths[key]}`;
 }
+
+window.afl2016 = afl2016;
+
+System.config(window.afl2016);
+
+Promise.all([
+        System.import('base/public/app/helpers/utils.spec'),
+        System.import('base/public/app/components/list-matches/list-matches.spec'),
+    ])
+    .then(function() { __karma__.start(); }, function(error) { __karma__.error(error.stack || error); })
+    .catch(console.error.bind(console));

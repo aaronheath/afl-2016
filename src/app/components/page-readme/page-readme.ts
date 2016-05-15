@@ -1,4 +1,4 @@
-import {Component, OnInit} from 'angular2/core';
+import {Component, OnInit} from '@angular/core';
 import * as marked from 'marked';
 
 import {ReadmeService} from '../../services/readme';

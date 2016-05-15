@@ -1,4 +1,4 @@
-import {Component, OnInit} from 'angular2/core';
+import {Component, OnInit} from '@angular/core';
 
 import {SortMatches} from '../../pipes/sort-matches';
 import {FormatNumber} from '../../pipes/format-number';

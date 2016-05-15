@@ -1,44 +1,44 @@
 module.exports = function(config) {
     config.set({
 
-        basePath: '.',
+        basePath: '',
 
         frameworks: [
             'jasmine'
         ],
 
         files: [
-            // paths loaded by Karma
-            { pattern: 'node_modules/zone.js/dist/zone.js', included: true, watched: false },
-            { pattern: 'node_modules/zone.js/dist/long-stack-trace-zone.js', included: true, watched: false },
-            { pattern: 'node_modules/zone.js/dist/async-test.js', included: true, watched: false },
-            { pattern: 'node_modules/zone.js/dist/jasmine-patch.js', included: true, watched: false },
+            // Global Libs
+            {pattern: 'node_modules/moment/min/moment.min.js', included: true, watched: false},
+            {
+                pattern: 'node_modules/moment-timezone/builds/moment-timezone-with-data-2010-2020.min.js',
+                included: true,
+                watched: false
+            },
 
-            {pattern: 'node_modules/es6-shim/es6-shim.min.js', included: true, watched: true},
-            {pattern: 'node_modules/systemjs/dist/system-polyfills.js', included: true, watched: true},
-            {pattern: 'node_modules/angular2/es6/dev/src/testing/shims_for_IE.js', included: true, watched: true},
-            {pattern: 'node_modules/angular2/bundles/angular2-polyfills.js', included: true, watched: true},
+            // Angular 2 Prerequisites
+            {pattern: 'node_modules/zone.js/dist/zone.js', included: true, watched: false},
+            {pattern: 'node_modules/reflect-metadata/Reflect.js', included: true, watched: false},
             {pattern: 'node_modules/systemjs/dist/system.src.js', included: true, watched: true},
-            {pattern: 'node_modules/rxjs/bundles/Rx.js', included: true, watched: true},
 
-            {pattern: 'node_modules/angular2/bundles/angular2.dev.js', included: true, watched: true},
-            {pattern: 'node_modules/angular2/bundles/testing.dev.js', included: true, watched: true},
-            {pattern: 'node_modules/angular2/bundles/http.dev.js', included: true, watched: true},
-
+            // Config SystemJS
+            {pattern: 'public/system.config.js', included: true, watched: true},
             {pattern: 'karma-test-shim.js', included: true, watched: true},
 
-            // paths loaded via module imports
+            // App & Module Assets Called Asynchronously
             {pattern: 'public/app/**/*.js', included: false, watched: true},
-            {pattern: 'node_modules/numeral/**/*.js', included: false, watched: true},
+            {pattern: 'node_modules/@angular/**/*.js', included: false, watched: false},
+            {pattern: 'node_modules/rxjs/**', included: false, watched: false},
+            {pattern: 'node_modules/lodash/**/*.js', included: false, watched: false},
+            {pattern: 'node_modules/marked/**/*.js', included: false, watched: false},
+            {pattern: 'node_modules/numeral/**/*.js', included: false, watched: false},
 
-            // paths to support debugging with source maps in dev tools
+            // Debug Tools Such As Source Maps
             {pattern: 'src/app/**/*.ts', included: false, watched: false},
             {pattern: 'public/app/**/*.js.map', included: false, watched: false}
         ],
 
-        // proxied base paths
         proxies: {
-            // required for component assests fetched by Angular's compiler
             '/public/src/app/': '/app/'
         },
 
@@ -48,7 +48,7 @@ module.exports = function(config) {
 
         colors: true,
 
-        autoWatch: false,
+        autoWatch: true,
 
         browsers: [
             //'PhantomJS',
@@ -84,7 +84,7 @@ module.exports = function(config) {
         //    ]
         //},
 
-        singleRun: true,
+        singleRun: false,
 
         concurrency: Infinity,
     })

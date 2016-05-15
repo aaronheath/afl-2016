@@ -26,7 +26,6 @@
     "max-line-length": [true, 120],
     "no-require-imports": true,
     "no-trailing-whitespace": true,
-    "object-literal-sort-keys": true,
     "trailing-comma": [true, {"multiline": "always", "singleline": "never"}],
     "class-name": true,
     "interface-name": true,

@@ -22,34 +22,17 @@
     <script src="/node_modules/moment/min/moment.min.js"></script>
     <script src="/node_modules/moment-timezone/builds/moment-timezone-with-data-2010-2020.min.js"></script>
 
-    <!-- Polyfills -->
-    <script src="/node_modules/es6-shim/es6-shim.min.js"></script>
-    <script src="/node_modules/systemjs/dist/system-polyfills.js"></script>
-    <script src="/node_modules/angular2/es6/dev/src/testing/shims_for_IE.js"></script>
-    <script src="/node_modules/angular2/bundles/angular2-polyfills.js"></script>
-    <script src="/node_modules/systemjs/dist/system.src.js"></script>
-    <script src="/node_modules/rxjs/bundles/Rx.js"></script>
-
-    <!-- Angular -->
-    <script src="/node_modules/angular2/bundles/angular2.dev.js"></script>
-    <script src="/node_modules/angular2/bundles/router.dev.js"></script>
-    <script src="/node_modules/angular2/bundles/http.dev.js"></script>
+    <!-- Angular 2 Prerequisites  -->
+    <script src="node_modules/es6-shim/es6-shim.min.js"></script>
+    <script src="node_modules/zone.js/dist/zone.js"></script>
+    <script src="node_modules/reflect-metadata/Reflect.js"></script>
+    <script src="node_modules/systemjs/dist/system.src.js"></script>
 
     <!-- Configure SystemJS -->
+    <script src="system.config.js"></script>
+
     <script>
-        System.config({
-            packages: {
-                app: {
-                    format: 'register',
-                    defaultExtension: 'js'
-                }
-            },
-            paths: {
-                'lodash': 'node_modules/lodash/lodash.js',
-                'marked': 'node_modules/marked/lib/marked.js',
-                'numeral': 'node_modules/numeral/min/numeral.min.js',
-            }
-        });
+        System.config(window.afl2016);
 
         System.import('/app/main').then(null, console.error.bind(console));
     </script>

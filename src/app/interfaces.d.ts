@@ -35,7 +35,7 @@ interface IMatch {
     home: TTeam;
     homeGoals?: number;
     homeBehinds?: number;
-    homePoints: number;
+    homePoints?: number;
     away: TTeam;
     awayGoals?: number;
     awayBehinds?: number;

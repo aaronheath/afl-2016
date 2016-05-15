@@ -27,6 +27,8 @@ watch.createMonitor(appSrcDir, options, (monitor) => {
     monitor.on('created', recompile);
     monitor.on('changed', recompile);
 
+    recompile();
+
     console.log(`Watching`.green);
 });
 
