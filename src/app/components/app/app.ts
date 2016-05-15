@@ -1,6 +1,6 @@
-import {Component, OnInit, OnChanges} from 'angular2/core';
-import {Router, RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router';
-import {HTTP_PROVIDERS} from 'angular2/http';
+import {Component, OnInit, OnChanges} from '@angular/core';
+import {Router, RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from '@angular/router-deprecated';
+import {HTTP_PROVIDERS} from '@angular/http';
 
 import {MatchesService} from '../../services/matches';
 import {TeamsService} from '../../services/teams';

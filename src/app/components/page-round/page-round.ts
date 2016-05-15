@@ -1,5 +1,5 @@
-import {Component, OnInit} from 'angular2/core';
-import {RouteParams} from 'angular2/router';
+import {Component, OnInit} from '@angular/core';
+import {RouteParams} from '@angular/router-deprecated';
 
 import {StatsService} from '../../services/stats';
 import {ListMatchesComponent} from '../list-matches/list-matches';

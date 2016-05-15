@@ -3,8 +3,8 @@
     "es6-shim": "github:DefinitelyTyped/DefinitelyTyped/es6-shim/es6-shim.d.ts#4de74cb527395c13ba20b438c3a7a419ad931f1c",
     "jasmine": "github:DefinitelyTyped/DefinitelyTyped/jasmine/jasmine.d.ts#bc92442c075929849ec41d28ab618892ba493504",
     "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash.d.ts#641df27e73ca67fa7199a3deedae104198d41a17",
-    "moment": "github:DefinitelyTyped/DefinitelyTyped/moment/moment.d.ts#ce8ae773688d2244ba11fdf3378fcd68f773e1c4",
-    "moment-timezone": "github:DefinitelyTyped/DefinitelyTyped/moment-timezone/moment-timezone.d.ts#ce8ae773688d2244ba11fdf3378fcd68f773e1c4",
+    "moment": "github:DefinitelyTyped/DefinitelyTyped/moment/moment-node.d.ts#398bd742115e2b071ab3edf8b543b6df6fa62dc2",
+    "moment-timezone": "github:DefinitelyTyped/DefinitelyTyped/moment-timezone/moment-timezone.d.ts#398bd742115e2b071ab3edf8b543b6df6fa62dc2",
     "marked": "github:DefinitelyTyped/DefinitelyTyped/marked/marked.d.ts#a44529fcb1e1cdc0355e71c42a6048de99b57c34",
     "numeraljs": "github:DefinitelyTyped/DefinitelyTyped/numeraljs/numeraljs.d.ts#a44529fcb1e1cdc0355e71c42a6048de99b57c34"
   }
