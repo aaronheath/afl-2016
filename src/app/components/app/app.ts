@@ -78,7 +78,7 @@ declare const $;
             <div class="ui three column divided center aligned grid inverted">
                 <div class="column">
                     <div class="ui link list inverted">
-                        <div *ngFor="#item of rounds[0]" class="item">
+                        <div *ngFor="let item of rounds[0]" class="item">
                             <a [routerLink]="['Round', {roundNumber: item}]" class="inverted">Round {{ item }}</a>
                         </div>
                     </div>
@@ -86,7 +86,7 @@ declare const $;
 
                 <div class="column">
                     <div class="ui link list inverted">
-                        <div *ngFor="#item of rounds[1]" class="item">
+                        <div *ngFor="let item of rounds[1]" class="item">
                             <a [routerLink]="['Round', {roundNumber: item}]" class="inverted">Round {{ item }}</a>
                         </div>
                     </div>
@@ -94,7 +94,7 @@ declare const $;
 
                 <div class="column">
                     <div class="ui link list inverted">
-                        <div *ngFor="#item of rounds[2]" class="item">
+                        <div *ngFor="let item of rounds[2]" class="item">
                             <a [routerLink]="['Round', {roundNumber: item}]">Round {{ item }}</a>
                         </div>
                     </div>
