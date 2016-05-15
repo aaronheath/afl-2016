@@ -12,20 +12,20 @@ var afl2016 = Object.assign(window.afl2016);
 afl2016.packages['base/public/app'] = afl2016.packages.app;
 delete afl2016.packages.app;
 
-for(const key in afl2016.map) {
+for(var key in afl2016.map) {
     if(!afl2016.map.hasOwnProperty(key) || key === 'app') {
         continue;
     }
 
-    afl2016.map[key] = `base/${afl2016.map[key]}`;
+    afl2016.map[key] = 'base/' + afl2016.map[key];
 }
 
-for(const key in afl2016.paths) {
+for(var key in afl2016.paths) {
     if(!afl2016.paths.hasOwnProperty(key)) {
         continue;
     }
 
-    afl2016.paths[key] = `base/${afl2016.paths[key]}`;
+    afl2016.paths[key] = 'base/' + afl2016.paths[key];
 }
 
 window.afl2016 = afl2016;

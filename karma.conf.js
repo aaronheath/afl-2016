@@ -20,6 +20,8 @@ module.exports = function(config) {
             {pattern: 'node_modules/zone.js/dist/zone.js', included: true, watched: false},
             {pattern: 'node_modules/reflect-metadata/Reflect.js', included: true, watched: false},
             {pattern: 'node_modules/systemjs/dist/system.src.js', included: true, watched: true},
+            {pattern: 'node_modules/systemjs/dist/system-polyfills.js', included: true, watched: true},
+            {pattern: 'node_modules/es6-shim/es6-shim.min.js', included: true, watched: true},
 
             // Config SystemJS
             {pattern: 'public/system.config.js', included: true, watched: true},
@@ -51,8 +53,8 @@ module.exports = function(config) {
         autoWatch: true,
 
         browsers: [
-            //'PhantomJS',
-            'Chrome',
+            'PhantomJS',
+            //'Chrome',
         ],
 
         // Karma plugins loaded
@@ -84,7 +86,7 @@ module.exports = function(config) {
         //    ]
         //},
 
-        singleRun: false,
+        singleRun: true,
 
         concurrency: Infinity,
     })
