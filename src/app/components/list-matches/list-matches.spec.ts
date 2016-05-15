@@ -36,7 +36,7 @@ describe('ListMatchesComponent', () => {
 
     it('should render list of matches', inject([TestComponentBuilder], (tcb) => {
         return tcb.createAsync(ListMatchesComponent)
-            .then((fixture : ComponentFixture) => {
+            .then((fixture) => {
                 const el = fixture.nativeElement;
 
                 fixture.componentInstance.matches = getMatches();
