@@ -20,45 +20,25 @@ const matches : IMatch[] = [
         date: '26/7',
         time: '13:15',
     },
-    //{
-    //    h_home: 'Port Adelaide',
-    //    result: 'ESS',
-    //    home: 'PA',
-    //    homeGoals: 8,
-    //    homeBehinds: 7,
-    //    homePoints: 55,
-    //    away: 'ESS',
-    //    awayGoals: 19,
-    //    awayBehinds: 13,
-    //    awayPoints: 127,
-    //    h_venue: 'Adelaide Oval',
-    //    attendance: 49986,
-    //    venue: 'AP',
-    //    h_home_abbr: 'PA',
-    //    h_away_abbr: 'ESS',
-    //    date: '',
-    //    time: '',
-    //},
-    //{
-    //    h_date: 'Wed 27 Jul',
-    //    h_home: 'ADL',
-    //    result: 'ADL',
-    //    home: 'ADL',
-    //    homeGoals: 6,
-    //    homeBehinds: 9,
-    //    homePoints: 45,
-    //    away: 'PA',
-    //    awayGoals: 5,
-    //    awayBehinds: 3,
-    //    awayPoints: 33,
-    //    h_venue: 'Adelaide Oval',
-    //    attendance: 56482,
-    //    venue: 'AO',
-    //    h_home_abbr: 'ADL',
-    //    h_away_abbr: 'PA',
-    //    date: '',
-    //    time: '',
-    //},
+    {
+        h_home: 'Port Adelaide',
+        result: 'PA',
+        home: 'PA',
+        homeGoals: 19,
+        homeBehinds: 13,
+        homePoints: 127,
+        away: 'COLL',
+        awayGoals: 3,
+        awayBehinds: 21,
+        awayPoints: 39,
+        venue: 'AO',
+        h_venue: 'Adelaide Oval',
+        attendance: 34561,
+        h_home_abbr: 'PA',
+        h_away_abbr: 'COLL',
+        date: '27/7',
+        time: '14:40',
+    },
 ];
 
 const venueTimezones = {
@@ -69,15 +49,7 @@ const venueTimezones = {
 const timezone = 'Australia/Adelaide';
 
 function _assignTimes() {
-    //const times = [
-    //    moment.tz(`26/7/2016 13:15`, 'D/M/YYYY HH:mm', 'Australia/Melbourne'),
-    //    moment.tz(`25/7/2016 19:10`, 'D/M/YYYY HH:mm', 'Australia/Adelaide'),
-    //    moment.tz(`27/7/2016 12:40`, 'D/M/YYYY HH:mm', 'Australia/Adelaide'),
-    //];
-
     return matches.map((match, i) => {
-        //match.date = times[i].format('D/M');
-        //match.time = times[i].format('HH:mm');
         match.venue_moment = moment.tz(
             `${match.date}/2016 ${match.time}`,
             'D/M/YYYY HH:mm',
