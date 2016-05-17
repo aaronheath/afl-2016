@@ -30,6 +30,7 @@
     Promise.all([
             System.import('app/helpers/utils.spec'),
             System.import('app/components/list-matches/list-matches.spec'),
+            System.import('app/pipes/format-number.spec'),
         ])
         .then(window.onload)
         .catch(console.error.bind(console));

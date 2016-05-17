@@ -45,10 +45,17 @@ describe('ListMatchesComponent', () => {
 
                 const matchRowsEls = el.querySelectorAll('tbody tr');
 
-                expect(matchRowsEls.length).toBe(1);
+                expect(matchRowsEls.length).toBe(2);
+
                 expect(matchRowsEls[0].children[0].innerHTML).toBe('Tue 26 Jul');
                 expect(matchRowsEls[0].children[1].classList.contains('positive')).toBe(true);
+                expect(matchRowsEls[0].children[5].classList.contains('positive')).not.toBe(true);
                 expect(matchRowsEls[0].children[12].innerHTML).toBe('56,482');
+
+                expect(matchRowsEls[1].children[0].innerHTML).toBe('Wed 27 Jul');
+                expect(matchRowsEls[1].children[1].classList.contains('positive')).toBe(true);
+                expect(matchRowsEls[1].children[5].classList.contains('positive')).not.toBe(true);
+                expect(matchRowsEls[1].children[12].innerHTML).toBe('34,561');
 
                 fixture.destroy();
             })
