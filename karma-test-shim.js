@@ -35,6 +35,8 @@ System.config(window.afl2016);
 Promise.all([
         System.import('base/public/app/helpers/utils.spec'),
         System.import('base/public/app/components/list-matches/list-matches.spec'),
+        System.import('base/public/app/pipes/format-number.spec'),
+        System.import('base/public/app/services/matches.spec'),
     ])
     .then(function() { __karma__.start(); }, function(error) { __karma__.error(error.stack || error); })
     .catch(console.error.bind(console));
