@@ -21,7 +21,19 @@ describe('MatchesService', () => {
     const matchesExpected = getMatchesWithPointsAndTimes();
 
     beforeEachProviders(() => [
-        MatchesService,
+        provide(
+            MatchesService,
+            {
+                useFactory: (backend) => {
+                    const matchesService = new MatchesService(backend);
+
+                    spyOn(matchesService, 'load').and.callThrough();
+
+                    return matchesService;
+                },
+                deps: [Http],
+            }
+        ),
         MockBackend,
         BaseRequestOptions,
         provide(
@@ -43,6 +55,8 @@ describe('MatchesService', () => {
 
     it('should parse and add calculated attr to matches', inject([MatchesService], (matchesService: MatchesService) => {
         matchesService.observable$.subscribe((data) => {
+            expect(matchesService.load).toHaveBeenCalled();
+
             const allMatches = matchesService.getAllMatches();
 
             // Round 1 Match 1
