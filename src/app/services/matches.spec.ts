@@ -15,6 +15,8 @@ import {MockBackend, MockConnection} from '@angular/http/testing';
 
 import {MatchesService} from './matches';
 
+import {Observable} from 'rxjs/Observable';
+
 import {getMatches, getMatchesWithPointsAndTimes} from '../tests/example-data-matches';
 
 describe('MatchesService', () => {
@@ -53,10 +55,15 @@ describe('MatchesService', () => {
         _mockbackend.connections.subscribe((c:MockConnection) => c.mockRespond(baseResponse));
     }));
 
-    it('should parse and add calculated attr to matches', inject([MatchesService], (matchesService: MatchesService) => {
+    it('should be constructed', inject([MatchesService], (matchesService: MatchesService) => {
         matchesService.observable$.subscribe((data) => {
             expect(matchesService.load).toHaveBeenCalled();
+            expect(matchesService.observable$).toEqual(jasmine.any(Observable));
+        });
+    }));
 
+    it('should parse and add calculated attr to matches', inject([MatchesService], (matchesService: MatchesService) => {
+        matchesService.observable$.subscribe((data) => {
             const allMatches = matchesService.getAllMatches();
 
             // Round 1 Match 1
