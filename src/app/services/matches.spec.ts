@@ -9,20 +9,19 @@ import {
     expect,
     inject,
     it,
-    xit,
     getTestInjector,
 } from '@angular/core/testing';
 
 import {MatchesService} from './matches';
 import {getMatches, getMatchesWithPointsAndTimes} from '../tests/example-data-matches';
 
+const standardTimeout = 1000; // 1 second
+const matchesExpected = getMatchesWithPointsAndTimes();
+
+let mockedBackend;
+
 describe('MatchesService', () => {
-    const standardTimeout = 1000; // 1 second
-    const matchesExpected = getMatchesWithPointsAndTimes();
-
-    let mockedBackend;
-
-    beforeEachProviders(() => [
+    const providers = [
         provide(
             MatchesService,
             {
@@ -51,15 +50,11 @@ describe('MatchesService', () => {
                 deps: [MockBackend, BaseRequestOptions],
             }
         ),
-    ]);
+    ];
 
-    beforeEach(inject([MockBackend, Http], (_mockbackend, _http) => {
-        const baseResponse = new Response(new ResponseOptions({body: getMatches()}));
+    beforeEachProviders(() => providers);
 
-        _mockbackend.connections.subscribe((c:MockConnection) => c.mockRespond(baseResponse));
-
-        mockedBackend = _mockbackend;
-    }));
+    beforeEach(generateMockBackend());
 
     it('should be constructed', inject([MatchesService, Http], (matchesService: MatchesService, http: Http) => {
         matchesService.observable$.subscribe((data) => {
@@ -97,46 +92,12 @@ describe('MatchesService', () => {
     }), standardTimeout);
 
     it('load() http call should handle an error response', () => {
-        const testInjector = getTestInjector();
+        // Little different this spec as we're needing to overwrite the standard beforeEach so that we can instead
+        // have the http call return an error.
 
-        testInjector.reset();
+        resetProviders(providers);
 
-        testInjector.addProviders([
-            provide(
-                MatchesService,
-                {
-                    useFactory: (backend) => {
-                        const matchesService = new MatchesService(backend);
-
-                        spyOn(matchesService, 'load').and.callThrough();
-
-                        return matchesService;
-                    },
-                    deps: [Http],
-                }
-            ),
-            MockBackend,
-            BaseRequestOptions,
-            provide(
-                Http,
-                {
-                    useFactory: (backend, options) => {
-                        const _http = new Http(backend, options);
-
-                        spyOn(_http, 'get').and.callThrough();
-
-                        return _http;
-                    },
-                    deps: [MockBackend, BaseRequestOptions],
-                }
-            ),
-        ]);
-
-        inject([MockBackend], (_mockbackend) => {
-            _mockbackend.connections.subscribe((c:MockConnection) => c.mockError());
-
-            mockedBackend = _mockbackend;
-        })();
+        generateMockBackend(false)();
 
         spyOn(console, 'error');
 
@@ -201,4 +162,34 @@ function compareMatches(received, expected) {
     expect(received.result).toBe(expected.result);
     expect(received.time).toBe(expected.time);
     expect(received.venue).toBe(expected.venue);
+}
+
+function generateMockBackend(success = true) {
+    return success ? successMockBackend() : errorMockBackend();
+}
+
+function successMockBackend() {
+    return inject([MockBackend, Http], (_mockbackend, _http) => {
+        const baseResponse = new Response(new ResponseOptions({body: getMatches()}));
+
+        _mockbackend.connections.subscribe((c:MockConnection) => c.mockRespond(baseResponse));
+
+        mockedBackend = _mockbackend;
+    });
+}
+
+function errorMockBackend() {
+    return inject([MockBackend], (_mockbackend) => {
+        _mockbackend.connections.subscribe((c:MockConnection) => c.mockError());
+
+        mockedBackend = _mockbackend;
+    });
+}
+
+function resetProviders(providers) {
+    const testInjector = getTestInjector();
+
+    testInjector.reset();
+
+    testInjector.addProviders(providers);
 }
