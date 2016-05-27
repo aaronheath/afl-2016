@@ -1,3 +1,7 @@
+import {provide} from '@angular/core';
+import {Http, Response, BaseRequestOptions, ResponseOptions} from '@angular/http';
+import {MockBackend, MockConnection} from '@angular/http/testing';
+import {Observable} from 'rxjs/Observable';
 import {
     beforeEachProviders,
     beforeEach,
@@ -9,16 +13,7 @@ import {
     getTestInjector,
 } from '@angular/core/testing';
 
-import {provide} from '@angular/core';
-
-import {Http, Response, BaseRequestOptions, ResponseOptions} from '@angular/http';
-
-import {MockBackend, MockConnection} from '@angular/http/testing';
-
 import {MatchesService} from './matches';
-
-import {Observable} from 'rxjs/Observable';
-
 import {getMatches, getMatchesWithPointsAndTimes} from '../tests/example-data-matches';
 
 describe('MatchesService', () => {
@@ -26,7 +21,6 @@ describe('MatchesService', () => {
     const matchesExpected = getMatchesWithPointsAndTimes();
 
     let mockedBackend;
-    let _console;
 
     beforeEachProviders(() => [
         provide(
@@ -102,17 +96,10 @@ describe('MatchesService', () => {
         return promise;
     }), standardTimeout);
 
-    xit('load() http call should handle an error response', () => {
+    it('load() http call should handle an error response', () => {
         const testInjector = getTestInjector();
+
         testInjector.reset();
-
-        inject([MockBackend], (_mockbackend) => {
-            const baseResponse = new Response(new ResponseOptions({status: 404}));
-
-            _mockbackend.connections.subscribe((c:MockConnection) => c.mockRespond(baseResponse));
-
-            mockedBackend = _mockbackend;
-        })();
 
         testInjector.addProviders([
             provide(
@@ -145,20 +132,21 @@ describe('MatchesService', () => {
             ),
         ]);
 
-        console.log('mockedBackend', mockedBackend);
-        spyOn(console, 'error').and.callThrough();
+        inject([MockBackend], (_mockbackend) => {
+            _mockbackend.connections.subscribe((c:MockConnection) => c.mockError());
+
+            mockedBackend = _mockbackend;
+        })();
+
+        spyOn(console, 'error');
 
         const fn = inject([MatchesService], (matchesService: MatchesService) => {
-            console.log(matchesService);
-
             const promise = new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    console.log(matchesService);
-
-                    expect(console.error).toHaveBeenCalled();
+                    expect(console.error).toHaveBeenCalledWith('Could not load matches.', undefined);
 
                     resolve();
-                }, 100);
+                }, 500);
 
                 matchesService.observable$.subscribe((data) => {
                     reject('should not have been called');
