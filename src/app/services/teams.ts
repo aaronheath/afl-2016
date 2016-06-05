@@ -16,9 +16,9 @@ export class TeamsService {
 
         this.observable$ = new Observable((observer) => {
             this._observer = observer;
-        }).share();
 
-        this.load();
+            this.load();
+        }).share();
     }
 
     /**
