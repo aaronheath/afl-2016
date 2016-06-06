@@ -5,18 +5,27 @@ import {Observable} from 'rxjs/Observable';
 import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@angular/core/testing';
 
 import {TestUtils} from '../tests/test-utils';
-import {TeamsService} from './teams';
-import {getTeams} from '../tests/example-data-teams';
+import {ReadmeService} from './readme';
 
 const testUtils = new TestUtils();
 
-describe('TeamsService', () => {
+const mockedReadme = `
+# Title
+
+Some text around here.
+
+## Another Title
+
+Some more text around here.
+`;
+
+describe('ReadmeService', () => {
     const providers = [
         provide(
-            TeamsService,
+            ReadmeService,
             {
                 useFactory: (backend) => {
-                    const service = new TeamsService(backend);
+                    const service = new ReadmeService(backend);
 
                     spyOn(service, 'load').and.callThrough();
 
@@ -44,18 +53,18 @@ describe('TeamsService', () => {
 
     beforeEachProviders(() => providers);
 
-    beforeEach(testUtils.generateMockBackend(true, {body: getTeams()}));
+    beforeEach(testUtils.generateMockBackend(true, {body: mockedReadme}));
 
-    it('should be constructed', inject([TeamsService, Http], (service: TeamsService, http: Http) => {
+    it('should be constructed', inject([ReadmeService, Http], (service: ReadmeService, http: Http) => {
         service.observable$.subscribe((data) => {
             expect(service.load).toHaveBeenCalled();
             expect(service.observable$).toEqual(jasmine.any(Observable));
         });
     }));
 
-    it('load() should fetch team data and call next on the observer', inject([
-        TeamsService,
-    ], (service: TeamsService) => {
+    it('load() should fetch venue data and call next on the observer', inject([
+        ReadmeService,
+    ], (service: ReadmeService) => {
         const promise = new Promise((resolve, reject) => {
             let loadCalls = 0;
 
@@ -71,7 +80,7 @@ describe('TeamsService', () => {
 
                     expect(testUtils.mockedBackend.connectionsArray.length).toBe(2);
                     expect(testUtils.mockedBackend.connectionsArray[1].request.method).toBe(0); // GET
-                    expect(testUtils.mockedBackend.connectionsArray[1].request.url).toBe('/data/teams.json');
+                    expect(testUtils.mockedBackend.connectionsArray[1].request.url).toBe('/data/README.md');
 
                     resolve();
                 }
@@ -91,10 +100,10 @@ describe('TeamsService', () => {
 
         spyOn(console, 'error');
 
-        const fn = inject([TeamsService], (service: TeamsService) => {
+        const fn = inject([ReadmeService], (service: ReadmeService) => {
             const promise = new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    expect(console.error).toHaveBeenCalledWith('Could not load teams.', undefined);
+                    expect(console.error).toHaveBeenCalledWith('Could not load readme.', undefined);
 
                     resolve();
                 }, 500);
@@ -110,36 +119,13 @@ describe('TeamsService', () => {
         return fn();
     }, testUtils.standardTimeout);
 
-    it('getTeams() should return all teams', inject([TeamsService], (
-        service: TeamsService
+    it('getReadme() should return the readme', inject([ReadmeService], (
+        service: ReadmeService
     ) => {
         service.observable$.subscribe((data) => {
-            const allTeams = service.getTeams();
-            let team;
+            const readme = service.getReadme();
 
-            // Adelaide
-            team = allTeams['ADL'];
-            expect(team).toBeDefined();
-            expect(team.fullName).toBe('Adelaide');
-            expect(team.abbreviation).toBe('ADL');
-            expect(team.city).toBe('Adelaide');
-            expect(team.state).toBe('SA');
-
-            // Essendon
-            team = allTeams['ESS'];
-            expect(team).toBeDefined();
-            expect(team.fullName).toBe('Essendon');
-            expect(team.abbreviation).toBe('ESS');
-            expect(team.city).toBe('Melbourne');
-            expect(team.state).toBe('VIC');
-
-            // Port Adelaide
-            team = allTeams['PA'];
-            expect(team).toBeDefined();
-            expect(team.fullName).toBe('Port Adelaide');
-            expect(team.abbreviation).toBe('PA');
-            expect(team.city).toBe('Adelaide');
-            expect(team.state).toBe('SA');
+            expect(readme).toBe(mockedReadme);
         });
     }));
 });

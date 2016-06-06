@@ -16,11 +16,11 @@ describe('VenuesService', () => {
             VenuesService,
             {
                 useFactory: (backend) => {
-                    const matchesService = new VenuesService(backend);
+                    const service = new VenuesService(backend);
 
-                    spyOn(matchesService, 'load').and.callThrough();
+                    spyOn(service, 'load').and.callThrough();
 
-                    return matchesService;
+                    return service;
                 },
                 deps: [Http],
             }
