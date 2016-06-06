@@ -1,24 +1,16 @@
 import {provide} from '@angular/core';
-import {Http, Response, BaseRequestOptions, ResponseOptions} from '@angular/http';
-import {MockBackend, MockConnection} from '@angular/http/testing';
+import {Http, BaseRequestOptions} from '@angular/http';
+import {MockBackend} from '@angular/http/testing';
 import {Observable} from 'rxjs/Observable';
-import {
-    beforeEachProviders,
-    beforeEach,
-    describe,
-    expect,
-    inject,
-    it,
-    getTestInjector,
-} from '@angular/core/testing';
+import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@angular/core/testing';
 
+import {TestUtils} from '../tests/test-utils';
 import {MatchesService} from './matches';
 import {getMatches, getMatchesWithPointsAndTimes} from '../tests/example-data-matches';
 
-const standardTimeout = 1000; // 1 second
-const matchesExpected = getMatchesWithPointsAndTimes();
+const testUtils = new TestUtils();
 
-let mockedBackend;
+const matchesExpected = getMatchesWithPointsAndTimes();
 
 describe('MatchesService', () => {
     const providers = [
@@ -54,7 +46,7 @@ describe('MatchesService', () => {
 
     beforeEachProviders(() => providers);
 
-    beforeEach(generateMockBackend());
+    beforeEach(testUtils.generateMockBackend(true, {body: getMatches()}));
 
     it('should be constructed', inject([MatchesService, Http], (matchesService: MatchesService, http: Http) => {
         matchesService.observable$.subscribe((data) => {
@@ -79,9 +71,9 @@ describe('MatchesService', () => {
                 if(loadCalls === 2) {
                     expect(matchesService.load).toHaveBeenCalledTimes(loadCalls);
 
-                    expect(mockedBackend.connectionsArray.length).toBe(2);
-                    expect(mockedBackend.connectionsArray[1].request.method).toBe(0); // GET
-                    expect(mockedBackend.connectionsArray[1].request.url).toBe('/data/matches.json');
+                    expect(testUtils.mockedBackend.connectionsArray.length).toBe(2);
+                    expect(testUtils.mockedBackend.connectionsArray[1].request.method).toBe(0); // GET
+                    expect(testUtils.mockedBackend.connectionsArray[1].request.url).toBe('/data/matches.json');
 
                     resolve();
                 }
@@ -89,15 +81,15 @@ describe('MatchesService', () => {
         });
 
         return promise;
-    }), standardTimeout);
+    }), testUtils.standardTimeout);
 
     it('load() http call should handle an error response', () => {
         // Little different this spec as we're needing to overwrite the standard beforeEach so that we can instead
         // have the http call return an error.
 
-        resetProviders(providers);
+        testUtils.resetProviders(providers);
 
-        generateMockBackend(false)();
+        testUtils.generateMockBackend()();
 
         spyOn(console, 'error');
 
@@ -118,7 +110,7 @@ describe('MatchesService', () => {
         });
 
         return fn();
-    }, standardTimeout);
+    }, testUtils.standardTimeout);
 
     it('getAllMatches() should return all matches with calculated attrs', inject([MatchesService], (
         matchesService: MatchesService
@@ -162,34 +154,4 @@ function compareMatches(received, expected) {
     expect(received.result).toBe(expected.result);
     expect(received.time).toBe(expected.time);
     expect(received.venue).toBe(expected.venue);
-}
-
-function generateMockBackend(success = true) {
-    return success ? successMockBackend() : errorMockBackend();
-}
-
-function successMockBackend() {
-    return inject([MockBackend, Http], (_mockbackend, _http) => {
-        const baseResponse = new Response(new ResponseOptions({body: getMatches()}));
-
-        _mockbackend.connections.subscribe((c:MockConnection) => c.mockRespond(baseResponse));
-
-        mockedBackend = _mockbackend;
-    });
-}
-
-function errorMockBackend() {
-    return inject([MockBackend], (_mockbackend) => {
-        _mockbackend.connections.subscribe((c:MockConnection) => c.mockError());
-
-        mockedBackend = _mockbackend;
-    });
-}
-
-function resetProviders(providers) {
-    const testInjector = getTestInjector();
-
-    testInjector.reset();
-
-    testInjector.addProviders(providers);
 }
