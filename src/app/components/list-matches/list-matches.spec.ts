@@ -17,7 +17,7 @@ import {
     TEST_BROWSER_DYNAMIC_PLATFORM_PROVIDERS,
 } from '@angular/platform-browser-dynamic/testing';
 
-import {getMatches} from '../../tests/example-data-matches';
+import {getMatchesWithPointsAndTimes} from '../../tests/example-data-matches';
 
 import {SortMatches} from '../../pipes/sort-matches';
 import {FormatNumber} from '../../pipes/format-number';
@@ -39,16 +39,23 @@ describe('ListMatchesComponent', () => {
             .then((fixture) => {
                 const el = fixture.nativeElement;
 
-                fixture.componentInstance.matches = getMatches();
+                fixture.componentInstance.matches = getMatchesWithPointsAndTimes()[1]; // Round 1
 
                 fixture.detectChanges();
 
                 const matchRowsEls = el.querySelectorAll('tbody tr');
 
-                expect(matchRowsEls.length).toBe(1);
-                expect(matchRowsEls[0].children[0].innerHTML).toBe('Tue 26 Jul');
+                expect(matchRowsEls.length).toBe(9);
+
+                expect(matchRowsEls[0].children[0].innerHTML).toBe('Thu 24 Mar');
                 expect(matchRowsEls[0].children[1].classList.contains('positive')).toBe(true);
-                expect(matchRowsEls[0].children[12].innerHTML).toBe('56,482');
+                expect(matchRowsEls[0].children[5].classList.contains('positive')).not.toBe(true);
+                expect(matchRowsEls[0].children[12].innerHTML).toBe('75,706');
+
+                expect(matchRowsEls[1].children[0].innerHTML).toBe('Sat 26 Mar');
+                expect(matchRowsEls[1].children[1].classList.contains('positive')).toBe(true);
+                expect(matchRowsEls[1].children[5].classList.contains('positive')).not.toBe(true);
+                expect(matchRowsEls[1].children[12].innerHTML).toBe('28,505');
 
                 fixture.destroy();
             })

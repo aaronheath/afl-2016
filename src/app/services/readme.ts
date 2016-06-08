@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Http} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {Subscriber} from 'rxjs/Subscriber';
@@ -17,9 +17,9 @@ export class ReadmeService {
         // Create Observable Stream to output our data
         this.observable$ = new Observable((observer) => {
             this._observer = observer;
-        }).share();
 
-        this.load();
+            this.load();
+        }).share();
     }
 
     /**

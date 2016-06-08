@@ -30,6 +30,12 @@
     Promise.all([
             System.import('app/helpers/utils.spec'),
             System.import('app/components/list-matches/list-matches.spec'),
+            System.import('app/pipes/format-number.spec'),
+            System.import('app/services/matches.spec'),
+            System.import('app/services/teams.spec'),
+            System.import('app/services/venues.spec'),
+            System.import('app/services/readme.spec'),
+            System.import('app/services/time.spec'),
         ])
         .then(window.onload)
         .catch(console.error.bind(console));

@@ -17,9 +17,9 @@ export class MatchesService {
 
         this.observable$ = new Observable((observer) => {
             this._observer = observer;
-        }).share();
 
-        this.load();
+            this.load();
+        }).share();
     }
 
     /**
@@ -30,6 +30,7 @@ export class MatchesService {
 
         observable.subscribe(data => {
             this._dataStore.matches = this._calculateAttrs(data);
+
             this._observer.next(this._dataStore.matches);
         }, (error) => {
             console.error('Could not load matches.', error);
