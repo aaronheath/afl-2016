@@ -40,6 +40,7 @@ Promise.all([
         System.import('base/public/app/services/teams.spec'),
         System.import('base/public/app/services/venues.spec'),
         System.import('base/public/app/services/readme.spec'),
+        System.import('base/public/app/services/time.spec'),
     ])
     .then(function() { __karma__.start(); }, function(error) { __karma__.error(error.stack || error); })
     .catch(console.error.bind(console));

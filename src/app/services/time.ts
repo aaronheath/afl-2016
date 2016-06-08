@@ -4,16 +4,18 @@ declare const moment;
 
 @Injectable()
 export class TimeService {
-    _guessedTimezone : ITimezone;
-    _customTimezone : ITimezone;
+    private guessedTimezone : ITimezone;
+    private customTimezone : ITimezone = '';
 
     constructor() {
-        this._guessedTimezone = moment.tz.guess();
+        this.guessedTimezone = moment.tz.guess();
+    }
 
-        this._customTimezone = '';
+    setTimezone(timezone) {
+        this.customTimezone = timezone;
     }
 
     getTimezone() : ITimezone {
-        return this._customTimezone || this._guessedTimezone;
+        return this.customTimezone || this.guessedTimezone;
     }
 }
