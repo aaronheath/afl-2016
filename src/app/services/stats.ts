@@ -43,11 +43,11 @@ export class StatsService {
 
         this.observable$ = new Observable((observer) => {
             this._observer = observer;
-        }).share();
 
-        this._loadMatches();
-        this._loadTeams();
-        this._loadVenues();
+            this._loadMatches();
+            this._loadTeams();
+            this._loadVenues();
+        }).share();
     }
 
     /**
