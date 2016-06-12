@@ -6,7 +6,11 @@ An example [Angular 2](https://angular.io/) app to track the 2016 [AFL](http://a
 
 ## Status
 
-Alpha (as of 27/3/2016)
+Alpha
+
+## Demo
+
+A demo of the master branch is available at [afl.aaronheath.com](http://afl.aaronheath.com/).
 
 ## Why?
 
@@ -90,5 +94,7 @@ This is not a complete project. Here's my (very) rough TODO's.
 - ~~Remote testing framework (travis-ci)~~
 - Deploy
 - Many more tests
+- Use classes variables for Matches, Venues, Teams instead of simple objects
 - UI Improvements
+- Optimise performance (currently unpacked results in ~400 asset downloads per page load)
 - More Stats

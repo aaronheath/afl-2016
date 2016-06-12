@@ -18,6 +18,7 @@ module.exports = function(config) {
 
             // Angular 2 Prerequisites
             {pattern: 'node_modules/zone.js/dist/zone.js', included: true, watched: false},
+            {pattern: 'node_modules/zone.js/dist/fake-async-test.js', included: true, watched: false},
             {pattern: 'node_modules/reflect-metadata/Reflect.js', included: true, watched: false},
             {pattern: 'node_modules/systemjs/dist/system.src.js', included: true, watched: true},
             {pattern: 'node_modules/systemjs/dist/system-polyfills.js', included: true, watched: true},
