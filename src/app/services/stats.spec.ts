@@ -2,7 +2,7 @@ import {provide} from '@angular/core';
 import {Http, BaseRequestOptions, Response, ResponseOptions} from '@angular/http';
 import {MockBackend, MockConnection} from '@angular/http/testing';
 import {Observable} from 'rxjs/Observable';
-import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@angular/core/testing';
+import {beforeEachProviders, beforeEach, describe, expect, inject, it, fakeAsync, tick} from '@angular/core/testing';
 
 import {TestUtils} from '../tests/test-utils';
 import {StatsService} from './stats';
@@ -15,6 +15,8 @@ import {getTeams} from '../tests/example-data-teams';
 import {getMatches} from '../tests/example-data-matches';
 import {getVenues} from '../tests/example-data-venues';
 
+declare const moment;
+
 const testUtils = new TestUtils();
 
 describe('StatsService', () => {
@@ -22,7 +24,15 @@ describe('StatsService', () => {
         provide(
             StatsService,
             {
-                useFactory: (matches, teams, venues, time) => new StatsService(matches, teams, venues, time),
+                useFactory: (matches, teams, venues, time) => {
+                    const service = new StatsService(matches, teams, venues, time);
+
+                    spyOn(service, '_loadMatches').and.callThrough();
+                    spyOn(service, '_loadTeams').and.callThrough();
+                    spyOn(service, '_loadVenues').and.callThrough();
+
+                    return service;
+                },
                 deps: [MatchesService, TeamsService, VenuesService, TimeService],
             }
         ),
@@ -106,93 +116,126 @@ describe('StatsService', () => {
         });
     }));
 
-    //it('load() should fetch team data and call next on the observer', inject([
-    //    TeamsService,
-    //], (service: TeamsService) => {
-    //    const promise = new Promise((resolve, reject) => {
-    //        let loadCalls = 0;
-    //
-    //        service.observable$.subscribe((data) => {
-    //            loadCalls++;
-    //
-    //            if(loadCalls === 1) {
-    //                service.load();
-    //            }
-    //
-    //            if(loadCalls === 2) {
-    //                expect(service.load).toHaveBeenCalledTimes(loadCalls);
-    //
-    //                expect(testUtils.mockedBackend.connectionsArray.length).toBe(2);
-    //                expect(testUtils.mockedBackend.connectionsArray[1].request.method).toBe(0); // GET
-    //                expect(testUtils.mockedBackend.connectionsArray[1].request.url).toBe('/data/teams.json');
-    //
-    //                resolve();
-    //            }
-    //        });
-    //    });
-    //
-    //    return promise;
-    //}), testUtils.standardTimeout);
-    //
-    //it('load() http call should handle an error response', () => {
-    //    // Little different this spec as we're needing to overwrite the standard beforeEach so that we can instead
-    //    // have the http call return an error.
-    //
-    //    testUtils.resetProviders(providers);
-    //
-    //    testUtils.generateMockBackend()();
-    //
-    //    spyOn(console, 'error');
-    //
-    //    const fn = inject([TeamsService], (service: TeamsService) => {
-    //        const promise = new Promise((resolve, reject) => {
-    //            setTimeout(() => {
-    //                expect(console.error).toHaveBeenCalledWith('Could not load teams.', undefined);
-    //
-    //                resolve();
-    //            }, 500);
-    //
-    //            service.observable$.subscribe((data) => {
-    //                reject('should not have been called');
-    //            });
-    //        });
-    //
-    //        return promise;
-    //    });
-    //
-    //    return fn();
-    //}, testUtils.standardTimeout);
-    //
-    //it('getTeams() should return all teams', inject([TeamsService], (
-    //    service: TeamsService
-    //) => {
-    //    service.observable$.subscribe((data) => {
-    //        const allTeams = service.getTeams();
-    //        let team;
-    //
-    //        // Adelaide
-    //        team = allTeams['ADL'];
-    //        expect(team).toBeDefined();
-    //        expect(team.fullName).toBe('Adelaide');
-    //        expect(team.abbreviation).toBe('ADL');
-    //        expect(team.city).toBe('Adelaide');
-    //        expect(team.state).toBe('SA');
-    //
-    //        // Essendon
-    //        team = allTeams['ESS'];
-    //        expect(team).toBeDefined();
-    //        expect(team.fullName).toBe('Essendon');
-    //        expect(team.abbreviation).toBe('ESS');
-    //        expect(team.city).toBe('Melbourne');
-    //        expect(team.state).toBe('VIC');
-    //
-    //        // Port Adelaide
-    //        team = allTeams['PA'];
-    //        expect(team).toBeDefined();
-    //        expect(team.fullName).toBe('Port Adelaide');
-    //        expect(team.abbreviation).toBe('PA');
-    //        expect(team.city).toBe('Adelaide');
-    //        expect(team.state).toBe('SA');
-    //    });
-    //}));
+    it('on construction observable should not be called if one (or more) `loads` doesn\'t fails', fakeAsync(() => {
+        testUtils.resetProviders(providers);
+
+        testUtils.generateMockBackend()();
+
+        spyOn(console, 'error');
+
+        return inject([StatsService], (service: StatsService) => {
+            service.observable$.subscribe(() => {
+                expect(false).toBe(true); // This should never be called
+            });
+
+            tick(500);
+
+            expect(console.error).toHaveBeenCalled();
+        })();
+    }));
+
+    it('getMatchesByRound() should return all matches for round', inject([StatsService], (
+        service: StatsService
+    ) => {
+        service.observable$.subscribe((data) => {
+            const rnd1 = service.getMatchesByRound(1);
+
+            expect(Array.isArray(rnd1)).toBe(true);
+            expect(rnd1.length).toBe(9);
+
+            // Test all matches in round have the expected attrs defined
+            rnd1.forEach((match) => {
+                hasAttrs(match, [
+                    'h_home',
+                    'h_home_abbr',
+                    'h_away',
+                    'h_away_abbr',
+                    'h_venue',
+                    'h_venue_abbr',
+                    'venue_moment',
+                    'local_moment',
+                    'local_datetime',
+                    'h_date',
+                    'h_venue_time',
+                    'h_local_time',
+                ]);
+            });
+
+            // Test individual match (round 2, match 2) has matching attrs
+            const rnd2 = service.getMatchesByRound(2);
+            const r2m2 = rnd2[1];
+
+            expect(r2m2.h_home).toBe('Adelaide');
+            expect(r2m2.h_home_abbr).toBe('ADL');
+            expect(r2m2.h_away).toBe('Port Adelaide');
+            expect(r2m2.h_away_abbr).toBe('PA');
+            expect(r2m2.h_venue).toBe('Adelaide Oval');
+            expect(r2m2.h_venue_abbr).toBe('AO');
+            expect(r2m2.venue_moment).toEqual(jasmine.any(moment));
+        });
+    }));
+
+    it('getRoundNumbers() should return array of known round numbers', inject([StatsService], (
+        service: StatsService
+    ) => {
+        service.observable$.subscribe((data) => {
+            const rounds = service.getRoundNumbers();
+
+            expect(Array.isArray(rounds)).toBe(true);
+            expect(rounds.length).toBe(2);
+        });
+    }));
+
+    it('getLadder() should return ladder array', inject([StatsService], (
+        service: StatsService
+    ) => {
+        service.observable$.subscribe((data) => {
+            const ladder = service.getLadder();
+
+            expect(Array.isArray(ladder)).toBe(true);
+            expect(ladder.length).toBe(18);
+
+            // Expect 1st to be Western Bulldogs
+            const first = ladder[0];
+            expect(first.h_name).toBe('Western Bulldogs');
+            expect(first.played).toBe(1);
+            expect(first.percentage).toBe(271.05);
+            expect(first.points).toBe(4);
+
+            // Expect 9th to be Richmond
+            const eighth = ladder[7];
+            expect(eighth.h_name).toBe('Richmond');
+            expect(eighth.played).toBe(2);
+            expect(eighth.percentage).toBe(104.71);
+            expect(eighth.points).toBe(4);
+
+            // Expect 9th to be Melbourne
+            const ninth = ladder[8];
+            expect(ninth.h_name).toBe('Melbourne');
+            expect(ninth.played).toBe(1);
+            expect(ninth.percentage).toBe(102.56);
+            expect(ninth.points).toBe(4);
+        });
+    }));
+
+    it('getSummaryForRound() should return round summary object', inject([StatsService], (
+        service: StatsService
+    ) => {
+        service.observable$.subscribe((data) => {
+            const summary = service.getSummaryForRound(1);
+
+            expect(summary.matchPlayed).toBe(true);
+            expect(summary.goals).toBe(255);
+            expect(summary.behinds).toBe(218);
+            expect(summary.totalPoints).toBe(1748);
+            expect(summary.accuracy).toBe(53.911205073995774);
+            expect(summary.attendance).toBe(360850);
+        });
+    }));
 });
+
+function hasAttrs(obj, attrs) {
+    attrs.forEach((attr) => {
+        expect(obj[attr]).toBeDefined();
+    });
+}

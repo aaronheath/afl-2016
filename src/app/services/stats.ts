@@ -3,6 +3,7 @@ import {Observable} from 'rxjs/Observable';
 import {Subscriber} from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
+import 'rxjs/add/operator/skip';
 import {generateLadder} from '../helpers/ladder';
 import {generateMatches} from '../helpers/matches';
 import {generateSummaries} from '../helpers/summaries';
@@ -42,12 +43,13 @@ export class StatsService {
         };
 
         this.observable$ = new Observable((observer) => {
+            //debugger;
             this._observer = observer;
 
             this._loadMatches();
             this._loadTeams();
             this._loadVenues();
-        }).share();
+        }).skip(2).share();
     }
 
     /**
