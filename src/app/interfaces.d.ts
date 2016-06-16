@@ -180,6 +180,22 @@ interface IBasicObjNum {
 }
 
 /**
+ * Item
+ */
+
+interface IItemData {
+    [x: string]: any;
+}
+
+interface IItem {
+    create(data: IItemData): this;
+    get(keys: string[] | string): any;
+    equals(key: string, value: any): boolean;
+    uid(): symbol;
+    isUid(symbol: symbol): boolean;
+}
+
+/**
  * ES6 & ES7 FEATURES UNKNOWN TO TYPESCRIPT (AT LEAST FOR NOW)
  *
  * Removes compile error for ES6 Object.assign()
