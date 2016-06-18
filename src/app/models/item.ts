@@ -1,13 +1,9 @@
-import {Injectable} from '@angular/core';
 import {Map} from 'immutable';
 import {ItemException} from '../exceptions/item';
 
 declare const Symbol;
 
-// TODO Convert this class over to not require Angular
-
-@Injectable()
-export class Item implements IItem {
+export abstract class Item implements IItem {
     protected symbol : symbol;
     protected data : Map<string, any>;
 
@@ -27,6 +23,10 @@ export class Item implements IItem {
 
     public get(keys : string[] | string) : any | any[] {
         const values = this.getFromArray(this.toArray(keys));
+
+        if(values.length === 0) {
+            return;
+        }
 
         return values.length === 1 ? values[0] : values;
     }

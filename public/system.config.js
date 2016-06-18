@@ -33,6 +33,7 @@
         'lodash': 'node_modules/lodash/lodash.js',
         'marked': 'node_modules/marked/lib/marked.js',
         'numeral': 'node_modules/numeral/min/numeral.min.js',
+        'immutable': 'node_modules/immutable/dist/immutable.min.js',
     };
 
     global.afl2016 = {

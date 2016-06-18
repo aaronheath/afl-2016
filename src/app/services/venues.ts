@@ -4,6 +4,8 @@ import {Observable} from 'rxjs/Observable';
 import {Subscriber} from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
+import VenueModel from '../models/venue';
+import 'lodash';
 
 @Injectable()
 export class VenuesService {
@@ -30,6 +32,20 @@ export class VenuesService {
 
         observable.subscribe(data => {
             this._dataStore.venues = data;
+
+            _.forEach(data, (attrs, id) => {
+                VenueModel.create({
+                    id: id,
+                    fullName: attrs.fullName,
+                    abbreviation: attrs.abbreviation,
+                    city: attrs.city,
+                    state: attrs.state,
+                    timezone: attrs.timezone,
+                });
+            });
+
+            console.log(VenueModel.find('AO').get('fullName'));
+
             this._observer.next(this._dataStore.venues);
         }, (error) => {
             console.error('Could not load venues.', error);
