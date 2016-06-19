@@ -5,6 +5,8 @@ import {Subscriber} from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 import {loopMatches} from '../helpers/matches';
+import MatchModel from '../models/match';
+import 'lodash';
 
 @Injectable()
 export class MatchesService {
@@ -30,6 +32,32 @@ export class MatchesService {
 
         observable.subscribe(data => {
             this._dataStore.matches = this._calculateAttrs(data);
+
+            _.forEach(data, (roundMatches, roundNo) => {
+                _.forEach(roundMatches, (match) => {
+                    MatchModel.updateOrCreate(
+                        [
+                            {key: 'roundNo', value: roundNo},
+                            {key: 'home', value: match.home},
+                            {key: 'away', value: match.away},
+                        ], {
+                            home: match.home,
+                            homeGoals: match.homeGoals,
+                            homeBehinds: match.homeBehinds,
+                            away: match.away,
+                            awayGoals: match.awayGoals,
+                            awayBehinds: match.awayBehinds,
+                            venue: match.venue,
+                            date: match.date,
+                            time: match.time,
+                            attendance: match.attendance,
+                            roundNo: +roundNo,
+                        }
+                    );
+                });
+            });
+
+            console.log(MatchModel.where([{key: 'roundNo', value: 3}])[0].homePoints());
 
             this._observer.next(this._dataStore.matches);
         }, (error) => {
@@ -79,5 +107,9 @@ export class MatchesService {
      */
     getAllMatches() : IMatches {
         return this._dataStore.matches;
+    }
+
+    getByRound(roundNo) : IItem[] {
+        return MatchModel.where([{key: 'roundNo', value: +roundNo}]);
     }
 }

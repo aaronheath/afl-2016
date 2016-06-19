@@ -28,6 +28,24 @@ describe('Item', () => {
         expect(service.get('key1')).toBe(testData.key1);
     });
 
+    it('fill() update items values', () => {
+        service.create(testData);
+
+        const updated = {
+            key1: 'value1a',
+            key2: 'value2a',
+            key3: 'value3',
+        };
+
+        service.fill(updated);
+
+        const response = service.get(Object.keys(updated));
+
+        expect(response[0]).toEqual(updated.key1);
+        expect(response[1]).toEqual(updated.key2);
+        expect(response[2]).toEqual(updated.key3);
+    });
+
     it('get() should return select item attrs', () => {
         service.create(testData);
 

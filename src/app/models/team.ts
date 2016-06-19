@@ -1,19 +1,18 @@
 import {Model} from './model';
 import {Item} from './item';
 
-class VenueItem extends Item {}
+class TeamItem extends Item {}
 
-class VenueModel extends Model {
+class TeamModel extends Model {
     protected fillable = [
         'id',
         'fullName',
         'abbreviation',
         'city',
         'state',
-        'timezone',
     ];
 }
 
-const model = new VenueModel(VenueItem);
+const model = new TeamModel(TeamItem);
 
 export default model;

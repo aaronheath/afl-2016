@@ -180,6 +180,16 @@ interface IBasicObjNum {
 }
 
 /**
+ * Model
+ */
+
+interface IModelWhereAttrs {
+    key: string;
+    value: any;
+    operator?: string;
+}
+
+/**
  * Item
  */
 
@@ -189,6 +199,7 @@ interface IItemData {
 
 interface IItem {
     create(data: IItemData): this;
+    fill(data: IItemData): this;
     get(keys: string[] | string): any;
     equals(key: string, value: any): boolean;
     uid(): symbol;

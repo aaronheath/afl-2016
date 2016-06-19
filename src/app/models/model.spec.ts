@@ -15,6 +15,7 @@ describe('Model', () => {
     let model, testData, fillableData;
 
     beforeEach(() => {
+        //console.log('set model');
         model = new AbstractedModel(Item);
 
         testData = {
@@ -57,6 +58,20 @@ describe('Model', () => {
         expect(() => model.create(testData)).toThrow(
             exception('Item attributes are not permitted during mass assignment.')
         );
+    });
+
+    it('updateOrCreate() should create new item', () => {
+        const response = model.updateOrCreate([{key: 'id', value: 1}], fillableData);
+        expect(response.get('id')).toBe(fillableData.id);
+    });
+
+    it('updateOrCreate() should update existing item', () => {
+        model.create(fillableData);
+
+        const update = {key3: 'new-value'};
+
+        const response = model.updateOrCreate([{key: 'id', value: 1}], update);
+        expect(response.get('key3')).toBe(update.key3);
     });
 
     it('find() should find the first item with the given id', () => {
@@ -111,6 +126,40 @@ describe('Model', () => {
         const response = model.findByUid(Symbol());
 
         expect(response).toBeUndefined();
+    });
+
+    it('where() should return items with matching key vales (first item)', () => {
+        model.create(fillableData);
+        model.create(Object.assign(fillableData, {id: 2}));
+
+        const check = model.where([{key: 'id', value: 1}]);
+        expect(check[0].get('id')).toBe(1);
+    });
+
+    it('where() should return items with matching key vales (last item)', () => {
+        model.create(fillableData);
+        model.create(Object.assign(fillableData, {id: 2}));
+
+        const check = model.where([{key: 'id', value: 2}]);
+        expect(check[0].get('id')).toBe(2);
+    });
+
+    it('where() should return items with matching key vales (multiple attrs)', () => {
+        model.create(fillableData);
+        model.create(Object.assign(fillableData, {id: 2}));
+
+        const check = model.where([{key: 'id', value: 2}, {key: 'key3', value: 'value3'}]);
+        expect(check.length).toBe(1);
+        expect(check[0].get('id')).toBe(2);
+        expect(check[0].get('key3')).toBe('value3');
+    });
+
+    it('where() should return items with matching key vales (not found)', () => {
+        model.create(fillableData);
+        model.create(Object.assign(fillableData, {id: 2}));
+
+        const check = model.where([{key: 'id', value: 99}]);
+        expect(check.length).toBe(0);
     });
 });
 

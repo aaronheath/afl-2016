@@ -21,6 +21,12 @@ export abstract class Item implements IItem {
         return this;
     }
 
+    public fill(data : IItemData) : this {
+        this.data = this.data.merge(data);
+
+        return this;
+    }
+
     public get(keys : string[] | string) : any | any[] {
         const values = this.getFromArray(this.toArray(keys));
 

@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {RouteParams} from '@angular/router-deprecated';
 
 import {StatsService} from '../../services/stats';
+import {MatchesService} from '../../services/matches';
 import {ListMatchesComponent} from '../list-matches/list-matches';
 import {RoundSummaryComponent} from '../round-summary/round-summary';
 import {FormatNumber} from '../../pipes/format-number';
@@ -34,7 +35,8 @@ export class PageRoundComponent implements OnInit {
 
     constructor(
         private _routeParams: RouteParams,
-        private _statsService: StatsService
+        private _statsService: StatsService,
+        private _matchesService: MatchesService
     ) {
     }
 
@@ -43,10 +45,14 @@ export class PageRoundComponent implements OnInit {
 
         this.roundNumber = parseInt(roundNumber, 10);
 
-        this.matches = this._statsService.getMatchesByRound(this.roundNumber);
+        //this.matches = this._statsService.getMatchesByRound(this.roundNumber);
+        this.matches = this._matchesService.getByRound(this.roundNumber);
+        console.log('this.matches', this.matches);
 
         this._statsService.observable$.subscribe(() => {
-            this.matches = this._statsService.getMatchesByRound(this.roundNumber);
+            //this.matches = this._statsService.getMatchesByRound(this.roundNumber);
+            this.matches = this._matchesService.getByRound(this.roundNumber);
+            console.log('this.matches', this.matches);
         });
     }
 

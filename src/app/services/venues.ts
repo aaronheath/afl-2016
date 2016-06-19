@@ -34,7 +34,7 @@ export class VenuesService {
             this._dataStore.venues = data;
 
             _.forEach(data, (attrs, id) => {
-                VenueModel.create({
+                VenueModel.updateOrCreate([{key: 'id', value: id}], {
                     id: id,
                     fullName: attrs.fullName,
                     abbreviation: attrs.abbreviation,

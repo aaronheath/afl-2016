@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 
+import {TimeService} from '../../services/time';
 import {SortMatches} from '../../pipes/sort-matches';
 import {FormatNumber} from '../../pipes/format-number';
 
@@ -9,6 +10,9 @@ import {FormatNumber} from '../../pipes/format-number';
     pipes: [
         SortMatches,
         FormatNumber,
+    ],
+    providers: [
+        TimeService
     ],
     inputs: ['matches'],
     template: `
@@ -31,20 +35,20 @@ import {FormatNumber} from '../../pipes/format-number';
             </tr>
         </thead>
         <tbody *ngIf="matches">
-            <tr *ngFor="let match of matches | sortMatches">
-                <td>{{ match.h_date }}</td>
-                <td [class.positive]="match.result === match.home">{{ match.h_home }}</td>
-                <td>{{ match.homeGoals }}</td>
-                <td>{{ match.homeBehinds }}</td>
-                <td>{{ match.homePoints }}</td>
-                <td [class.positive]="match.result === match.away">{{ match.h_away }}</td>
-                <td>{{ match.awayGoals }}</td>
-                <td>{{ match.awayBehinds }}</td>
-                <td>{{ match.awayPoints }}</td>
-                <td>{{ match.h_venue }}</td>
-                <td>{{ match.h_venue_time }}</td>
-                <td>{{ match.h_local_time }}</td>
-                <td>{{ match.attendance | formatNumber }}</td>
+            <tr *ngFor="let match of matches">
+                <td>{{ match.date() }}</td>
+                <td [class.positive]="match.result() === match.get('home')">{{ match.home().get('fullName') }}</td>
+                <td>{{ match.get('homeGoals') }}</td>
+                <td>{{ match.get('homeBehinds') }}</td>
+                <td>{{ match.homePoints() }}</td>
+                <td [class.positive]="match.result() === match.get('away')">{{ match.away().get('fullName') }}</td>
+                <td>{{ match.get('awayGoals') }}</td>
+                <td>{{ match.get('awayBehinds') }}</td>
+                <td>{{ match.awayPoints() }}</td>
+                <td>{{ match.venue().get('fullName') }}</td>
+                <td>{{ match.time() }}</td>
+                <td>{{ match.timeTz(getTimezone()) }}</td>
+                <td>{{ match.get('attendance') | formatNumber }}</td>
             </tr>
         </tbody>
     </table>
@@ -54,7 +58,11 @@ import {FormatNumber} from '../../pipes/format-number';
 export class ListMatchesComponent implements OnInit {
     matches : IMatch[];
 
-    constructor() {}
+    constructor(private _timeService: TimeService) {}
 
     ngOnInit() {}
+
+    getTimezone() {
+        return this._timeService.getTimezone();
+    }
 }

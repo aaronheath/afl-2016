@@ -3,6 +3,8 @@ import {Component, OnInit} from '@angular/core';
 import {StatsService} from '../../services/stats';
 import {FormatPercentage} from '../../pipes/format-percentage';
 
+import VenueModel from '../../models/venue';
+
 @Component({
     selector: 'ladder',
     directives: [],
