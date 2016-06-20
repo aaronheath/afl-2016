@@ -5,12 +5,12 @@ import VenueModel from './venue';
 
 declare const moment;
 
-class MatchItem extends Item {
-    public homePoints()  {
+class MatchItem extends Item implements IItemMatch {
+    public homePoints() {
         return this.points('home');
     }
 
-    public awayPoints()  {
+    public awayPoints() {
         return this.points('away');
     }
 
@@ -106,6 +106,12 @@ class MatchModel extends Model {
         'attendance',
         'roundNo',
     ];
+
+    public wherePlayed() {
+        return this.all().filter((item) => {
+            return !!item.result();
+        });
+    }
 }
 
 const model = new MatchModel(MatchItem);

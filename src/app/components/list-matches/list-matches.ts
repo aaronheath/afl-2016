@@ -12,7 +12,7 @@ import {FormatNumber} from '../../pipes/format-number';
         FormatNumber,
     ],
     providers: [
-        TimeService
+        TimeService,
     ],
     inputs: ['matches'],
     template: `

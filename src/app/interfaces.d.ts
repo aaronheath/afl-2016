@@ -200,10 +200,16 @@ interface IItemData {
 interface IItem {
     create(data: IItemData): this;
     fill(data: IItemData): this;
+    set(key: string, value: any): this;
     get(keys: string[] | string): any;
     equals(key: string, value: any): boolean;
     uid(): symbol;
     isUid(symbol: symbol): boolean;
+    toObject(): any;
+}
+
+interface IItemMatch extends IItem {
+    result(): string;
 }
 
 /**

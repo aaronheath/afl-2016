@@ -27,8 +27,14 @@ export abstract class Item implements IItem {
         return this;
     }
 
+    public set(key, value) {
+        this.data = this.data.set(key, value);
+
+        return this;
+    }
+
     public get(keys : string[] | string) : any | any[] {
-        const values = this.getFromArray(this.toArray(keys));
+        const values = this.getFromArray(this.convertToArray(keys));
 
         if(values.length === 0) {
             return;
@@ -53,7 +59,13 @@ export abstract class Item implements IItem {
         return this.symbol === symbol;
     }
 
-    protected toArray<T>(data : T | T[]) : T[] {
+    public toObject() {
+        console.log('this.data', this.data);
+
+        return this.data.toObject();
+    }
+
+    protected convertToArray<T>(data : T | T[]) : T[] {
         return Array.isArray(data) ? data : [data];
     }
 }

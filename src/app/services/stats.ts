@@ -7,6 +7,8 @@ import 'rxjs/add/operator/skip';
 import {generateLadder} from '../helpers/ladder';
 import {generateMatches} from '../helpers/matches';
 import {generateSummaries} from '../helpers/summaries';
+import MatchModel from '../models/match';
+import LadderModel from '../models/ladder';
 
 declare const moment;
 
@@ -132,10 +134,59 @@ export class StatsService {
             this._dataStore.matches
         );
 
+        this.generateLadder();
+
         this._dataStore.summaries = generateSummaries(
             this._dataStore.matches
         );
     }
+
+    generateLadder() {
+        const matches = MatchModel.wherePlayed();
+
+        matches.forEach((match) => {
+            let homeTeam = LadderModel.find(match.get('home'));
+            let awayTeam = LadderModel.find(match.get('away'));
+
+            if(!homeTeam) {
+                homeTeam = LadderModel.create({id: match.get('home')});
+            }
+
+            if(!awayTeam) {
+                awayTeam = LadderModel.create({id: match.get('away')});
+            }
+
+            // Increment Win/Loss/Draw
+            if(match.result() === match.get('home')) {
+                homeTeam.set('wins', (homeTeam.get('wins') || 0) + 1);
+                awayTeam.set('losses', (homeTeam.get('losses') || 0) + 1);
+            } else if(match.result() === match.get('away')) {
+                homeTeam.set('losses', (homeTeam.get('losses') || 0) + 1);
+                awayTeam.set('wins', (homeTeam.get('wins') || 0) + 1);
+            } else {
+                homeTeam.set('draws', (homeTeam.get('draws') || 0) + 1);
+                awayTeam.set('draws', (homeTeam.get('draws') || 0) + 1);
+            }
+
+            // Increment Game Points
+            homeTeam.set('goalsFor', (homeTeam.get('goalsFor') || 0) + match.get('homeGoals'));
+            homeTeam.set('goalsAgainst', (homeTeam.get('goalsAgainst') || 0) + match.get('awayGoals'));
+            homeTeam.set('behindsFor', (homeTeam.get('behindsFor') || 0) + match.get('homeBehinds'));
+            homeTeam.set('behindsAgainst', (homeTeam.get('behindsAgainst') || 0) + match.get('awayBehinds'));
+
+            awayTeam.set('goalsFor', (awayTeam.get('goalsFor') || 0) + match.get('awayGoals'));
+            awayTeam.set('goalsAgainst', (awayTeam.get('goalsAgainst') || 0) + match.get('homeGoals'));
+            awayTeam.set('behindsFor', (awayTeam.get('behindsFor') || 0) + match.get('awayBehinds'));
+            awayTeam.set('behindsAgainst', (awayTeam.get('behindsAgainst') || 0) + match.get('homeBehinds'));
+        });
+
+        //console.log('played matches', matches);
+        let ess = LadderModel.find('ESS');
+        console.log('ladder array', [ess, ess.toObject(), ess.get('id')]);
+    }
+
+    // TODO make this a utility helper
+
 
     /**
      * Returns matches for requested round

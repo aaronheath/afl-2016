@@ -1,6 +1,14 @@
 import 'lodash';
 import {ModelException} from '../exceptions/model';
 
+/**
+ * TODO Features that may one day be implemented
+ * - Default values for items
+ * - One to one relationships
+ * - One to many relationships
+ * - Many to many relationships
+ */
+
 export abstract class Model {
     protected models : IItem[] = [];
     protected fillable = [];
@@ -52,17 +60,17 @@ export abstract class Model {
         }
     }
 
-    protected itemCreate(data) {
+    protected itemCreate(data) : IItem {
         const item : IItem = new this.item();
 
         return item.create(data);
     }
 
-    public find(id) {
+    public find(id) : IItem {
         return this.findWhere('id', id);
     }
 
-    public findWhere(key, value) {
+    public findWhere(key, value) : IItem {
         return this.models.find((model) => {
             return model.equals(key, value);
         });
@@ -79,15 +87,16 @@ export abstract class Model {
 
         return this.models.filter((item) => {
             const response = attrs.reduce((prev, attr, i) => {
-                //console.log('in reduce', [prev, attr, i]);
-
                 if(!prev) {
                     return prev;
                 }
 
                 if(!attr.operator || attr.operator === '=') {
-                    //console.log('item.get(attr.key) === attr.value', item.get(attr.key) === attr.value);
                     return item.get(attr.key) === attr.value;
+                }
+
+                if(attr.operator === '!=') {
+                    return item.get(attr.key) !== attr.value;
                 }
 
                 // TODO implement support for operators
@@ -98,7 +107,7 @@ export abstract class Model {
         });
     }
 
-    public all() {
+    public all() : IItem[] {
         return this.models;
     }
 
