@@ -60,8 +60,6 @@ export abstract class Item implements IItem {
     }
 
     public toObject() {
-        console.log('this.data', this.data);
-
         return this.data.toObject();
     }
 

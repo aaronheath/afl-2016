@@ -3,14 +3,12 @@ import {Component, OnInit} from '@angular/core';
 import {StatsService} from '../../services/stats';
 import {FormatPercentage} from '../../pipes/format-percentage';
 
-import VenueModel from '../../models/venue';
-
 @Component({
     selector: 'ladder',
     directives: [],
     inputs: [],
     pipes: [
-        FormatPercentage
+        FormatPercentage,
     ],
     template: `
         <table class="ui celled table structured compact striped">
@@ -37,19 +35,19 @@ import VenueModel from '../../models/venue';
             </thead>
             <tbody>
                 <tr *ngFor="let team of ladder; let i = index" [class.positive]="i < 8">
-                    <td>{{ team.h_name }}</td>
-                    <td>{{ team.played }}</td>
-                    <td><strong>{{ team.wins }}</strong></td>
-                    <td><strong>{{ team.losses }}</strong></td>
-                    <td><strong>{{ team.draws }}</strong></td>
-                    <td>{{ team.goalsFor }}</td>
-                    <td>{{ team.behindsFor }}</td>
-                    <td>{{ team.pointsFor }}</td>
-                    <td>{{ team.goalsAgainst }}</td>
-                    <td>{{ team.behindsAgainst }}</td>
-                    <td>{{ team.pointsAgainst }}</td>
-                    <td><strong>{{ team.percentage | formatPercentage }}</strong></td>
-                    <td><strong>{{ team.points }}</strong></td>
+                    <td><span *ngIf="team.team()">{{ team.team().get('fullName') }}</span></td>
+                    <td>{{ team.played() }}</td>
+                    <td><strong>{{ team.get('wins') || 0 }}</strong></td>
+                    <td><strong>{{ team.get('losses') || 0 }}</strong></td>
+                    <td><strong>{{ team.get('draws') || 0 }}</strong></td>
+                    <td>{{ team.get('goalsFor') || 0 }}</td>
+                    <td>{{ team.get('behindsFor') || 0 }}</td>
+                    <td>{{ team.pointsFor() }}</td>
+                    <td>{{ team.get('goalsAgainst') || 0 }}</td>
+                    <td>{{ team.get('behindsAgainst') || 0 }}</td>
+                    <td>{{ team.pointsAgainst() }}</td>
+                    <td><strong>{{ team.percentage() | formatPercentage }}</strong></td>
+                    <td><strong>{{ team.points() }}</strong></td>
                 </tr>
             </tbody>
         </table>

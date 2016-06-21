@@ -144,6 +144,8 @@ export class StatsService {
     generateLadder() {
         const matches = MatchModel.wherePlayed();
 
+        LadderModel.reset();
+
         matches.forEach((match) => {
             let homeTeam = LadderModel.find(match.get('home'));
             let awayTeam = LadderModel.find(match.get('away'));
@@ -159,13 +161,13 @@ export class StatsService {
             // Increment Win/Loss/Draw
             if(match.result() === match.get('home')) {
                 homeTeam.set('wins', (homeTeam.get('wins') || 0) + 1);
-                awayTeam.set('losses', (homeTeam.get('losses') || 0) + 1);
+                awayTeam.set('losses', (awayTeam.get('losses') || 0) + 1);
             } else if(match.result() === match.get('away')) {
                 homeTeam.set('losses', (homeTeam.get('losses') || 0) + 1);
-                awayTeam.set('wins', (homeTeam.get('wins') || 0) + 1);
+                awayTeam.set('wins', (awayTeam.get('wins') || 0) + 1);
             } else {
                 homeTeam.set('draws', (homeTeam.get('draws') || 0) + 1);
-                awayTeam.set('draws', (homeTeam.get('draws') || 0) + 1);
+                awayTeam.set('draws', (awayTeam.get('draws') || 0) + 1);
             }
 
             // Increment Game Points
@@ -179,10 +181,6 @@ export class StatsService {
             awayTeam.set('behindsFor', (awayTeam.get('behindsFor') || 0) + match.get('awayBehinds'));
             awayTeam.set('behindsAgainst', (awayTeam.get('behindsAgainst') || 0) + match.get('homeBehinds'));
         });
-
-        //console.log('played matches', matches);
-        let ess = LadderModel.find('ESS');
-        console.log('ladder array', [ess, ess.toObject(), ess.get('id')]);
     }
 
     // TODO make this a utility helper
@@ -217,7 +215,8 @@ export class StatsService {
      * @returns {ILadderTeam[]}
      */
     getLadder() : ILadderTeam[] {
-        return this._dataStore.ladder;
+        //return this._dataStore.ladder;
+        return LadderModel.ranked();
     }
 
     /**

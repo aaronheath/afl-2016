@@ -118,4 +118,8 @@ export abstract class Model {
     public remove() {
         //
     }
+
+    public reset() {
+        this.models = [];
+    }
 }
