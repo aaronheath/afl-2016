@@ -4,7 +4,7 @@ import {ModelException} from '../exceptions/model';
 
 declare const Symbol;
 
-class AbstractedModel extends Model {
+class AbstractedModel<T extends IItem> extends Model<T> {
     protected fillable = [
         'id',
         'key3',
@@ -16,7 +16,7 @@ describe('Model', () => {
 
     beforeEach(() => {
         //console.log('set model');
-        model = new AbstractedModel(Item);
+        model = new AbstractedModel<Item>(Item);
 
         testData = {
             key1: 'value1',

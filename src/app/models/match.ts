@@ -92,7 +92,7 @@ class MatchItem extends Item implements IItemMatch {
     }
 }
 
-class MatchModel extends Model {
+class MatchModel<T extends IItem & MatchItem> extends Model<T> {
     protected fillable = [
         'home',
         'homeGoals',
@@ -114,6 +114,6 @@ class MatchModel extends Model {
     }
 }
 
-const model = new MatchModel(MatchItem);
+const model = new MatchModel<MatchItem>(MatchItem);
 
 export default model;

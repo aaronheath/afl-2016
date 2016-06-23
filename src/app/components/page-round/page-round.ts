@@ -31,7 +31,7 @@ import {FormatPercentage} from '../../pipes/format-percentage';
 
 export class PageRoundComponent implements OnInit {
     roundNumber : number;
-    matches : IMatch[];
+    matches : IItemMatch[];
 
     constructor(
         private _routeParams: RouteParams,
@@ -61,7 +61,7 @@ export class PageRoundComponent implements OnInit {
      *
      * @returns {any}
      */
-    getMatches() : IMatch[] {
+    getMatches() : IItemMatch[] {
         return this.matches;
     }
 }

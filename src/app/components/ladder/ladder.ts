@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 
 import {StatsService} from '../../services/stats';
 import {FormatPercentage} from '../../pipes/format-percentage';
+import { LadderItem } from '../../models/index';
 
 @Component({
     selector: 'ladder',
@@ -55,7 +56,7 @@ import {FormatPercentage} from '../../pipes/format-percentage';
 })
 
 export class LadderComponent implements OnInit {
-    ladder : ILadderTeam[];
+    ladder : LadderItem[];
 
     constructor(
         private _statsService: StatsService

@@ -109,7 +109,7 @@ export class MatchesService {
         return this._dataStore.matches;
     }
 
-    getByRound(roundNo) : IItem[] {
+    getByRound(roundNo) : IItemMatch[] {
         return MatchModel.where([{key: 'roundNo', value: +roundNo}]);
     }
 }

@@ -212,6 +212,10 @@ interface IItemMatch extends IItem {
     result(): string;
 }
 
+interface IItemLadder extends IItem {
+    result(): string;
+}
+
 /**
  * ES6 & ES7 FEATURES UNKNOWN TO TYPESCRIPT (AT LEAST FOR NOW)
  *

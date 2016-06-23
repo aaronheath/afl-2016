@@ -9,8 +9,8 @@ import {ModelException} from '../exceptions/model';
  * - Many to many relationships
  */
 
-export abstract class Model {
-    protected models : IItem[] = [];
+export class Model<T extends IItem> {
+    protected models : T[] = [];
     protected fillable = [];
     protected item;
 
@@ -60,8 +60,8 @@ export abstract class Model {
         }
     }
 
-    protected itemCreate(data) : IItem {
-        const item : IItem = new this.item();
+    protected itemCreate(data) : T {
+        const item : T = new this.item();
 
         return item.create(data);
     }
@@ -82,7 +82,7 @@ export abstract class Model {
         });
     }
 
-    public where(attrs : IModelWhereAttrs[]) : IItem[] {
+    public where(attrs : IModelWhereAttrs[]) : T[] {
         //console.log('this.models', this.models)
 
         return this.models.filter((item) => {
@@ -107,7 +107,7 @@ export abstract class Model {
         });
     }
 
-    public all() : IItem[] {
+    public all() : T[] {
         return this.models;
     }
 

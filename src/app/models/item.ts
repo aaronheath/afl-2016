@@ -3,7 +3,7 @@ import {ItemException} from '../exceptions/item';
 
 declare const Symbol;
 
-export abstract class Item implements IItem {
+export class Item implements IItem {
     protected symbol : symbol;
     protected data : Map<string, any>;
 
@@ -11,7 +11,7 @@ export abstract class Item implements IItem {
         this.symbol = Symbol();
     }
 
-    public create(data : IItemData) : this {
+    create(data : IItemData) : this {
         if(!Object.keys(data).length) {
             throw new ItemException('Unable to create item from empty object.');
         }

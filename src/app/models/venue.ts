@@ -3,7 +3,7 @@ import {Item} from './item';
 
 class VenueItem extends Item {}
 
-class VenueModel extends Model {
+class VenueModel<T extends IItem & VenueItem> extends Model<T> {
     protected fillable = [
         'id',
         'fullName',
@@ -14,6 +14,6 @@ class VenueModel extends Model {
     ];
 }
 
-const model = new VenueModel(VenueItem);
+const model = new VenueModel<VenueItem>(VenueItem);
 
 export default model;

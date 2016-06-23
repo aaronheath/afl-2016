@@ -197,24 +197,24 @@ describe('StatsService', () => {
 
             // Expect 1st to be Western Bulldogs
             const first = ladder[0];
-            expect(first.h_name).toBe('Western Bulldogs');
-            expect(first.played).toBe(1);
-            expect(first.percentage).toBe(271.05);
-            expect(first.points).toBe(4);
+            expect(first.team().get('fullName')).toBe('Western Bulldogs');
+            expect(first.played()).toBe(1);
+            expect(first.percentage()).toBe(271.05);
+            expect(first.points()).toBe(4);
 
             // Expect 9th to be Richmond
             const eighth = ladder[7];
-            expect(eighth.h_name).toBe('Richmond');
-            expect(eighth.played).toBe(2);
-            expect(eighth.percentage).toBe(104.71);
-            expect(eighth.points).toBe(4);
+            expect(eighth.team().get('fullName')).toBe('Richmond');
+            expect(eighth.played()).toBe(2);
+            expect(eighth.percentage()).toBe(104.71);
+            expect(eighth.points()).toBe(4);
 
             // Expect 9th to be Melbourne
             const ninth = ladder[8];
-            expect(ninth.h_name).toBe('Melbourne');
-            expect(ninth.played).toBe(1);
-            expect(ninth.percentage).toBe(102.56);
-            expect(ninth.points).toBe(4);
+            expect(ninth.team().get('fullName')).toBe('Melbourne');
+            expect(ninth.played()).toBe(1);
+            expect(ninth.percentage()).toBe(102.56);
+            expect(ninth.points()).toBe(4);
         });
     }));
 

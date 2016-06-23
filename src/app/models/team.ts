@@ -3,7 +3,7 @@ import {Item} from './item';
 
 class TeamItem extends Item {}
 
-class TeamModel extends Model {
+class TeamModel<T extends IItem & TeamItem> extends Model<T> {
     protected fillable = [
         'id',
         'fullName',
@@ -13,6 +13,6 @@ class TeamModel extends Model {
     ];
 }
 
-const model = new TeamModel(TeamItem);
+const model = new TeamModel<TeamItem>(TeamItem);
 
 export default model;

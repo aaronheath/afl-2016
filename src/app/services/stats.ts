@@ -8,7 +8,7 @@ import {generateLadder} from '../helpers/ladder';
 import {generateMatches} from '../helpers/matches';
 import {generateSummaries} from '../helpers/summaries';
 import MatchModel from '../models/match';
-import LadderModel from '../models/ladder';
+import { Ladder, LadderItem } from '../models/index';
 
 declare const moment;
 
@@ -144,18 +144,18 @@ export class StatsService {
     generateLadder() {
         const matches = MatchModel.wherePlayed();
 
-        LadderModel.reset();
+        Ladder.reset();
 
         matches.forEach((match) => {
-            let homeTeam = LadderModel.find(match.get('home'));
-            let awayTeam = LadderModel.find(match.get('away'));
+            let homeTeam = Ladder.find(match.get('home'));
+            let awayTeam = Ladder.find(match.get('away'));
 
             if(!homeTeam) {
-                homeTeam = LadderModel.create({id: match.get('home')});
+                homeTeam = Ladder.create({id: match.get('home')});
             }
 
             if(!awayTeam) {
-                awayTeam = LadderModel.create({id: match.get('away')});
+                awayTeam = Ladder.create({id: match.get('away')});
             }
 
             // Increment Win/Loss/Draw
@@ -214,9 +214,9 @@ export class StatsService {
      *
      * @returns {ILadderTeam[]}
      */
-    getLadder() : ILadderTeam[] {
+    getLadder() : LadderItem[] {
         //return this._dataStore.ladder;
-        return LadderModel.ranked();
+        return Ladder.ranked();
     }
 
     /**
