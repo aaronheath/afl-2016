@@ -1,5 +1,6 @@
 import 'lodash';
-import {ModelException} from '../exceptions/model';
+
+import { ModelException } from '../exceptions/index';
 
 /**
  * TODO Features that may one day be implemented
@@ -18,9 +19,7 @@ export class Model<T extends IItem> {
         this.item = item;
     }
 
-    public create(data = {}) : IItem {
-        //console.log('create', data);
-
+    create(data = {}) : IItem {
         if(!Object.keys(data).length) {
             throw new ModelException('Item contains no attributes.');
         }
@@ -50,7 +49,7 @@ export class Model<T extends IItem> {
      * Create or update a record matching the attributes, and fill it with values.
      * @param data
      */
-    public updateOrCreate(attrs : IModelWhereAttrs[], data = {}) : IItem {
+    updateOrCreate(attrs : IModelWhereAttrs[], data = {}) : IItem {
         const matches = this.where(attrs);
 
         if(matches.length === 0) {
@@ -66,25 +65,23 @@ export class Model<T extends IItem> {
         return item.create(data);
     }
 
-    public find(id) : IItem {
+    find(id) : IItem {
         return this.findWhere('id', id);
     }
 
-    public findWhere(key, value) : IItem {
+    findWhere(key, value) : IItem {
         return this.models.find((model) => {
             return model.equals(key, value);
         });
     }
 
-    public findByUid(symbol) {
+    findByUid(symbol) {
         return this.models.find((model) => {
             return model.isUid(symbol);
         });
     }
 
-    public where(attrs : IModelWhereAttrs[]) : T[] {
-        //console.log('this.models', this.models)
-
+    where(attrs : IModelWhereAttrs[]) : T[] {
         return this.models.filter((item) => {
             const response = attrs.reduce((prev, attr, i) => {
                 if(!prev) {
@@ -107,19 +104,11 @@ export class Model<T extends IItem> {
         });
     }
 
-    public all() : T[] {
+    all() : T[] {
         return this.models;
     }
 
-    public get() {
-        //
-    }
-
-    public remove() {
-        //
-    }
-
-    public reset() {
+    reset() {
         this.models = [];
     }
 }

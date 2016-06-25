@@ -1,12 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import {TimeService} from '../../services/time';
-import {SortMatches} from '../../pipes/sort-matches';
-import {FormatNumber} from '../../pipes/format-number';
+import { TimeService } from '../../services/index';
+import { FormatNumber, SortMatches } from '../../pipes/index';
 
 @Component({
     selector: 'list-matches',
-    directives: [],
     pipes: [
         SortMatches,
         FormatNumber,
@@ -54,7 +52,6 @@ import {FormatNumber} from '../../pipes/format-number';
     </table>
     `,
 })
-
 export class ListMatchesComponent implements OnInit {
     matches : IMatch[];
 

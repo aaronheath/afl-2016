@@ -1,12 +1,11 @@
-import { Item } from './item';
-import TeamModel from './team';
+import { Item, Team } from './index';
 
 export class LadderItem extends Item implements IItem {
-    public team() {
-        return TeamModel.find(this.get('id'));
+    team() {
+        return Team.find(this.get('id'));
     }
 
-    public played() {
+    played() {
         const wins = this.get('wins') || 0;
         const losses = this.get('losses') || 0;
         const draws = this.get('draws') || 0;
@@ -14,29 +13,29 @@ export class LadderItem extends Item implements IItem {
         return wins + losses + draws;
     }
 
-    public pointsFor() {
+    pointsFor() {
         return this.totalPoints('goalsFor', 'behindsFor');
     }
 
-    public pointsAgainst() {
+    pointsAgainst() {
         return this.totalPoints('goalsAgainst', 'behindsAgainst');
     }
 
-    private totalPoints(goalsKey, behindsKey) {
+    totalPoints(goalsKey, behindsKey) {
         const goals = this.get(goalsKey) || 0;
         const behinds = this.get(behindsKey) || 0;
 
         return goals * 6 + behinds;
     }
 
-    public percentage() {
+    percentage() {
         const pointsFor = this.pointsFor();
         const pointsAgainst = this.pointsAgainst();
 
         return ((Math.round(pointsFor / pointsAgainst * 10000)) / 100) || 0;
     }
 
-    public points() {
+    points() {
         const wins = this.get('wins') || 0;
         const draws = this.get('draws') || 0;
 

@@ -1,5 +1,6 @@
-import {Map} from 'immutable';
-import {ItemException} from '../exceptions/item';
+import { Map } from 'immutable';
+
+import { ItemException } from '../exceptions/index';
 
 declare const Symbol;
 
@@ -21,19 +22,19 @@ export class Item implements IItem {
         return this;
     }
 
-    public fill(data : IItemData) : this {
+    fill(data : IItemData) : this {
         this.data = this.data.merge(data);
 
         return this;
     }
 
-    public set(key, value) {
+    set(key, value) {
         this.data = this.data.set(key, value);
 
         return this;
     }
 
-    public get(keys : string[] | string) : any | any[] {
+    get(keys : string[] | string) : any | any[] {
         const values = this.getFromArray(this.convertToArray(keys));
 
         if(values.length === 0) {
@@ -47,19 +48,19 @@ export class Item implements IItem {
         return this.data.filter((val, key) => keys.includes(key)).toArray();
     }
 
-    public equals(key : string, value : any) : boolean {
+    equals(key : string, value : any) : boolean {
         return this.data.get(key) === value;
     }
 
-    public uid() : symbol {
+    uid() : symbol {
         return this.symbol;
     }
 
-    public isUid(symbol : symbol) : boolean {
+    isUid(symbol : symbol) : boolean {
         return this.symbol === symbol;
     }
 
-    public toObject() {
+    toObject() {
         return this.data.toObject();
     }
 

@@ -1,13 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import {StatsService} from '../../services/stats';
-import {FormatPercentage} from '../../pipes/format-percentage';
+import { StatsService } from '../../services/index';
+import { FormatPercentage } from '../../pipes/index';
 import { LadderItem } from '../../models/index';
 
 @Component({
     selector: 'ladder',
-    directives: [],
-    inputs: [],
     pipes: [
         FormatPercentage,
     ],
@@ -54,7 +52,6 @@ import { LadderItem } from '../../models/index';
         </table>
     `,
 })
-
 export class LadderComponent implements OnInit {
     ladder : LadderItem[];
 

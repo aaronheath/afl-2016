@@ -5,7 +5,7 @@ import {Subscriber} from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 import {loopMatches} from '../helpers/matches';
-import MatchModel from '../models/match';
+import { Match } from '../models/index';
 import 'lodash';
 
 @Injectable()
@@ -35,7 +35,7 @@ export class MatchesService {
 
             _.forEach(data, (roundMatches, roundNo) => {
                 _.forEach(roundMatches, (match) => {
-                    MatchModel.updateOrCreate(
+                    Match.updateOrCreate(
                         [
                             {key: 'roundNo', value: roundNo},
                             {key: 'home', value: match.home},
@@ -57,7 +57,7 @@ export class MatchesService {
                 });
             });
 
-            console.log(MatchModel.where([{key: 'roundNo', value: 3}])[0].homePoints());
+            console.log(Match.where([{key: 'roundNo', value: 3}])[0].homePoints());
 
             this._observer.next(this._dataStore.matches);
         }, (error) => {
@@ -110,6 +110,6 @@ export class MatchesService {
     }
 
     getByRound(roundNo) : IItemMatch[] {
-        return MatchModel.where([{key: 'roundNo', value: +roundNo}]);
+        return Match.where([{key: 'roundNo', value: +roundNo}]);
     }
 }

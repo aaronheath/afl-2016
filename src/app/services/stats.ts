@@ -4,11 +4,11 @@ import {Subscriber} from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/skip';
+
 import {generateLadder} from '../helpers/ladder';
 import {generateMatches} from '../helpers/matches';
 import {generateSummaries} from '../helpers/summaries';
-import MatchModel from '../models/match';
-import { Ladder, LadderItem } from '../models/index';
+import { Ladder, LadderItem, Match } from '../models/index';
 
 declare const moment;
 
@@ -142,7 +142,7 @@ export class StatsService {
     }
 
     generateLadder() {
-        const matches = MatchModel.wherePlayed();
+        const matches = Match.wherePlayed();
 
         Ladder.reset();
 

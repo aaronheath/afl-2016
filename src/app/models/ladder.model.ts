@@ -1,5 +1,4 @@
-import { Model } from './model';
-import { LadderItem } from './ladder.item';
+import { LadderItem, Model } from './index';
 
 export class LadderModel<T extends IItem & LadderItem> extends Model<T> {
     protected fillable = [
@@ -13,7 +12,7 @@ export class LadderModel<T extends IItem & LadderItem> extends Model<T> {
         'behindsAgainst',
     ];
 
-    public ranked() : LadderItem[] {
+    ranked() : LadderItem[] {
         return this.all().sort((a, b) => {
             let compare;
 

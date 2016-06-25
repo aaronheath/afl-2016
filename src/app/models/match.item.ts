@@ -1,16 +1,13 @@
-import {Model} from './model';
-import {Item} from './item';
-import TeamModel from './team';
-import VenueModel from './venue';
+import { Item, Team, Venue } from './index';
 
 declare const moment;
 
-class MatchItem extends Item implements IItemMatch {
-    public homePoints() {
+export class MatchItem extends Item implements IItemMatch {
+    homePoints() {
         return this.points('home');
     }
 
-    public awayPoints() {
+    awayPoints() {
         return this.points('away');
     }
 
@@ -25,7 +22,7 @@ class MatchItem extends Item implements IItemMatch {
         return goals * 6 + behinds;
     }
 
-    public margin() {
+    margin() {
         const home = this.homePoints();
         const away = this.awayPoints();
 
@@ -36,7 +33,7 @@ class MatchItem extends Item implements IItemMatch {
         return Math.abs(home - away);
     }
 
-    public result() {
+    result() {
         const home = this.homePoints();
         const away = this.awayPoints();
 
@@ -55,31 +52,31 @@ class MatchItem extends Item implements IItemMatch {
         return 'DRAW';
     }
 
-    public home() {
+    home() {
         return this.team('home');
     }
 
-    public away() {
+    away() {
         return this.team('away');
     }
 
     private team(attr) {
-        return TeamModel.find(this.get(attr));
+        return Team.find(this.get(attr));
     }
 
-    public venue() {
-        return VenueModel.find(this.get('venue'));
+    venue() {
+        return Venue.find(this.get('venue'));
     }
 
-    public date(format = 'ddd D MMM', timezone?) {
+    date(format = 'ddd D MMM', timezone?) {
         return this.moment().format(format);
     }
 
-    public time(format = 'HH:mm') {
+    time(format = 'HH:mm') {
         return this.moment().format(format);
     }
 
-    public timeTz(timezone, format = 'HH:mm') {
+    timeTz(timezone, format = 'HH:mm') {
         return this.moment().clone().tz(timezone).format(format);
     }
 
@@ -91,29 +88,3 @@ class MatchItem extends Item implements IItemMatch {
         );
     }
 }
-
-class MatchModel<T extends IItem & MatchItem> extends Model<T> {
-    protected fillable = [
-        'home',
-        'homeGoals',
-        'homeBehinds',
-        'away',
-        'awayGoals',
-        'awayBehinds',
-        'venue',
-        'date',
-        'time',
-        'attendance',
-        'roundNo',
-    ];
-
-    public wherePlayed() {
-        return this.all().filter((item) => {
-            return !!item.result();
-        });
-    }
-}
-
-const model = new MatchModel<MatchItem>(MatchItem);
-
-export default model;

@@ -4,7 +4,7 @@ import {Observable} from 'rxjs/Observable';
 import {Subscriber} from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
-import TeamModel from '../models/team';
+import { Team } from '../models/index';
 import 'lodash';
 
 @Injectable()
@@ -33,7 +33,7 @@ export class TeamsService {
             this._dataStore.teams = data;
 
             _.forEach(data, (attrs, id) => {
-                TeamModel.updateOrCreate([{key: 'id', value: id}], {
+                Team.updateOrCreate([{key: 'id', value: id}], {
                     id: id,
                     fullName: attrs.fullName,
                     abbreviation: attrs.abbreviation,
@@ -42,7 +42,7 @@ export class TeamsService {
                 });
             });
 
-            console.log(TeamModel.find('ESS').get('fullName'));
+            console.log(Team.find('ESS').get('fullName'));
 
             this._observer.next(this._dataStore.teams);
         }, (error) => {

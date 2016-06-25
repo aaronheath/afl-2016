@@ -1,11 +1,12 @@
-import { Injectable } from '@angular/core';
-import {Http} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
-import {Subscriber} from 'rxjs/Subscriber';
+import 'lodash';
+import { Observable } from 'rxjs/Observable';
+import { Subscriber } from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
-import VenueModel from '../models/venue';
-import 'lodash';
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+
+import { Venue } from '../models/index';
 
 @Injectable()
 export class VenuesService {
@@ -34,7 +35,7 @@ export class VenuesService {
             this._dataStore.venues = data;
 
             _.forEach(data, (attrs, id) => {
-                VenueModel.updateOrCreate([{key: 'id', value: id}], {
+                Venue.updateOrCreate([{key: 'id', value: id}], {
                     id: id,
                     fullName: attrs.fullName,
                     abbreviation: attrs.abbreviation,
@@ -44,7 +45,7 @@ export class VenuesService {
                 });
             });
 
-            console.log(VenueModel.find('AO').get('fullName'));
+            console.log(Venue.find('AO').get('fullName'));
 
             this._observer.next(this._dataStore.venues);
         }, (error) => {

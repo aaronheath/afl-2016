@@ -1,12 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {RouteParams} from '@angular/router-deprecated';
+import { Component, OnInit } from '@angular/core';
+import { RouteParams } from '@angular/router-deprecated';
 
-import {StatsService} from '../../services/stats';
-import {MatchesService} from '../../services/matches';
-import {ListMatchesComponent} from '../list-matches/list-matches';
-import {RoundSummaryComponent} from '../round-summary/round-summary';
-import {FormatNumber} from '../../pipes/format-number';
-import {FormatPercentage} from '../../pipes/format-percentage';
+import { MatchesService, StatsService } from '../../services/index';
+import { FormatNumber, FormatPercentage } from '../../pipes/index';
+import { ListMatchesComponent } from '../list-matches/list-matches';
+import { RoundSummaryComponent } from '../round-summary/round-summary';
 
 @Component({
     directives: [
@@ -28,7 +26,6 @@ import {FormatPercentage} from '../../pipes/format-percentage';
         </div>
     `,
 })
-
 export class PageRoundComponent implements OnInit {
     roundNumber : number;
     matches : IItemMatch[];
@@ -45,14 +42,11 @@ export class PageRoundComponent implements OnInit {
 
         this.roundNumber = parseInt(roundNumber, 10);
 
-        //this.matches = this._statsService.getMatchesByRound(this.roundNumber);
         this.matches = this._matchesService.getByRound(this.roundNumber);
         console.log('this.matches', this.matches);
 
         this._statsService.observable$.subscribe(() => {
-            //this.matches = this._statsService.getMatchesByRound(this.roundNumber);
             this.matches = this._matchesService.getByRound(this.roundNumber);
-            console.log('this.matches', this.matches);
         });
     }
 
