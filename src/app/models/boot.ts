@@ -1,3 +1,9 @@
+/**
+ * Instantiated and export Models.
+ *
+ * Throughout the app these instantiated models will be the canonical instance.
+ */
+
 import {
     LadderItem,
     LadderModel,

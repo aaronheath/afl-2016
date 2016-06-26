@@ -3,6 +3,10 @@ import 'lodash';
 import { Item } from './index';
 import { ModelException } from '../exceptions/index';
 
+/**
+ * Interface(s)
+ */
+
 export interface ModelWhereAttrs {
     key: string;
     value: any;
@@ -10,25 +14,69 @@ export interface ModelWhereAttrs {
 }
 
 /**
- * TODO Features that may one day be implemented
+ * Base Model which can be expanded as required for unique models.
+ *
+ * Influenced by Laravel's Eloquent ORM (https://laravel.com/docs/5.2/eloquent).
+ *
+ * TODO Some of the features that may or may not be implemented one day:
  * - Default values for items
  * - One to one relationships
  * - One to many relationships
  * - Many to many relationships
  */
-
 export class Model<T extends Item> {
+    /**
+     * Array of Items
+     *
+     * @type {Array}
+     */
     protected models : T[] = [];
-    protected transitoryUse = false;
+
+    /**
+     * Used when chaining methods to enable further limiting / sorting of results.
+     *
+     * True: An existing response limiting call has been made.
+     * False: No existing response limiting call has been made.
+     *
+     * Example:
+     * Item.where([{key: 'test', value: 'testing'}]).orderBy('id', 'desc').get();
+     *
+     * @type {boolean}
+     */
+    protected transitoryUse : boolean = false;
+
+    /**
+     * Limited and / or sorted array of Items. Used when this.transitoryUse is true as the data for further operations
+     * to be performed against.
+     *
+     * @type {Array}
+     */
     protected transitoryModels : T[] = [];
-    protected fillable = [];
+
+    /**
+     * Fields permissible to be set with Item's create method.
+     *
+     * @type {string[]}
+     */
+    protected fillable : string[] = [];
+
+    /**
+     * Non initialised Item for Model.
+     */
     protected item;
 
+    /**
+     * Constructor.
+     *
+     * Expects Item to be provided which will be initialised when Items are being created.
+     *
+     * @param item
+     */
     constructor(item) {
         this.item = item;
     }
 
-    create(data = {}) : Item {
+    create(data = {}) : T {
         if(!Object.keys(data).length) {
             throw new ModelException('Item contains no attributes.');
         }
@@ -58,7 +106,7 @@ export class Model<T extends Item> {
      * Will attempt to locate item using the given key / value pairs. If the item can not be found, an item will be
      * created with the given attributes. If item is found, data is NOT updated.
      */
-    firstOrCreate(attrs : ModelWhereAttrs[], data = {}) : Item {
+    firstOrCreate(attrs : ModelWhereAttrs[], data = {}) : T {
         const matches = this.where(attrs).get();
 
         if(matches.length === 0) {
@@ -73,7 +121,7 @@ export class Model<T extends Item> {
      * created with the given attributes. If item is found, data WILL BE updated.
      * @param data
      */
-    updateOrCreate(attrs : ModelWhereAttrs[], data = {}) : Item {
+    updateOrCreate(attrs : ModelWhereAttrs[], data = {}) : T {
         const matches = this.where(attrs).get();
 
         if(matches.length === 0) {
