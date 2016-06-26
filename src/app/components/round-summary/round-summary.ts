@@ -3,8 +3,10 @@ import 'lodash';
 import {Component, OnInit} from '@angular/core';
 
 import {StatsService} from '../../services/stats';
+import { MatchSummaryService, RoundSummary } from '../../services/match-summary';
 import {FormatNumber} from '../../pipes/format-number';
 import {FormatPercentage} from '../../pipes/format-percentage';
+import { MatchItem } from '../../models/index';
 
 @Component({
     directives: [],
@@ -96,17 +98,18 @@ import {FormatPercentage} from '../../pipes/format-percentage';
 
 export class RoundSummaryComponent implements OnInit {
     roundNumber : number;
-    summary : IRoundSummary;
+    summary;
 
     constructor(
-        private _statsService: StatsService
+        private _statsService: StatsService,
+        private _matchSummaryService: MatchSummaryService
     ) {}
 
     ngOnInit() {
-        this.summary = this._statsService.getSummaryForRound(this.roundNumber);
+        this.summary = this._matchSummaryService.getSummaryForRound(this.roundNumber);
 
         this._statsService.observable$.subscribe(() => {
-            this.summary = this._statsService.getSummaryForRound(this.roundNumber);
+            this.summary = this._matchSummaryService.getSummaryForRound(this.roundNumber);
         });
     }
 
@@ -173,22 +176,22 @@ export class RoundSummaryComponent implements OnInit {
      * @returns {string[]}
      * @private
      */
-    private _getMatchesScoreStringArray(key : string, matches : IMatch[]) {
-        return matches.map((match) => {
+    private _getMatchesScoreStringArray(key : string, matches : MatchItem[]) {
+        return matches.map((match : MatchItem) => {
             let winner, loser, highScore, lowScore;
 
-            if(match.homePoints > match.awayPoints) {
-                winner = match.h_home_abbr;
-                loser = match.h_away_abbr;
-                highScore = match.homePoints;
-                lowScore = match.awayPoints;
+            if(match.homePoints() > match.awayPoints()) {
+                winner = match.home().get('abbreviation');
+                loser = match.away().get('abbreviation');
+                highScore = match.homePoints();
+                lowScore = match.awayPoints();
             }
 
-            if(match.homePoints < match.awayPoints) {
-                winner = match.h_away_abbr;
-                loser = match.h_home_abbr;
-                highScore = match.awayPoints;
-                lowScore = match.homePoints;
+            if(match.homePoints() < match.awayPoints()) {
+                winner = match.away().get('abbreviation');
+                loser = match.home().get('abbreviation');
+                highScore = match.awayPoints();
+                lowScore = match.homePoints();
             }
 
             return this._getIndMatchScoreString(key, match, winner, loser, highScore, lowScore);
@@ -209,15 +212,15 @@ export class RoundSummaryComponent implements OnInit {
      */
     private _getIndMatchScoreString(
         key : string,
-        match : IMatch,
+        match : MatchItem,
         winner : string,
         loser : string,
         highScore : number,
         lowScore : number
     ) : string {
-        if(match.homePoints === match.awayPoints) {
-            return `${match.awayPoints} <small>by</small>
-                ${match.h_home_abbr} <small>&</small> ${match.h_away_abbr} <small>in drawn game</small>`;
+        if(match.homePoints() === match.awayPoints()) {
+            return `${match.awayPoints()} <small>by</small> ${match.home().get('abbreviation')} <small>&</small>
+            ${match.away().get('abbreviation')} <small>in drawn game</small>`;
         }
 
         let firstTeam;

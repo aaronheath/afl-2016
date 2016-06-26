@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
+import { zeroUndef } from '../../helpers/utils';
 import { StatsService } from '../../services/index';
 import { FormatPercentage } from '../../pipes/index';
 import { LadderItem } from '../../models/index';
@@ -36,14 +37,14 @@ import { LadderItem } from '../../models/index';
                 <tr *ngFor="let team of ladder; let i = index" [class.positive]="i < 8">
                     <td><span *ngIf="team.team()">{{ team.team().get('fullName') }}</span></td>
                     <td>{{ team.played() }}</td>
-                    <td><strong>{{ team.get('wins') || 0 }}</strong></td>
-                    <td><strong>{{ team.get('losses') || 0 }}</strong></td>
-                    <td><strong>{{ team.get('draws') || 0 }}</strong></td>
-                    <td>{{ team.get('goalsFor') || 0 }}</td>
-                    <td>{{ team.get('behindsFor') || 0 }}</td>
+                    <td><strong>{{ teamAttr(team, 'wins') }}</strong></td>
+                    <td><strong>{{ teamAttr(team, 'losses') }}</strong></td>
+                    <td><strong>{{ teamAttr(team, 'draws') }}</strong></td>
+                    <td>{{ teamAttr(team, 'goalsFor') }}</td>
+                    <td>{{ teamAttr(team, 'behindsFor') }}</td>
                     <td>{{ team.pointsFor() }}</td>
-                    <td>{{ team.get('goalsAgainst') || 0 }}</td>
-                    <td>{{ team.get('behindsAgainst') || 0 }}</td>
+                    <td>{{ teamAttr(team, 'goalsAgainst') }}</td>
+                    <td>{{ teamAttr(team, 'behindsAgainst') }}</td>
                     <td>{{ team.pointsAgainst() }}</td>
                     <td><strong>{{ team.percentage() | formatPercentage }}</strong></td>
                     <td><strong>{{ team.points() }}</strong></td>
@@ -65,5 +66,9 @@ export class LadderComponent implements OnInit {
         this._statsService.observable$.subscribe((data) => {
             this.ladder = this._statsService.getLadder();
         });
+    }
+
+    teamAttr(team, attr) {
+        return zeroUndef(team.get(attr));
     }
 }

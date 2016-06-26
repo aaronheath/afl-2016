@@ -5,6 +5,7 @@ import { MatchesService, StatsService } from '../../services/index';
 import { FormatNumber, FormatPercentage } from '../../pipes/index';
 import { ListMatchesComponent } from '../list-matches/list-matches';
 import { RoundSummaryComponent } from '../round-summary/round-summary';
+import { MatchItem } from '../../models/index';
 
 @Component({
     directives: [
@@ -28,7 +29,7 @@ import { RoundSummaryComponent } from '../round-summary/round-summary';
 })
 export class PageRoundComponent implements OnInit {
     roundNumber : number;
-    matches : IItemMatch[];
+    matches : MatchItem[];
 
     constructor(
         private _routeParams: RouteParams,
@@ -43,7 +44,6 @@ export class PageRoundComponent implements OnInit {
         this.roundNumber = parseInt(roundNumber, 10);
 
         this.matches = this._matchesService.getByRound(this.roundNumber);
-        console.log('this.matches', this.matches);
 
         this._statsService.observable$.subscribe(() => {
             this.matches = this._matchesService.getByRound(this.roundNumber);
@@ -55,7 +55,7 @@ export class PageRoundComponent implements OnInit {
      *
      * @returns {any}
      */
-    getMatches() : IItemMatch[] {
+    getMatches() : MatchItem[] {
         return this.matches;
     }
 }

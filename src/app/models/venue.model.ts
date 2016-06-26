@@ -1,6 +1,6 @@
-import { Model, VenueItem } from './index';
+import { Item, Model, VenueItem } from './index';
 
-export class VenueModel<T extends IItem & VenueItem> extends Model<T> {
+export class VenueModel<T extends Item & VenueItem> extends Model<T> {
     protected fillable = [
         'id',
         'fullName',
@@ -10,4 +10,3 @@ export class VenueModel<T extends IItem & VenueItem> extends Model<T> {
         'timezone',
     ];
 }
-

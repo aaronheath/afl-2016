@@ -1,5 +1,6 @@
-import {Component} from '@angular/core';
-import {TimeService} from '../../services/time';
+import { Component } from '@angular/core';
+
+import { TimeService, Timezone } from '../../services/index';
 
 @Component({
     selector: 'site-footer',
@@ -56,7 +57,7 @@ export class FooterComponent {
         private _timeService: TimeService
     ) {}
 
-    getTimezone() : ITimezone {
+    getTimezone() : Timezone {
         return this._timeService.getTimezone();
     }
 }

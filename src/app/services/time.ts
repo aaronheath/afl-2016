@@ -2,10 +2,12 @@ import {Injectable} from '@angular/core';
 
 declare const moment;
 
+export declare type Timezone = string;
+
 @Injectable()
 export class TimeService {
-    private guessedTimezone : ITimezone;
-    private customTimezone : ITimezone = '';
+    private guessedTimezone : Timezone;
+    private customTimezone : Timezone = '';
 
     constructor() {
         this.guessedTimezone = moment.tz.guess();
@@ -15,7 +17,7 @@ export class TimeService {
         this.customTimezone = timezone;
     }
 
-    getTimezone() : ITimezone {
+    getTimezone() : Timezone {
         return this.customTimezone || this.guessedTimezone;
     }
 }

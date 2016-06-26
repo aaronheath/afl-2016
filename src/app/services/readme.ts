@@ -5,11 +5,15 @@ import {Subscriber} from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 
+export interface ReadmeDataStore {
+    readme: string;
+}
+
 @Injectable()
 export class ReadmeService {
     observable$ : Observable<Subscriber<string>>;
     private _observer : Subscriber<string>;
-    private _dataStore : IReadmeDataStore;
+    private _dataStore : ReadmeDataStore;
 
     constructor(private _http: Http) {
         this._dataStore = { readme: '' };

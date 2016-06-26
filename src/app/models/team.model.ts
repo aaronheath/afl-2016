@@ -1,6 +1,6 @@
-import { Model, TeamItem } from './index';
+import { Item, Model, TeamItem } from './index';
 
-export class TeamModel<T extends IItem & TeamItem> extends Model<T> {
+export class TeamModel<T extends Item & TeamItem> extends Model<T> {
     protected fillable = [
         'id',
         'fullName',

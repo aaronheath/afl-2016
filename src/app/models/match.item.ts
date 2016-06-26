@@ -2,7 +2,7 @@ import { Item, Team, Venue } from './index';
 
 declare const moment;
 
-export class MatchItem extends Item implements IItemMatch {
+export class MatchItem extends Item {
     homePoints() {
         return this.points('home');
     }

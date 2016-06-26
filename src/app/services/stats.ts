@@ -5,10 +5,11 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/skip';
 
-import {generateLadder} from '../helpers/ladder';
-import {generateMatches} from '../helpers/matches';
-import {generateSummaries} from '../helpers/summaries';
-import { Ladder, LadderItem, Match } from '../models/index';
+//import {generateLadder} from '../helpers/ladder';
+//import {generateMatches} from '../helpers/matches';
+//import {generateSummaries} from '../helpers/summaries';
+import { zeroUndef } from '../helpers/utils';
+import { Ladder, LadderItem, Match, MatchItem, TeamItem, VenueItem } from '../models/index';
 
 declare const moment;
 
@@ -17,12 +18,26 @@ import {TeamsService} from './teams';
 import {VenuesService} from './venues';
 import {TimeService} from './time';
 
+//interface IStatsDataStore {
+//    matches: IMatches;
+//    summaries: ISummaries;
+//    teams: TeamItem[];
+//    venues: VenueItem[];
+//    ladder: ILadderTeam[];
+//}
+//
+//interface IStatsTempDataStore {
+//    matches: IMatches;
+//    teams: TeamItem[];
+//    venues: VenueItem[];
+//}
+
 @Injectable()
 export class StatsService {
-    observable$ : Observable<Subscriber<IStatsDataStore>>;
-    private _observer : Subscriber<IStatsDataStore>;
-    private _dataStore : IStatsDataStore;
-    private _tempDataStore : IStatsTempDataStore;
+    observable$ : Observable<Subscriber<boolean>>;
+    private _observer : Subscriber<boolean>;
+    //private _dataStore : IStatsDataStore;
+    //private _tempDataStore : IStatsTempDataStore;
 
     constructor(
         private _matchesService: MatchesService,
@@ -30,19 +45,19 @@ export class StatsService {
         private _venuesService: VenuesService,
         private _timeService: TimeService
     ) {
-        this._dataStore = {
-            ladder: [],
-            matches: {},
-            summaries: {},
-            teams: {},
-            venues: {},
-        };
-
-        this._tempDataStore = {
-            matches: {},
-            teams: {},
-            venues: {},
-        };
+        //this._dataStore = {
+        //    ladder: [],
+        //    matches: {},
+        //    summaries: {},
+        //    teams: [],
+        //    venues: [],
+        //};
+        //
+        //this._tempDataStore = {
+        //    matches: {},
+        //    teams: [],
+        //    venues: [],
+        //};
 
         this.observable$ = new Observable((observer) => {
             //debugger;
@@ -64,11 +79,11 @@ export class StatsService {
      */
     private _loadMatches() : void {
         this._matchesService.observable$.subscribe((data) => {
-            this._tempDataStore.matches = this._matchesService.getAllMatches();
+            //this._tempDataStore.matches = this._matchesService.getAllMatches();
 
             this._generateStats();
 
-            this._observer.next(this._dataStore);
+            this._observer.next(true);
         });
     }
 
@@ -82,11 +97,11 @@ export class StatsService {
      */
     private _loadTeams() : void {
         this._teamsService.observable$.subscribe((data) => {
-            this._tempDataStore.teams = this._teamsService.getTeams();
+            //this._tempDataStore.teams = this._teamsService.getTeams();
 
             this._generateStats();
 
-            this._observer.next(this._dataStore);
+            this._observer.next(true);
         });
     }
 
@@ -100,11 +115,11 @@ export class StatsService {
      */
     private _loadVenues() : void {
         this._venuesService.observable$.subscribe((data) => {
-            this._tempDataStore.venues = this._venuesService.getVenues();
+            //this._tempDataStore.venues = this._venuesService.getVenues();
 
             this._generateStats();
 
-            this._observer.next(this._dataStore);
+            this._observer.next(true);
         });
     }
 
@@ -114,77 +129,84 @@ export class StatsService {
      * @private
      */
     private _generateStats() : void {
-        this._dataStore.venues = this._tempDataStore.venues;
+        //this._dataStore.venues = this._tempDataStore.venues;
+        //
+        //this._dataStore.teams = this._tempDataStore.teams;
+        //
+        //if(!Object.keys(this._tempDataStore.matches).length) {
+        //    return;
+        //}
 
-        this._dataStore.teams = this._tempDataStore.teams;
+        //this._dataStore.matches = generateMatches(
+        //    this._tempDataStore.matches,
+        //    this._dataStore.teams,
+        //    this._tempDataStore.venues,
+        //    this._timeService.getTimezone()
+        //);
 
-        if(!Object.keys(this._tempDataStore.matches).length) {
-            return;
-        }
-
-        this._dataStore.matches = generateMatches(
-            this._tempDataStore.matches,
-            this._dataStore.teams,
-            this._tempDataStore.venues,
-            this._timeService.getTimezone()
-        );
-
-        this._dataStore.ladder = generateLadder(
-            this._dataStore.teams,
-            this._dataStore.matches
-        );
+        //this._dataStore.ladder = generateLadder(
+        //    this._dataStore.teams,
+        //    this._dataStore.matches
+        //);
 
         this.generateLadder();
 
-        this._dataStore.summaries = generateSummaries(
-            this._dataStore.matches
-        );
+        //this._dataStore.summaries = generateSummaries(
+        //    this._dataStore.matches
+        //);
     }
 
     generateLadder() {
-        const matches = Match.wherePlayed();
-
         Ladder.reset();
 
-        matches.forEach((match) => {
-            let homeTeam = Ladder.find(match.get('home'));
-            let awayTeam = Ladder.find(match.get('away'));
-
-            if(!homeTeam) {
-                homeTeam = Ladder.create({id: match.get('home')});
-            }
-
-            if(!awayTeam) {
-                awayTeam = Ladder.create({id: match.get('away')});
-            }
+        Match.wherePlayed().forEach((match) => {
+            const homeTeam = this.createTeamIfNotFound(match.get('home'));
+            const awayTeam = this.createTeamIfNotFound(match.get('away'));
 
             // Increment Win/Loss/Draw
             if(match.result() === match.get('home')) {
-                homeTeam.set('wins', (homeTeam.get('wins') || 0) + 1);
-                awayTeam.set('losses', (awayTeam.get('losses') || 0) + 1);
+                this.addResultToTeamAttr(homeTeam, 'wins');
+                this.addResultToTeamAttr(awayTeam, 'losses');
             } else if(match.result() === match.get('away')) {
-                homeTeam.set('losses', (homeTeam.get('losses') || 0) + 1);
-                awayTeam.set('wins', (awayTeam.get('wins') || 0) + 1);
+                this.addResultToTeamAttr(homeTeam, 'losses');
+                this.addResultToTeamAttr(awayTeam, 'wins');
             } else {
-                homeTeam.set('draws', (homeTeam.get('draws') || 0) + 1);
-                awayTeam.set('draws', (awayTeam.get('draws') || 0) + 1);
+                this.addResultToTeamAttr(homeTeam, 'draws');
+                this.addResultToTeamAttr(awayTeam, 'draws');
             }
 
             // Increment Game Points
-            homeTeam.set('goalsFor', (homeTeam.get('goalsFor') || 0) + match.get('homeGoals'));
-            homeTeam.set('goalsAgainst', (homeTeam.get('goalsAgainst') || 0) + match.get('awayGoals'));
-            homeTeam.set('behindsFor', (homeTeam.get('behindsFor') || 0) + match.get('homeBehinds'));
-            homeTeam.set('behindsAgainst', (homeTeam.get('behindsAgainst') || 0) + match.get('awayBehinds'));
+            this.addScoreToTeamAttr(homeTeam, 'goalsFor', match, 'homeGoals');
+            this.addScoreToTeamAttr(homeTeam, 'goalsAgainst', match, 'awayGoals');
+            this.addScoreToTeamAttr(homeTeam, 'behindsFor', match, 'homeBehinds');
+            this.addScoreToTeamAttr(homeTeam, 'behindsAgainst', match, 'awayBehinds');
 
-            awayTeam.set('goalsFor', (awayTeam.get('goalsFor') || 0) + match.get('awayGoals'));
-            awayTeam.set('goalsAgainst', (awayTeam.get('goalsAgainst') || 0) + match.get('homeGoals'));
-            awayTeam.set('behindsFor', (awayTeam.get('behindsFor') || 0) + match.get('awayBehinds'));
-            awayTeam.set('behindsAgainst', (awayTeam.get('behindsAgainst') || 0) + match.get('homeBehinds'));
+            this.addScoreToTeamAttr(awayTeam, 'goalsFor', match, 'awayGoals');
+            this.addScoreToTeamAttr(awayTeam, 'goalsAgainst', match, 'homeGoals');
+            this.addScoreToTeamAttr(awayTeam, 'behindsFor', match, 'awayBehinds');
+            this.addScoreToTeamAttr(awayTeam, 'behindsAgainst', match, 'homeBehinds');
         });
     }
 
-    // TODO make this a utility helper
+    protected createTeamIfNotFound(team) {
+        return Ladder.firstOrCreate([{key: 'id', value: team}], {id: team});
+    }
 
+    protected plusOne(value) {
+        return zeroUndef(value) + 1;
+    }
+
+    protected plusX(value, x) {
+        return zeroUndef(value) + x;
+    }
+
+    protected addResultToTeamAttr(team, key) {
+        team.set(key, this.plusOne(team.get(key)));
+    }
+
+    protected addScoreToTeamAttr(team, key, match, matchAttr) {
+        team.set(key, this.plusX(team.get(key), match.get(matchAttr)));
+    }
 
     /**
      * Returns matches for requested round
@@ -192,12 +214,8 @@ export class StatsService {
      * @param round
      * @returns {any}
      */
-    getMatchesByRound(round) : IMatch[] {
-        if(typeof this._dataStore.matches[round] === 'undefined') {
-            return [];
-        }
-
-        return this._dataStore.matches[round];
+    getMatchesByRound(round) : MatchItem[] {
+        return Match.where([{key: 'roundNo', value: round}]).get();
     }
 
     /**
@@ -206,7 +224,7 @@ export class StatsService {
      * @returns {number[]}
      */
     getRoundNumbers() : number[] {
-        return Object.keys(this._dataStore.matches).map(key => parseInt(key, 10));
+        return Match.roundNumbers();
     }
 
     /**
@@ -215,7 +233,6 @@ export class StatsService {
      * @returns {ILadderTeam[]}
      */
     getLadder() : LadderItem[] {
-        //return this._dataStore.ladder;
         return Ladder.ranked();
     }
 
@@ -225,11 +242,50 @@ export class StatsService {
      * @param round
      * @returns {any}
      */
-    getSummaryForRound(round) : IRoundSummary {
-        if(!this._dataStore.summaries.rounds || !this._dataStore.summaries.rounds[round]) {
-            return;
-        }
+    //getSummaryForRound(roundNo) : IRoundSummary {
+    //    // Highest Attendance
+    //    Match.where([{key: 'roundNo', value: +roundNo}]).orderBy('attendance', 'desc').get();
+    //
+    //    // Lowest Attendance
+    //    Match.where([{key: 'roundNo', value: +roundNo}]).orderBy('attendance').get();
+    //
+    //    // Overall Attendance
+    //    const attendance = Match.where([{key: 'roundNo', value: +roundNo}]).sum('attendance');
+    //
+    //    // Goals
+    //    const homeGoals = Match.where([{key: 'roundNo', value: +roundNo}]).sum('homeGoals');
+    //    const awayGoals = Match.where([{key: 'roundNo', value: +roundNo}]).sum('awayGoals');
+    //    const goals = homeGoals + awayGoals;
+    //
+    //    // Behinds
+    //    const homeBehinds = Match.where([{key: 'roundNo', value: +roundNo}]).sum('homeBehinds');
+    //    const awayBehinds = Match.where([{key: 'roundNo', value: +roundNo}]).sum('awayBehinds');
+    //    const behinds = homeBehinds + awayBehinds;
+    //
+    //    // Points
+    //    const points = goals * 6 + behinds;
+    //
+    //    // Accuracy
+    //    const accurancy = goals / (goals + behinds) * 100;
+    //
+    //    // Highest Scores
+    //    const highestHomeScore = Match.where([{key: 'roundNo', value: +roundNo}]).orderBy('homePoints', 'desc', true).get();
+    //    const highestAwayScore = Match.where([{key: 'roundNo', value: +roundNo}]).orderBy('awayPoints', 'desc', true).get();
+    //    // TODO compare each
+    //
+    //    // Highest Scores
+    //    const lowestHomeScore = Match.where([{key: 'roundNo', value: +roundNo}]).orderBy('homePoints', 'asc', true).get();
+    //    const lowestAwayScore = Match.where([{key: 'roundNo', value: +roundNo}]).orderBy('awayPoints', 'asc', true).get();
+    //    // TODO compare each
+    //
+    //    // Played
+    //    const played = Match.where([{key: 'roundNo', value: +roundNo}, {key: 'result', value: undefined, operator: '!='}]).count();
+    //
+    //    return {
+    //        matchPlayed: played,
+    //        attendance: attendance,
+    //    }
+    //}
 
-        return this._dataStore.summaries.rounds[round];
-    }
+
 }

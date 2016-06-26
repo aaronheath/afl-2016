@@ -1,6 +1,6 @@
-import { LadderItem, Model } from './index';
+import { Item, LadderItem, Model } from './index';
 
-export class LadderModel<T extends IItem & LadderItem> extends Model<T> {
+export class LadderModel<T extends Item & LadderItem> extends Model<T> {
     protected fillable = [
         'id',
         'wins',

@@ -4,7 +4,22 @@ import { ItemException } from '../exceptions/index';
 
 declare const Symbol;
 
-export class Item implements IItem {
+export interface ItemData {
+    [x: string]: any;
+}
+
+export interface ItemInterface {
+    create(data: ItemData): this;
+    fill(data: ItemData): this;
+    set(key: string, value: any): this;
+    get(keys: string[] | string): any;
+    equals(key: string, value: any): boolean;
+    uid(): symbol;
+    isUid(symbol: symbol): boolean;
+    toObject(): any;
+}
+
+export class Item implements ItemInterface {
     protected symbol : symbol;
     protected data : Map<string, any>;
 
@@ -12,7 +27,7 @@ export class Item implements IItem {
         this.symbol = Symbol();
     }
 
-    create(data : IItemData) : this {
+    create(data : ItemData) : this {
         if(!Object.keys(data).length) {
             throw new ItemException('Unable to create item from empty object.');
         }
@@ -22,7 +37,7 @@ export class Item implements IItem {
         return this;
     }
 
-    fill(data : IItemData) : this {
+    fill(data : ItemData) : this {
         this.data = this.data.merge(data);
 
         return this;

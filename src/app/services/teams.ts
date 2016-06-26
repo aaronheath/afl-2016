@@ -4,17 +4,16 @@ import {Observable} from 'rxjs/Observable';
 import {Subscriber} from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
-import { Team } from '../models/index';
+import { Team, TeamItem } from '../models/index';
 import 'lodash';
 
 @Injectable()
 export class TeamsService {
-    observable$ : Observable<Subscriber<ITeams>>;
-    private _observer : Subscriber<ITeams>;
-    private _dataStore : ITeamsDataStore;
+    observable$ : Observable<Subscriber<TeamItem[]>>;
+    private _observer : Subscriber<TeamItem[]>;
 
     constructor(private _http: Http) {
-        this._dataStore = { teams: {} };
+        //this._dataStore = { teams: {} };
 
         this.observable$ = new Observable((observer) => {
             this._observer = observer;
@@ -30,23 +29,25 @@ export class TeamsService {
         let observable = this._http.get('/data/teams.json').map(response => response.json());
 
         observable.subscribe(data => {
-            this._dataStore.teams = data;
+            this.updateOrCreateTeams(data);
 
-            _.forEach(data, (attrs, id) => {
-                Team.updateOrCreate([{key: 'id', value: id}], {
-                    id: id,
-                    fullName: attrs.fullName,
-                    abbreviation: attrs.abbreviation,
-                    city: attrs.city,
-                    state: attrs.state,
-                });
-            });
-
-            console.log(Team.find('ESS').get('fullName'));
-
-            this._observer.next(this._dataStore.teams);
+            this._observer.next(Team.all());
         }, (error) => {
             console.error('Could not load teams.', error);
+        });
+    }
+
+    private updateOrCreateTeams(data) {
+        _.forEach(data, this.updateOrCreate);
+    }
+
+    private updateOrCreate(attrs, id) {
+        Team.updateOrCreate([{key: 'id', value: id}], {
+            id: id,
+            fullName: attrs.fullName,
+            abbreviation: attrs.abbreviation,
+            city: attrs.city,
+            state: attrs.state,
         });
     }
 
@@ -55,7 +56,7 @@ export class TeamsService {
      *
      * @returns {ITeams}
      */
-    getTeams() : ITeams {
-        return this._dataStore.teams;
+    getTeams() : TeamItem[] {
+        return Team.all();
     }
 }

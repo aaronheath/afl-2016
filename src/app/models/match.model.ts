@@ -1,6 +1,6 @@
-import { Model, MatchItem } from './index';
+import { Item, Model, MatchItem } from './index';
 
-export class MatchModel<T extends IItem & MatchItem> extends Model<T> {
+export class MatchModel<T extends Item & MatchItem> extends Model<T> {
     protected fillable = [
         'home',
         'homeGoals',
@@ -19,5 +19,11 @@ export class MatchModel<T extends IItem & MatchItem> extends Model<T> {
         return this.all().filter((item) => {
             return !!item.result();
         });
+    }
+
+    public roundNumbers() {
+        const roundNumbers = this.all().map((item) => +item.get('roundNo'));
+
+        return _.uniq(roundNumbers);
     }
 }

@@ -19,7 +19,6 @@ import {
 
 import {getMatchesWithPointsAndTimes} from '../../tests/example-data-matches';
 
-import {SortMatches} from '../../pipes/sort-matches';
 import {FormatNumber} from '../../pipes/format-number';
 
 import {ListMatchesComponent} from './list-matches';
@@ -29,7 +28,6 @@ setBaseTestProviders(TEST_BROWSER_DYNAMIC_PLATFORM_PROVIDERS, TEST_BROWSER_DYNAM
 describe('ListMatchesComponent', () => {
     beforeEachProviders(() => {
         return [
-            SortMatches,
             FormatNumber,
         ];
     });

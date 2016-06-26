@@ -1,4 +1,13 @@
-import { LadderItem, LadderModel, MatchItem, MatchModel, TeamItem, TeamModel, VenueItem, VenueModel } from './index';
+import {
+    LadderItem,
+    LadderModel,
+    MatchItem,
+    MatchModel,
+    TeamItem,
+    TeamModel,
+    VenueItem,
+    VenueModel,
+} from './index';
 
 const ladder = new LadderModel<LadderItem>(LadderItem);
 const match = new MatchModel<MatchItem>(MatchItem);

@@ -1,3 +1,13 @@
+export declare type BasicObj = BasicObjStr | BasicObjNum;
+
+export interface BasicObjStr {
+    [x: string]: any;
+}
+
+export interface BasicObjNum {
+    [x: number]: any;
+}
+
 /**
  * Provides the ability to loop through a simple 1 layer object
  *
@@ -5,7 +15,7 @@
  * @param callback
  * @returns {any|({}&IBasicObj)}
  */
-function loopObj(data : IBasicObj, callback : Function) : IBasicObj {
+function loopObj(data : BasicObj, callback : Function) : BasicObj {
     const _data = copy(data);
 
     for(const key in _data) {
@@ -26,7 +36,7 @@ function loopObj(data : IBasicObj, callback : Function) : IBasicObj {
  * @param obj
  * @returns {Array}
  */
-function objectToArray(obj : IBasicObj) : any[] {
+function objectToArray(obj : BasicObj) : any[] {
     const response = [];
 
     loopObj(obj, (value) => {
@@ -53,7 +63,7 @@ function objectToArray(obj : IBasicObj) : any[] {
  * @param attr
  * @returns {*}
  */
-function getDatastoreAttr(datastore : IBasicObj, key : string | number, attr : string | number) : any {
+function getDatastoreAttr(datastore : BasicObj, key : string | number, attr : string | number) : any {
     if(!datastore[key]) {
         return;
     }
@@ -86,10 +96,21 @@ function applyMixins(derivedCtor: any, baseCtors: any[]) {
     });
 }
 
+/**
+ * Returns integer 0 if value is falsy.
+ *
+ * @param value
+ * @returns {any|number}
+ */
+function zeroUndef(value: any) {
+    return value || 0;
+}
+
 export {
     loopObj,
     objectToArray,
     getDatastoreAttr,
     copy,
     applyMixins,
+    zeroUndef,
 };

@@ -1,6 +1,6 @@
 import { Item, Team } from './index';
 
-export class LadderItem extends Item implements IItem {
+export class LadderItem extends Item {
     team() {
         return Team.find(this.get('id'));
     }

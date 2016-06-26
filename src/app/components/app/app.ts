@@ -8,6 +8,7 @@ import {VenuesService} from '../../services/venues';
 import {StatsService} from '../../services/stats';
 import {ReadmeService} from '../../services/readme';
 import {TimeService} from '../../services/time';
+import {MatchSummaryService} from '../../services/match-summary';
 
 import {ListMatchesComponent} from '../list-matches/list-matches';
 import {PageLadderComponent} from '../page-ladder/page-ladder';
@@ -16,7 +17,6 @@ import {LadderComponent} from '../ladder/ladder';
 import {PageReadmeComponent} from '../page-readme/page-readme';
 import {FooterComponent} from '../footer/footer';
 
-import {SortMatches} from '../../pipes/sort-matches';
 import {FormatNumber} from '../../pipes/format-number';
 import {FormatPercentage} from '../../pipes/format-percentage';
 
@@ -38,8 +38,8 @@ declare const $;
         StatsService,
         ReadmeService,
         TimeService,
+        MatchSummaryService,
         // Pipes
-        SortMatches,
         FormatNumber,
         FormatPercentage,
     ],

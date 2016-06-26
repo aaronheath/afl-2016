@@ -6,16 +6,28 @@ import 'rxjs/add/operator/share';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
-import { Venue } from '../models/index';
+import { Venue, VenueItem } from '../models/index';
+
+//export interface IndividualVenue {
+//    fullName: string;
+//    abbreviation: string;
+//    city: string;
+//    state: string;
+//    timezone: string;
+//}
+//
+//export interface VenueList {
+//    [venue: string]: Venue;
+//}
 
 @Injectable()
 export class VenuesService {
-    observable$ : Observable<Subscriber<IVenues>>;
-    private _observer : Subscriber<IVenues>;
-    private _dataStore : IVenuesDataStore;
+    observable$ : Observable<Subscriber<VenueItem[]>>;
+    private _observer : Subscriber<VenueItem[]>;
+    //private _dataStore : IVenuesDataStore;
 
     constructor(private _http: Http) {
-        this._dataStore = { venues: {} };
+        //this._dataStore = { venues: {} };
 
         // Create Observable Stream to output our data
         this.observable$ = new Observable((observer) => {
@@ -32,24 +44,26 @@ export class VenuesService {
         let observable = this._http.get('/data/venues.json').map(response => response.json());
 
         observable.subscribe(data => {
-            this._dataStore.venues = data;
+            this.updateOrCreateVenues(data);
 
-            _.forEach(data, (attrs, id) => {
-                Venue.updateOrCreate([{key: 'id', value: id}], {
-                    id: id,
-                    fullName: attrs.fullName,
-                    abbreviation: attrs.abbreviation,
-                    city: attrs.city,
-                    state: attrs.state,
-                    timezone: attrs.timezone,
-                });
-            });
-
-            console.log(Venue.find('AO').get('fullName'));
-
-            this._observer.next(this._dataStore.venues);
+            this._observer.next(Venue.all());
         }, (error) => {
             console.error('Could not load venues.', error);
+        });
+    }
+
+    private updateOrCreateVenues(data) {
+        _.forEach(data, this.updateOrCreate);
+    }
+
+    private updateOrCreate(attrs, id) {
+        Venue.updateOrCreate([{key: 'id', value: id}], {
+            id: id,
+            fullName: attrs.fullName,
+            abbreviation: attrs.abbreviation,
+            city: attrs.city,
+            state: attrs.state,
+            timezone: attrs.timezone,
         });
     }
 
@@ -59,6 +73,6 @@ export class VenuesService {
      * @returns {IVenues}
      */
     getVenues() {
-        return this._dataStore.venues;
+        return Venue.all();
     }
 }

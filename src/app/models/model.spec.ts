@@ -1,10 +1,9 @@
-import {Model} from './model';
-import {Item} from './item';
+import { Item, Model } from './index';
 import {ModelException} from '../exceptions/model';
 
 declare const Symbol;
 
-class AbstractedModel<T extends IItem> extends Model<T> {
+class AbstractedModel<T extends Item> extends Model<T> {
     protected fillable = [
         'id',
         'key3',
