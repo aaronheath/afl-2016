@@ -1,6 +1,6 @@
 import 'lodash';
 
-import { Item } from './index';
+import { Item, ItemData } from './index';
 import { ModelException } from '../exceptions/index';
 
 /**
@@ -131,36 +131,79 @@ export class Model<T extends Item> {
         }
     }
 
-    protected itemCreate(data) : T {
+    /**
+     * Create a new Item for the Model.
+     *
+     * @param data
+     * @returns {any}
+     */
+    protected itemCreate(data : ItemData) : T {
         const item : T = new this.item();
 
         return item.create(data);
     }
 
-    find(id) : Item {
+    /**
+     * Find first Item on the Model with matching 'id'.
+     *
+     * @param id
+     * @returns {Item}
+     */
+    find(id : any) : Item {
         return this.findWhere('id', id);
     }
 
-    findWhere(key, value) : Item {
+    /**
+     * Find first Item on the Model with matching key / value pair.
+     *
+     * @param key
+     * @param value
+     * @returns {T|boolean|void}
+     */
+    findWhere(key : string, value : any) : Item {
         return this.models.find((model) => {
             return model.equals(key, value);
         });
     }
 
-    findByUid(symbol) {
-        return this.models.find((model) => {
+    /**
+     * Find first Item on the Model with matching Uid (symbol).
+     *
+     * @param symbol
+     * @returns {Item|boolean|void}
+     */
+    findByUid(symbol : symbol) : Item {
+        return this.models.find((model : Item) => {
             return model.isUid(symbol);
         });
     }
 
+    /**
+     * Filters Items that satisfies where condition(s). Returns current instance of Model to allow chain of where,
+     * or other methods. Results can be call via the this.get() method.
+     *
+     * Example attrs:
+     * [{key: 'key-to-find', value: 'value-to-compare', operator: 'comparison-operation'}, ...]
+     *
+     * Supported operators:
+     * - '=' Equals
+     * - '!=' Not Equal
+     *
+     * TODO:
+     * - Support more operations (<, >, <=, >= etc)
+     * - Optimiations
+     *
+     * @param attrs
+     * @returns {Model}
+     */
     where(attrs : ModelWhereAttrs[]) : this {
-        this.transitoryModels = this.transitory().filter((item) => {
-            const response = attrs.reduce((prev, attr, i) => {
+        this.transitoryModels = this.transitory().filter((item : T) => {
+            const response = attrs.reduce((prev : boolean, attr : ModelWhereAttrs) => {
                 if(!prev) {
                     return prev;
                 }
 
-                const value = _.isFunction(item[attr.key]) ? item[attr.key]() : item.get(attr.key);
+                const value = this.isItemMethod(attr.key) ? item[attr.key]() : item.get(attr.key);
 
                 if(!attr.operator || attr.operator === '=') {
                     return value === attr.value;
@@ -170,7 +213,6 @@ export class Model<T extends Item> {
                     return value !== attr.value;
                 }
 
-                // TODO implement support for operators
                 return false;
             }, true);
 
@@ -180,14 +222,28 @@ export class Model<T extends Item> {
         return this;
     }
 
-    orderBy(key : string, direction : 'asc' | 'desc' = 'asc', dynamicAttr : boolean = false) : this {
+    /**
+     * Sorts transitory Items by 'key'. Returns current instance of Model. Results can be call via the this.get()
+     * method.
+     *
+     * TODO:
+     * - Support direction. Currently always descending.
+     * - Support sorting by multiple keys with given priority (sort by 'a' asc then by 'b' desc).
+     *
+     * @param methodOrKey Name of Item method or data 'key'
+     * @param direction 'asc' or 'desc'
+     * @returns {Model}
+     */
+    orderBy(methodOrKey : string, direction : 'asc' | 'desc' = 'asc') : this {
         this.transitoryModels = this.transitory().sort((a, b) => {
+            const dynamicAttr = this.isItemMethod(methodOrKey);
+
             if(dynamicAttr) {
-                if(a[key]() < b[key]()) {
+                if(a[methodOrKey]() < b[methodOrKey]()) {
                     return -1;
                 }
 
-                if(a[key]() > b[key]()) {
+                if(a[methodOrKey]() > b[methodOrKey]()) {
                     return 1;
                 }
 
@@ -195,25 +251,33 @@ export class Model<T extends Item> {
             }
 
             if(!dynamicAttr) {
-                if(a.get(key) < b.get(key)) {
+                if(a.get(methodOrKey) < b.get(methodOrKey)) {
                     return -1;
                 }
 
-                if(a.get(key) > b.get(key)) {
+                if(a.get(methodOrKey) > b.get(methodOrKey)) {
                     return 1;
                 }
 
                 return 0;
             }
+
+            return 0;
         });
 
         return this;
     }
 
-    sum(key : string, dynamicAttr : boolean = false) : number {
+    /**
+     * Sum of transitory Items by key or method output.
+     *
+     * @param key
+     * @returns {any}
+     */
+    sum(key : string) : number {
         let response;
 
-        if(dynamicAttr) {
+        if(this.isItemMethod(key)) {
             response = this.transitory().reduce((prev, curr) => prev + curr[key](), 0);
         } else {
             response = this.transitory().reduce((prev, curr) => prev + curr.get(key), 0);
@@ -224,6 +288,11 @@ export class Model<T extends Item> {
         return response;
     }
 
+    /**
+     * Count of transitory Items.
+     *
+     * @returns {number}
+     */
     count() : number {
         const response = this.transitoryModels.length;
 
@@ -232,6 +301,11 @@ export class Model<T extends Item> {
         return response;
     }
 
+    /**
+     * Returns array of transitory Items.
+     *
+     * @returns {T[]}
+     */
     get() : T[] {
         const response = this.transitoryModels;
 
@@ -240,6 +314,11 @@ export class Model<T extends Item> {
         return response;
     }
 
+    /**
+     * Returns first Item on array of transitory Items
+     *
+     * @returns {T}
+     */
     first() : T {
         const response = this.transitoryModels.length ? this.transitoryModels[0] : undefined;
 
@@ -248,31 +327,65 @@ export class Model<T extends Item> {
         return response;
     }
 
+    /**
+     * Return array of all Items.
+     *
+     * @returns {T[]}
+     */
     all() : T[] {
         this.resetTransitory();
 
         return this.models;
     }
 
-    reset() {
+    /**
+     * Performs hard reset of stored Items.
+     */
+    reset() : void {
         this.models = [];
     }
 
+    /**
+     * Returns array of transitory Items. Should this.transitoryUse be true then the existing transitory Items array
+     * will be returned, otherwise the this.models Items array will be returned.
+     *
+     * Typicall called by methods such as where(), orderBy() and get().
+     *
+     * @returns {T[]}
+     */
     protected transitory() : T[] {
         const response = this.transitoryUse ? this.transitoryModels : this.models;
 
-        this.startTransitiory();
+        this.startTransitory();
 
         return response;
     }
 
-    protected startTransitiory() {
+    /**
+     * To be called when using the transitory Items array.
+     */
+    protected startTransitory() {
         this.transitoryUse = true;
     }
 
+    /**
+     * Resets transitory Items array. Should be called when invoking a new lookup.
+     */
     protected resetTransitory() {
         this.transitoryUse = false;
 
         this.transitoryModels = [];
+    }
+
+    /**
+     * Determines whether given key is a method on the Item.
+     *
+     * @param key
+     * @returns {boolean|boolean}
+     */
+    protected isItemMethod(key : string) : boolean {
+        const item : T = new this.item();
+
+        return _.isFunction(item[key]);
     }
 }
