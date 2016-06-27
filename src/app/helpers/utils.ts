@@ -11,6 +11,8 @@ export interface BasicObjNum {
 /**
  * Provides the ability to loop through a simple 1 layer object
  *
+ * TODO remove and replace usage with lodash method.
+ *
  * @param data
  * @param callback
  * @returns {any|({}&IBasicObj)}
@@ -30,49 +32,9 @@ function loopObj(data : BasicObj, callback : Function) : BasicObj {
 }
 
 /**
- * Basic object to array converter.
- * Discards the objects key.
- *
- * @param obj
- * @returns {Array}
- */
-function objectToArray(obj : BasicObj) : any[] {
-    const response = [];
-
-    loopObj(obj, (value) => {
-        response.push(value);
-    });
-
-    return response;
-}
-
-/**
- * Returns the value from a datastore object.
- *
- * Datastore object format:
- * ```
- * {
- *   key: {
- *     attr: x
- *   }
- *
- * ```
- *
- * @param datastore
- * @param key
- * @param attr
- * @returns {*}
- */
-function getDatastoreAttr(datastore : BasicObj, key : string | number, attr : string | number) : any {
-    if(!datastore[key]) {
-        return;
-    }
-
-    return datastore[key][attr];
-}
-
-/**
  * Simple copy of an object
+ *
+ * TODO remove, only used by loopObj.
  *
  * @param obj
  * @returns {any|({}&U)}
@@ -84,6 +46,8 @@ function copy<T>(obj : T) : T {
 /**
  * Mixins runtime func
  * Ref: https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Mixins.md
+ *
+ * TODO review whether required, we're not using mixins so far.
  *
  * @param derivedCtor
  * @param baseCtors
@@ -108,8 +72,6 @@ function zeroUndef(value: any) {
 
 export {
     loopObj,
-    objectToArray,
-    getDatastoreAttr,
     copy,
     applyMixins,
     zeroUndef,
