@@ -1,17 +1,12 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import {Subscriber} from 'rxjs/Subscriber';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/share';
-import 'rxjs/add/operator/skip';
 
-//import {generateLadder} from '../helpers/ladder';
-//import {generateMatches} from '../helpers/matches';
-//import {generateSummaries} from '../helpers/summaries';
-import { zeroUndef } from '../helpers/utils';
-import { Ladder, LadderItem, Match, MatchItem, ModelWhereAttrs, TeamItem, VenueItem } from '../models/index';
+import { Match, MatchItem, ModelWhereAttrs } from '../models/index';
 
-export interface RoundSummary {
+/**
+ * Interface(s)
+ */
+
+export interface SummaryOfMatches {
     goals: number;
     behinds: number;
     totalPoints: number;
@@ -24,37 +19,47 @@ export interface RoundSummary {
     played: number;
 }
 
+/**
+ * Match Summary Service
+ *
+ * Primary purpose is to generate a summary for a given set of matches.
+ *
+ * TODO:
+ * - May .where() calls are made against the Match model. This is expensive. When Model supports optimising this
+ * senario we'll be able to optimise this service.
+ */
 @Injectable()
 export class MatchSummaryService {
-    constructor() {}
-
     /**
-     * Returns calculated summary for individual round
+     * Summary for an individual AFL Premiership Round.
      *
-     * @param round
-     * @returns {any}
+     * @returns {SummaryOfMatches}
+     * @param roundNo
      */
-    getSummaryForRound(roundNo) : RoundSummary {
+    getSummaryForRound(roundNo : number) : SummaryOfMatches {
         const where = [{key: 'roundNo', value: +roundNo}];
 
+        return this.summaryForQuery(where);
+    }
+
+    /**
+     * Using where query array a summary of matching matches is returned.
+     *
+     * @param where
+     * @returns {{goals: number, behinds: number, totalPoints: number, accuracy: number, highestScore: MatchItem[],
+     * lowestScore: MatchItem[], attendance: number, highestAttendance: MatchItem[], lowestAttendance: MatchItem[],
+     * played: number}}
+     */
+    protected summaryForQuery(where : ModelWhereAttrs[]) : SummaryOfMatches {
         const played = this.played(where);
-
         const highestAttendance = this.highestAttendance(where);
-
         const lowestAttendance = this.lowestAttendance(where);
-
         const attendance = this.overallAttendance(where);
-
         const goals = this.goals(where);
-
         const behinds = this.behinds(where);
-
         const points = this.points(goals, behinds);
-
         const accuracy = this.accuracy(goals, behinds);
-
         const highestScore = this.highestScore(where);
-
         const lowestScore = this.lowestScore(where);
 
         return {
@@ -71,13 +76,25 @@ export class MatchSummaryService {
         };
     }
 
-    private played(where) {
+    /**
+     * Count of matches played.
+     *
+     * @param where
+     * @returns {any}
+     */
+    protected played(where : ModelWhereAttrs[]) : number {
         const finalWhere = where.concat({key: 'result', value: undefined, operator: '!='});
 
         return Match.where(finalWhere).count();
     }
 
-    private highestAttendance(where) {
+    /**
+     * Array of matches with the highest attendance.
+     *
+     * @param where
+     * @returns {TValue[]}
+     */
+    protected highestAttendance(where : ModelWhereAttrs[]) : MatchItem[] {
         const sorted = Match.where(where).orderBy('attendance', 'desc').get();
 
         let attendance;
@@ -91,7 +108,13 @@ export class MatchSummaryService {
         });
     }
 
-    private lowestAttendance(where) {
+    /**
+     * Array of matches with the lowest attendance.
+     *
+     * @param where
+     * @returns {TValue[]}
+     */
+    protected lowestAttendance(where : ModelWhereAttrs[]) : MatchItem[] {
         const sorted = Match.where(where).orderBy('attendance').get();
 
         let attendance;
@@ -105,39 +128,82 @@ export class MatchSummaryService {
         });
     }
 
-    private overallAttendance(where : ModelWhereAttrs[]) {
+    /**
+     * Overall attendance integer for the matches.
+     *
+     * @param where
+     * @returns {number|LoDashExplicitWrapper<number>}
+     */
+    protected overallAttendance(where : ModelWhereAttrs[]) : number {
         return Match.where(where).sum('attendance');
     }
 
-    private goals(where : ModelWhereAttrs[]) {
+    /**
+     * Goals scored in all matches.
+     *
+     * @param where
+     * @returns {number}
+     */
+    protected goals(where : ModelWhereAttrs[]) : number {
         return this.scores(where, 'Goals');
     }
 
-    private behinds(where : ModelWhereAttrs[]) {
+    /**
+     * Behinds scored in all matches
+     *
+     * @param where
+     * @returns {number}
+     */
+    protected behinds(where : ModelWhereAttrs[]) : number {
         return this.scores(where, 'Behinds');
     }
 
-    private scores(where : ModelWhereAttrs[], type : 'Goals' | 'Behinds') {
+    /**
+     * Count of goals or behinds scored in all matches.
+     *
+     * @param where
+     * @param type
+     * @returns {any}
+     */
+    protected scores(where : ModelWhereAttrs[], type : 'Goals' | 'Behinds') : number {
         const home = Match.where(where).sum(`home${type}`);
         const away = Match.where(where).sum(`away${type}`);
 
         return home + away;
     }
 
-    private points(goals : number, behinds : number) {
+    /**
+     * Points score that corresponds to given goals and behinds.
+     *
+     * @param goals
+     * @param behinds
+     * @returns {number}
+     */
+    protected points(goals : number, behinds : number) {
         return goals * 6 + behinds;
     }
 
-    private accuracy(goals : number, behinds : number) {
+    /**
+     * Shooting accuracy determined by how many goals were scored against all scoring events.
+     *
+     * @param goals
+     * @param behinds
+     * @returns {number}
+     */
+    protected accuracy(goals : number, behinds : number) : number {
         return goals / (goals + behinds) * 100;
     }
 
-    private highestScore(where) {
+    /**
+     * Narrows down all matches with those that have the highest score by either a home or away team. The returns
+     * an array of matches with the highest individual team score.
+     *
+     * @param where
+     * @returns {MatchItem[]}
+     */
+    protected highestScore(where : ModelWhereAttrs[]) : MatchItem[] {
         const sortedHomeScores = this.sortedByScore(where, 'homePoints', 'desc');
         const highestHomeScore = this.highestScores(sortedHomeScores, 'homePoints');
-
-        console.log(sortedHomeScores);
-        console.log(highestHomeScore);
 
         const sortedAwayScores = this.sortedByScore(where, 'awayPoints', 'desc');
         const highestAwayScore = this.highestScores(sortedAwayScores, 'awayPoints');
@@ -147,10 +213,17 @@ export class MatchSummaryService {
         return this.takeHighestScore(mergedScores);
     }
 
-    private highestScores(matches, fn) {
+    /**
+     * Array of matches with highest scores by either home or away points.
+     *
+     * @param matches
+     * @param fn
+     * @returns {MatchItem[]|TValue[]}
+     */
+    protected highestScores(matches : MatchItem[], fn : string) : MatchItem[] {
         let highestScore;
 
-        return _.takeWhile(matches, (match) => {
+        return _.takeWhile(matches, (match : MatchItem) => {
             if (!match[fn]() || highestScore > match[fn]()) {
                 return false;
             }
@@ -159,7 +232,13 @@ export class MatchSummaryService {
         });
     }
 
-    private takeHighestScore(matches) {
+    /**
+     * Array of matches with the highest individual team score.
+     *
+     * @param matches
+     * @returns {Array}
+     */
+    protected takeHighestScore(matches : MatchItem[]) : MatchItem[] {
         let response = [];
         let notableScore;
 
@@ -171,7 +250,7 @@ export class MatchSummaryService {
             const matchNotableScore = match.get('homePoints') > match.get('awayPoints')
                 ? match.get('homePoints') : match.get('awayPoints');
 
-            if(matchNotableScore !== matchNotableScore) {
+            if(matchNotableScore !== notableScore) {
                 response = [];
             }
 
@@ -181,7 +260,14 @@ export class MatchSummaryService {
         return response;
     }
 
-    private lowestScore(where) {
+    /**
+     * Narrows down all matches with those that have the lowest score by either a home or away team. The returns
+     * an array of matches with the lowest individual team score.
+     *
+     * @param where
+     * @returns {MatchItem[]}
+     */
+    protected lowestScore(where : ModelWhereAttrs[]) : MatchItem[] {
         const sortedHomeScores = this.sortedByScore(where, 'homePoints', 'asc');
         const lowestHomeScore = this.lowestScores(sortedHomeScores, 'homePoints');
 
@@ -193,7 +279,14 @@ export class MatchSummaryService {
         return this.takeLowestScore(mergedScores);
     }
 
-    private lowestScores(matches, fn) {
+    /**
+     * Array of matches with lowest scores by either home or away points.
+     *
+     * @param matches
+     * @param fn
+     * @returns {TValue[]}
+     */
+    protected lowestScores(matches : MatchItem[], fn : string) : MatchItem[] {
         let lowestScore;
 
         return _.takeWhile(matches, (match) => {
@@ -205,7 +298,13 @@ export class MatchSummaryService {
         });
     }
 
-    private takeLowestScore(matches) {
+    /**
+     * Array of matches with the lowest individual team score.
+     *
+     * @param matches
+     * @returns {Array}
+     */
+    protected takeLowestScore(matches : MatchItem[]) : MatchItem[] {
         let response = [];
         let notableScore;
 
@@ -227,7 +326,15 @@ export class MatchSummaryService {
         return response;
     }
 
-    private sortedByScore(where, attr, direction) {
+    /**
+     * Array of matches sorted by attribute in desired direction.
+     *
+     * @param where
+     * @param attr
+     * @param direction
+     * @returns {any}
+     */
+    protected sortedByScore(where : ModelWhereAttrs[], attr : string, direction : 'asc' | 'desc') : MatchItem[] {
         return Match.where(where).orderBy(attr, direction).get();
     }
 }

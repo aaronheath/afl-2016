@@ -3,7 +3,7 @@ import 'lodash';
 import {Component, OnInit} from '@angular/core';
 
 import {StatsService} from '../../services/stats';
-import { MatchSummaryService, RoundSummary } from '../../services/match-summary';
+import { MatchSummaryService } from '../../services/match-summary';
 import {FormatNumber} from '../../pipes/format-number';
 import {FormatPercentage} from '../../pipes/format-percentage';
 import { MatchItem } from '../../models/index';
