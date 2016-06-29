@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { Match, MatchItem, ModelWhereAttrs } from '../models/index';
 

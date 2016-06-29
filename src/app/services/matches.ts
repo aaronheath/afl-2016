@@ -1,31 +1,36 @@
 import 'lodash';
-import {Injectable} from '@angular/core';
-import {Http} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
-import {Subscriber} from 'rxjs/Subscriber';
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+import { Subscriber } from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 
-//import {loopMatches} from '../helpers/matches';
 import { Match, MatchItem } from '../models/index';
 
-//export interface ApiMatch {
-//    home: string;
-//    homeGoals?: number;
-//    homeBehinds?: number;
-//    away: string;
-//    awayGoals?: number;
-//    awayBehinds?: number;
-//    venue: string;
-//    date: string;
-//    time: string;
-//    attendance?: number;
-//}
-//
-//export interface ApiMatches {
-//    [roundNumber: number]: ApiMatch[];
-//}
+/**
+ * Interface
+ */
 
+export interface MatchObject {
+    home: string;
+    homeGoals?: number;
+    homeBehinds?: number;
+    away: string;
+    awayGoals?: number;
+    awayBehinds?: number;
+    venue: string;
+    date: string;
+    time: string;
+    attendance?: number;
+    roundNo: number;
+}
+
+/**
+ * Matches Service
+ *
+ * Repository and HTTP handler for match data.
+ */
 @Injectable()
 export class MatchesService {
     observable$ : Observable<Subscriber<MatchItem[]>>;
@@ -40,79 +45,72 @@ export class MatchesService {
     }
 
     /**
-     * Fetch matches data and calls next on observer
+     * Fetch matches data, updates MatchModel and calls next on observer.
      */
     load() : void {
         let observable = this._http.get('/data/matches.json').map(response => response.json());
 
         observable.subscribe(data => {
-            _.forEach(data, (roundMatches, roundNo) => {
-                _.forEach(roundMatches, (match) => {
-                    Match.updateOrCreate(
-                        [
-                            {key: 'roundNo', value: roundNo},
-                            {key: 'home', value: match.home},
-                            {key: 'away', value: match.away},
-                        ], {
-                            home: match.home,
-                            homeGoals: match.homeGoals,
-                            homeBehinds: match.homeBehinds,
-                            away: match.away,
-                            awayGoals: match.awayGoals,
-                            awayBehinds: match.awayBehinds,
-                            venue: match.venue,
-                            date: match.date,
-                            time: match.time,
-                            attendance: match.attendance,
-                            roundNo: +roundNo,
-                        }
-                    );
-                });
-            });
+            this.flattenRounds(data).forEach(this.updateOrCreateMatchItem);
 
-            this._observer.next(Match.all());
+            this._observer.next();
         }, (error) => {
             console.error('Could not load matches.', error);
         });
     }
 
     /**
-     * Calculates team points and result if goals and points are supplied for both teams.
-     * Where a draw has occurred the result attr will be set to 'DRAW'
+     * Flattens data provided by matches.json in array.
      *
      * @param data
-     * @returns {any|({}&any)}
-     * @private
+     * @returns {any}
      */
-    //private _calculateAttrs(data : IMatches) : IMatches {
-    //    return loopMatches(data, (match : IMatch) => {
-    //        // Calculate Points
-    //        if(typeof match.homeGoals !== 'undefined'
-    //            && typeof match.homeBehinds !== 'undefined'
-    //            && typeof match.awayGoals !== 'undefined'
-    //            && typeof match.awayBehinds !== 'undefined'
-    //        ) {
-    //            match.homePoints = match.homeGoals * 6 + match.homeBehinds;
-    //            match.awayPoints = match.awayGoals * 6 + match.awayBehinds;
-    //
-    //            match.margin = Math.abs(match.homePoints - match.awayPoints);
-    //
-    //            // Result
-    //            if(match.homePoints > match.awayPoints) {
-    //                match.result = match.home;
-    //            } else if(match.homePoints < match.awayPoints) {
-    //                match.result = match.away;
-    //            } else {
-    //                match.result = 'DRAW';
-    //            }
-    //        }
-    //
-    //        return match;
-    //    });
-    //}
+    protected flattenRounds(data) {
+        return _.flatMap(data, (matches, roundNo) => {
+            return matches.map((match) => this.generateMatchItemData(match, roundNo));
+        });
+    }
 
     /**
-     * Returns matches in datastore
+     * With match data provided by matches.json and round number that groups an array of matches, returns JS object,
+     * with this data merged.
+     *
+     * @param match
+     * @param roundNo
+     * @returns {{home: string, homeGoals: number, homeBehinds: number, away: string, awayGoals: number,
+     * awayBehinds: number, venue: string, date: string, time: string, attendance: number, roundNo: number}}
+     */
+    protected generateMatchItemData(match : MatchObject, roundNo : string) : MatchObject {
+        return {
+            home: match.home,
+            homeGoals: match.homeGoals,
+            homeBehinds: match.homeBehinds,
+            away: match.away,
+            awayGoals: match.awayGoals,
+            awayBehinds: match.awayBehinds,
+            venue: match.venue,
+            date: match.date,
+            time: match.time,
+            attendance: match.attendance,
+            roundNo: +roundNo,
+        };
+    }
+
+    /**
+     * Create new or updates if already exists MatchItem for individual match.
+     *
+     * @param match
+     */
+    protected updateOrCreateMatchItem(match : MatchObject) : void {
+        Match.updateOrCreate([
+            {key: 'roundNo', value: match.roundNo},
+            {key: 'home', value: match.home},
+            {key: 'away', value: match.away},
+        ], match);
+    }
+
+    /**
+     * Returns all matches.
      *
      * @returns {IMatches}
      */
@@ -120,7 +118,13 @@ export class MatchesService {
         return Match.all();
     }
 
-    getByRound(roundNo) : MatchItem[] {
+    /**
+     * All matches from specific AFL Premiership Round.
+     *
+     * @param roundNo
+     * @returns {any}
+     */
+    getByRound(roundNo : number) : MatchItem[] {
         return Match.where([{key: 'roundNo', value: +roundNo}]).get();
     }
 }
