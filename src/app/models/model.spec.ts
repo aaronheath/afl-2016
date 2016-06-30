@@ -131,7 +131,7 @@ describe('Model', () => {
         model.create(fillableData);
         model.create(Object.assign(fillableData, {id: 2}));
 
-        const check = model.where([{key: 'id', value: 1}]);
+        const check = model.where([{key: 'id', value: 1}]).get();
         expect(check[0].get('id')).toBe(1);
     });
 
@@ -139,7 +139,7 @@ describe('Model', () => {
         model.create(fillableData);
         model.create(Object.assign(fillableData, {id: 2}));
 
-        const check = model.where([{key: 'id', value: 2}]);
+        const check = model.where([{key: 'id', value: 2}]).get();
         expect(check[0].get('id')).toBe(2);
     });
 
@@ -147,7 +147,7 @@ describe('Model', () => {
         model.create(fillableData);
         model.create(Object.assign(fillableData, {id: 2}));
 
-        const check = model.where([{key: 'id', value: 2}, {key: 'key3', value: 'value3'}]);
+        const check = model.where([{key: 'id', value: 2}, {key: 'key3', value: 'value3'}]).get();
         expect(check.length).toBe(1);
         expect(check[0].get('id')).toBe(2);
         expect(check[0].get('key3')).toBe('value3');
@@ -157,7 +157,7 @@ describe('Model', () => {
         model.create(fillableData);
         model.create(Object.assign(fillableData, {id: 2}));
 
-        const check = model.where([{key: 'id', value: 99}]);
+        const check = model.where([{key: 'id', value: 99}]).get();
         expect(check.length).toBe(0);
     });
 });

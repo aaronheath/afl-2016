@@ -7,8 +7,11 @@ import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@an
 import {TestUtils} from '../tests/test-utils';
 import {TeamsService} from './teams';
 import {getTeams} from '../tests/example-data-teams';
+import {TeamItem} from "../models/index";
 
 const testUtils = new TestUtils();
+
+const seededTeams = getTeams();
 
 describe('TeamsService', () => {
     const providers = [
@@ -44,7 +47,7 @@ describe('TeamsService', () => {
 
     beforeEachProviders(() => providers);
 
-    beforeEach(testUtils.generateMockBackend(true, {body: getTeams()}));
+    beforeEach(testUtils.generateMockBackend(true, {body: seededTeams}));
 
     it('should be constructed', inject([TeamsService, Http], (service: TeamsService, http: Http) => {
         service.observable$.subscribe((data) => {
@@ -110,36 +113,24 @@ describe('TeamsService', () => {
         return fn();
     }, testUtils.standardTimeout);
 
-    it('getTeams() should return all teams', inject([TeamsService], (
+    it('getTeams() should array of all teams as TeamItem\'s', inject([TeamsService], (
         service: TeamsService
     ) => {
-        service.observable$.subscribe((data) => {
-            const allTeams = service.getTeams();
-            let team;
+        service.observable$.subscribe(() => {
+            const teams = service.getTeams();
 
-            // Adelaide
-            team = allTeams['ADL'];
-            expect(team).toBeDefined();
-            expect(team.fullName).toBe('Adelaide');
-            expect(team.abbreviation).toBe('ADL');
-            expect(team.city).toBe('Adelaide');
-            expect(team.state).toBe('SA');
+            teams.forEach((item) => {
+                expect(item).toEqual(jasmine.any(TeamItem));
+            });
 
-            // Essendon
-            team = allTeams['ESS'];
-            expect(team).toBeDefined();
-            expect(team.fullName).toBe('Essendon');
-            expect(team.abbreviation).toBe('ESS');
-            expect(team.city).toBe('Melbourne');
-            expect(team.state).toBe('VIC');
+            // Match the second game
+            const item = teams[4];
+            const seeded = seededTeams.ESS;
 
-            // Port Adelaide
-            team = allTeams['PA'];
-            expect(team).toBeDefined();
-            expect(team.fullName).toBe('Port Adelaide');
-            expect(team.abbreviation).toBe('PA');
-            expect(team.city).toBe('Adelaide');
-            expect(team.state).toBe('SA');
+            expect(item.get('fullName')).toBe(seeded.fullName);
+            expect(item.get('abbreviation')).toBe(seeded.abbreviation);
+            expect(item.get('city')).toBe(seeded.city);
+            expect(item.get('state')).toBe(seeded.state);
         });
     }));
 });

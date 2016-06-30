@@ -7,8 +7,11 @@ import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@an
 import {TestUtils} from '../tests/test-utils';
 import {VenuesService} from './venues';
 import {getVenues} from '../tests/example-data-venues';
+import {VenueItem} from "../models/index";
 
 const testUtils = new TestUtils();
+
+const seededVenues = getVenues();
 
 describe('VenuesService', () => {
     const providers = [
@@ -44,7 +47,7 @@ describe('VenuesService', () => {
 
     beforeEachProviders(() => providers);
 
-    beforeEach(testUtils.generateMockBackend(true, {body: getVenues()}));
+    beforeEach(testUtils.generateMockBackend(true, {body: seededVenues}));
 
     it('should be constructed', inject([VenuesService, Http], (service: VenuesService, http: Http) => {
         service.observable$.subscribe((data) => {
@@ -110,39 +113,56 @@ describe('VenuesService', () => {
         return fn();
     }, testUtils.standardTimeout);
 
-    it('getVenues() should return all venues', inject([VenuesService], (
+    it('getVenues() should array of all venues as VenueItem\'s', inject([VenuesService], (
         service: VenuesService
     ) => {
-        service.observable$.subscribe((data) => {
-            const allVenues = service.getVenues();
-            let venue;
+        service.observable$.subscribe(() => {
+            const venues = service.getVenues();
 
-            // MCG
-            venue = allVenues['MCG'];
-            expect(venue).toBeDefined();
-            expect(venue.fullName).toBe('Melbourne Cricket Ground');
-            expect(venue.abbreviation).toBe('MCG');
-            expect(venue.city).toBe('Melbourne');
-            expect(venue.state).toBe('VIC');
-            expect(venue.timezone).toBe('Australia/Melbourne');
+            venues.forEach((item) => {
+                expect(item).toEqual(jasmine.any(VenueItem));
+            });
 
-            // Adelaide Oval
-            venue = allVenues['AO'];
-            expect(venue).toBeDefined();
-            expect(venue.fullName).toBe('Adelaide Oval');
-            expect(venue.abbreviation).toBe('AO');
-            expect(venue.city).toBe('Adelaide');
-            expect(venue.state).toBe('SA');
-            expect(venue.timezone).toBe('Australia/Adelaide');
+            // Match the second game
+            const item = venues[3];
+            const seeded = seededVenues.SCG;
 
-            // Spotless Stadium
-            venue = allVenues['SPO'];
-            expect(venue).toBeDefined();
-            expect(venue.fullName).toBe('Spotless Stadium');
-            expect(venue.abbreviation).toBe('SPO');
-            expect(venue.city).toBe('Sydney');
-            expect(venue.state).toBe('NSW');
-            expect(venue.timezone).toBe('Australia/Sydney');
+            expect(item.get('fullName')).toBe(seeded.fullName);
+            expect(item.get('abbreviation')).toBe(seeded.abbreviation);
+            expect(item.get('city')).toBe(seeded.city);
+            expect(item.get('state')).toBe(seeded.state);
+            expect(item.get('timezone')).toBe(seeded.timezone);
+
+
+
+            //let venue;
+            //
+            //// MCG
+            //venue = allVenues['MCG'];
+            //expect(venue).toBeDefined();
+            //expect(venue.fullName).toBe('Melbourne Cricket Ground');
+            //expect(venue.abbreviation).toBe('MCG');
+            //expect(venue.city).toBe('Melbourne');
+            //expect(venue.state).toBe('VIC');
+            //expect(venue.timezone).toBe('Australia/Melbourne');
+            //
+            //// Adelaide Oval
+            //venue = allVenues['AO'];
+            //expect(venue).toBeDefined();
+            //expect(venue.fullName).toBe('Adelaide Oval');
+            //expect(venue.abbreviation).toBe('AO');
+            //expect(venue.city).toBe('Adelaide');
+            //expect(venue.state).toBe('SA');
+            //expect(venue.timezone).toBe('Australia/Adelaide');
+            //
+            //// Spotless Stadium
+            //venue = allVenues['SPO'];
+            //expect(venue).toBeDefined();
+            //expect(venue.fullName).toBe('Spotless Stadium');
+            //expect(venue.abbreviation).toBe('SPO');
+            //expect(venue.city).toBe('Sydney');
+            //expect(venue.state).toBe('NSW');
+            //expect(venue.timezone).toBe('Australia/Sydney');
         });
     }));
 });
