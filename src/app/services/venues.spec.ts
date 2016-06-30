@@ -7,7 +7,7 @@ import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@an
 import {TestUtils} from '../tests/test-utils';
 import {VenuesService} from './venues';
 import {getVenues} from '../tests/example-data-venues';
-import {VenueItem} from "../models/index";
+import {VenueItem} from '../models/index';
 
 const testUtils = new TestUtils();
 
@@ -132,37 +132,6 @@ describe('VenuesService', () => {
             expect(item.get('city')).toBe(seeded.city);
             expect(item.get('state')).toBe(seeded.state);
             expect(item.get('timezone')).toBe(seeded.timezone);
-
-
-
-            //let venue;
-            //
-            //// MCG
-            //venue = allVenues['MCG'];
-            //expect(venue).toBeDefined();
-            //expect(venue.fullName).toBe('Melbourne Cricket Ground');
-            //expect(venue.abbreviation).toBe('MCG');
-            //expect(venue.city).toBe('Melbourne');
-            //expect(venue.state).toBe('VIC');
-            //expect(venue.timezone).toBe('Australia/Melbourne');
-            //
-            //// Adelaide Oval
-            //venue = allVenues['AO'];
-            //expect(venue).toBeDefined();
-            //expect(venue.fullName).toBe('Adelaide Oval');
-            //expect(venue.abbreviation).toBe('AO');
-            //expect(venue.city).toBe('Adelaide');
-            //expect(venue.state).toBe('SA');
-            //expect(venue.timezone).toBe('Australia/Adelaide');
-            //
-            //// Spotless Stadium
-            //venue = allVenues['SPO'];
-            //expect(venue).toBeDefined();
-            //expect(venue.fullName).toBe('Spotless Stadium');
-            //expect(venue.abbreviation).toBe('SPO');
-            //expect(venue.city).toBe('Sydney');
-            //expect(venue.state).toBe('NSW');
-            //expect(venue.timezone).toBe('Australia/Sydney');
         });
     }));
 });

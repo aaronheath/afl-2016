@@ -7,11 +7,10 @@ import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@an
 import {TestUtils} from '../tests/test-utils';
 import {MatchesService} from './matches';
 import { Match, MatchItem } from '../models/index';
-import {getMatches, getMatchesWithPointsAndTimes} from '../tests/example-data-matches';
+import {getMatches} from '../tests/example-data-matches';
 
 const testUtils = new TestUtils();
 
-const matchesExpected = getMatchesWithPointsAndTimes();
 const matches = getMatches();
 
 describe('MatchesService', () => {

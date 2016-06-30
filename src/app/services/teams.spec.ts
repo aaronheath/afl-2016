@@ -7,7 +7,7 @@ import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@an
 import {TestUtils} from '../tests/test-utils';
 import {TeamsService} from './teams';
 import {getTeams} from '../tests/example-data-teams';
-import {TeamItem} from "../models/index";
+import {TeamItem} from '../models/index';
 
 const testUtils = new TestUtils();
 
