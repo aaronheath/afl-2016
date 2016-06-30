@@ -6,7 +6,7 @@ import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/skip';
 
 import { zeroUndef } from '../helpers/utils';
-import { Ladder, LadderItem, Match, MatchItem, TeamItem } from '../models/index';
+import { Ladder, LadderItem, Match, MatchItem } from '../models/index';
 import { MatchesService, TeamsService, VenuesService } from '../services/index';
 
 declare const moment;
@@ -19,8 +19,16 @@ declare const moment;
  */
 @Injectable()
 export class StatsService {
-    observable$ : Observable<Subscriber<boolean>>;
-    private observer : Subscriber<boolean>;
+    /**
+     * Observable available for subscription that emits upon greater than two Matches, Teams or Venues observables have
+     * been fired.
+     */
+    observable$ : Observable<Subscriber<void>>;
+
+    /**
+     * Observer for observable$ subscription.
+     */
+    private observer : Subscriber<void>;
 
     /**
      * Sets up observable for this service. As we're wanting data from three services (Matches, Teams and Venues) we

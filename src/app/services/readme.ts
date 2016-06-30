@@ -1,22 +1,34 @@
-import {Injectable} from '@angular/core';
-import {Http} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
-import {Subscriber} from 'rxjs/Subscriber';
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+import { Subscriber } from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 
-export interface ReadmeDataStore {
-    readme: string;
-}
-
+/**
+ * Readme Service
+ *
+ * Repository and HTTP handler for readme content.
+ */
 @Injectable()
 export class ReadmeService {
+    /**
+     * Observable available for subscription that emits when readme is loaded.
+     */
     observable$ : Observable<Subscriber<string>>;
+
+    /**
+     * Observer for observable$ subscription.
+     */
     private _observer : Subscriber<string>;
-    private _dataStore : ReadmeDataStore;
+
+    /**
+     * Store for readme content.
+     */
+    private store : string = '';
 
     constructor(private _http: Http) {
-        this._dataStore = { readme: '' };
+        //this.store = { readme: '' };
 
         // Create Observable Stream to output our data
         this.observable$ = new Observable((observer) => {
@@ -27,26 +39,26 @@ export class ReadmeService {
     }
 
     /**
-     * Fetch readme.md and calls next on observer
+     * Fetch readme.md and calls next on observer with the content of the readme.
      */
     load() {
-        let observable = this._http.get('/data/README.md')
-            .map(response => response.text());
+        let observable = this._http.get('/data/README.md').map(response => response.text());
 
         observable.subscribe(data => {
-            this._dataStore.readme = data;
-            this._observer.next(this._dataStore.readme);
+            this.store = data;
+
+            this._observer.next(this.store);
         }, (error) => {
             console.error('Could not load readme.', error);
         });
     }
 
     /**
-     * Returns readme in datastore
+     * Returns readme content.
      *
      * @returns {string}
      */
     getReadme() {
-        return this._dataStore.readme;
+        return this.store;
     }
 }

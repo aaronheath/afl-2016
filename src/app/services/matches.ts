@@ -33,12 +33,24 @@ export interface MatchObject {
  */
 @Injectable()
 export class MatchesService {
-    observable$ : Observable<Subscriber<MatchItem[]>>;
-    private _observer : Subscriber<MatchItem[]>;
+    /**
+     * Observable available for subscription that emits when match data is loaded.
+     */
+    observable$ : Observable<Subscriber<void>>;
 
+    /**
+     * Observer for observable$ subscription.
+     */
+    private observer : Subscriber<void>;
+
+    /**
+     * Constructor. Http injected. Observable initialised and load called().
+     *
+     * @param http
+     */
     constructor(private http: Http) {
         this.observable$ = new Observable((observer) => {
-            this._observer = observer;
+            this.observer = observer;
 
             this.load();
         }).share();
@@ -53,7 +65,7 @@ export class MatchesService {
         observable.subscribe(data => {
             this.flattenRounds(data).forEach(this.updateOrCreateMatchItem);
 
-            this._observer.next();
+            this.observer.next();
         }, (error) => {
             console.error('Could not load matches.', error);
         });

@@ -8,30 +8,47 @@ import { Http } from '@angular/http';
 
 import { Venue, VenueItem } from '../models/index';
 
-//export interface IndividualVenue {
-//    fullName: string;
-//    abbreviation: string;
-//    city: string;
-//    state: string;
-//    timezone: string;
-//}
-//
-//export interface VenueList {
-//    [venue: string]: Venue;
-//}
+/**
+ * Interfaces
+ */
 
+export interface IndividualVenue {
+    fullName: string;
+    abbreviation: string;
+    city: string;
+    state: string;
+    timezone: string;
+}
+
+export interface VenueList {
+    [id: string]: IndividualVenue;
+}
+
+/**
+ * Venues Service
+ *
+ * Repository and HTTP handler for venue data.
+ */
 @Injectable()
 export class VenuesService {
-    observable$ : Observable<Subscriber<VenueItem[]>>;
-    private _observer : Subscriber<VenueItem[]>;
-    //private _dataStore : IVenuesDataStore;
+    /**
+     * Observable available for subscription that emits when venue data is loaded.
+     */
+    observable$ : Observable<Subscriber<void>>;
 
-    constructor(private _http: Http) {
-        //this._dataStore = { venues: {} };
+    /**
+     * Observer for observable$ subscription.
+     */
+    private observer : Subscriber<void>;
 
-        // Create Observable Stream to output our data
+    /**
+     * Constructor. Http injected. Observable initialised and load called().
+     *
+     * @param http
+     */
+    constructor(private http: Http) {
         this.observable$ = new Observable((observer) => {
-            this._observer = observer;
+            this.observer = observer;
 
             this.load();
         }).share();
@@ -40,23 +57,34 @@ export class VenuesService {
     /**
      * Fetch venues data and calls next on observer
      */
-    load() {
-        let observable = this._http.get('/data/venues.json').map(response => response.json());
+    load() : void {
+        let observable = this.http.get('/data/venues.json').map(response => response.json());
 
         observable.subscribe(data => {
             this.updateOrCreateVenues(data);
 
-            this._observer.next(Venue.all());
+            this.observer.next();
         }, (error) => {
             console.error('Could not load venues.', error);
         });
     }
 
-    private updateOrCreateVenues(data) {
+    /**
+     * Loops venue json data and calls updateOrCreate().
+     *
+     * @param data
+     */
+    private updateOrCreateVenues(data : VenueList) : void {
         _.forEach(data, this.updateOrCreate);
     }
 
-    private updateOrCreate(attrs, id) {
+    /**
+     * Creates new or updates existing individual venue on Venue Model.
+     *
+     * @param attrs
+     * @param id
+     */
+    private updateOrCreate(attrs : IndividualVenue, id : string) : void {
         Venue.updateOrCreate([{key: 'id', value: id}], {
             id: id,
             fullName: attrs.fullName,
@@ -68,11 +96,11 @@ export class VenuesService {
     }
 
     /**
-     * Returns venues in datastore
+     * Returns array of Venue Items.
      *
-     * @returns {IVenues}
+     * @returns {VenueItem[]}
      */
-    getVenues() {
+    getVenues() : VenueItem[] {
         return Venue.all();
     }
 }

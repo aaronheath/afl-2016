@@ -9,7 +9,6 @@ import {StatsService} from './stats';
 import {MatchesService} from './matches';
 import {TeamsService} from './teams';
 import {VenuesService} from './venues';
-import {TimeService} from './time';
 
 import {getTeams} from '../tests/example-data-teams';
 import {getMatches} from '../tests/example-data-matches';
@@ -24,8 +23,8 @@ describe('StatsService', () => {
         provide(
             StatsService,
             {
-                useFactory: (matches, teams, venues, time) => {
-                    const service = new StatsService(matches, teams, venues, time);
+                useFactory: (matches, teams, venues) => {
+                    const service = new StatsService(matches, teams, venues);
 
                     spyOn(service, 'loadMatches').and.callThrough();
                     spyOn(service, 'loadTeams').and.callThrough();
@@ -33,7 +32,7 @@ describe('StatsService', () => {
 
                     return service;
                 },
-                deps: [MatchesService, TeamsService, VenuesService, TimeService],
+                deps: [MatchesService, TeamsService, VenuesService],
             }
         ),
         provide(
@@ -66,7 +65,6 @@ describe('StatsService', () => {
                 deps: [MockBackend, BaseRequestOptions],
             }
         ),
-        TimeService,
         MockBackend,
         BaseRequestOptions,
     ];

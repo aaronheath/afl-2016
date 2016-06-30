@@ -1,22 +1,53 @@
-import {Injectable} from '@angular/core';
-import {Http} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
-import {Subscriber} from 'rxjs/Subscriber';
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+import { Subscriber } from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
-import { Team, TeamItem } from '../models/index';
 import 'lodash';
 
+import { Team, TeamItem } from '../models/index';
+
+/**
+ * Interfaces
+ */
+
+export interface IndividualTeam {
+    fullName: string;
+    abbreviation: string;
+    city: string;
+    state: string;
+}
+
+export interface TeamList {
+    [id: string]: IndividualTeam;
+}
+
+/**
+ * Teams Service
+ *
+ * Repository and HTTP handler for teams data.
+ */
 @Injectable()
 export class TeamsService {
-    observable$ : Observable<Subscriber<TeamItem[]>>;
-    private _observer : Subscriber<TeamItem[]>;
+    /**
+     * Observable available for subscription that emits when teams data is loaded.
+     */
+    observable$ : Observable<Subscriber<void>>;
 
-    constructor(private _http: Http) {
-        //this._dataStore = { teams: {} };
+    /**
+     * Observer for observable$ subscription.
+     */
+    private observer : Subscriber<void>;
 
+    /**
+     * Constructor. Http injected. Observable initialised and load called().
+     *
+     * @param http
+     */
+    constructor(private http: Http) {
         this.observable$ = new Observable((observer) => {
-            this._observer = observer;
+            this.observer = observer;
 
             this.load();
         }).share();
@@ -26,22 +57,33 @@ export class TeamsService {
      * Fetch teams data and calls next on observer
      */
     load() : void {
-        let observable = this._http.get('/data/teams.json').map(response => response.json());
+        let observable = this.http.get('/data/teams.json').map(response => response.json());
 
         observable.subscribe(data => {
             this.updateOrCreateTeams(data);
 
-            this._observer.next(Team.all());
+            this.observer.next();
         }, (error) => {
             console.error('Could not load teams.', error);
         });
     }
 
-    private updateOrCreateTeams(data) {
+    /**
+     * Loops venue json data and calls updateOrCreate().
+     *
+     * @param data
+     */
+    private updateOrCreateTeams(data : TeamList) : void {
         _.forEach(data, this.updateOrCreate);
     }
 
-    private updateOrCreate(attrs, id) {
+    /**
+     * Creates new or updates existing individual team on Team Model.
+     *
+     * @param attrs
+     * @param id
+     */
+    private updateOrCreate(attrs : IndividualTeam, id : string) : void {
         Team.updateOrCreate([{key: 'id', value: id}], {
             id: id,
             fullName: attrs.fullName,
@@ -52,9 +94,9 @@ export class TeamsService {
     }
 
     /**
-     * Returns teams in datastore
+     * Returns array of Team Items.
      *
-     * @returns {ITeams}
+     * @returns {TeamItem[]}
      */
     getTeams() : TeamItem[] {
         return Team.all();
