@@ -36,7 +36,7 @@ export class MatchesService {
     observable$ : Observable<Subscriber<MatchItem[]>>;
     private _observer : Subscriber<MatchItem[]>;
 
-    constructor(private _http: Http) {
+    constructor(private http: Http) {
         this.observable$ = new Observable((observer) => {
             this._observer = observer;
 
@@ -48,7 +48,7 @@ export class MatchesService {
      * Fetch matches data, updates MatchModel and calls next on observer.
      */
     load() : void {
-        let observable = this._http.get('/data/matches.json').map(response => response.json());
+        let observable = this.http.get('/data/matches.json').map(response => response.json());
 
         observable.subscribe(data => {
             this.flattenRounds(data).forEach(this.updateOrCreateMatchItem);

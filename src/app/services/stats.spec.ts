@@ -27,9 +27,9 @@ describe('StatsService', () => {
                 useFactory: (matches, teams, venues, time) => {
                     const service = new StatsService(matches, teams, venues, time);
 
-                    spyOn(service, '_loadMatches').and.callThrough();
-                    spyOn(service, '_loadTeams').and.callThrough();
-                    spyOn(service, '_loadVenues').and.callThrough();
+                    spyOn(service, 'loadMatches').and.callThrough();
+                    spyOn(service, 'loadTeams').and.callThrough();
+                    spyOn(service, 'loadVenues').and.callThrough();
 
                     return service;
                 },
