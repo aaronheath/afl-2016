@@ -19,4 +19,3 @@ export * from './venue.model';
  */
 
 export * from './boot';
-
