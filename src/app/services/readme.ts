@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 
@@ -15,12 +14,7 @@ export class ReadmeService {
     /**
      * Observable available for subscription that emits when readme is loaded.
      */
-    observable$ : Observable<Subscriber<string>>;
-
-    /**
-     * Observer for observable$ subscription.
-     */
-    private _observer : Subscriber<string>;
+    observable$;
 
     /**
      * Store for readme content.
@@ -28,14 +22,9 @@ export class ReadmeService {
     private store : string = '';
 
     constructor(private _http: Http) {
-        //this.store = { readme: '' };
+        this.observable$ = new ReplaySubject(1);
 
-        // Create Observable Stream to output our data
-        this.observable$ = new Observable((observer) => {
-            this._observer = observer;
-
-            this.load();
-        }).share();
+        this.load();
     }
 
     /**
@@ -46,8 +35,7 @@ export class ReadmeService {
 
         observable.subscribe(data => {
             this.store = data;
-
-            this._observer.next(this.store);
+            this.observable$.next(this.store);
         }, (error) => {
             console.error('Could not load readme.', error);
         });

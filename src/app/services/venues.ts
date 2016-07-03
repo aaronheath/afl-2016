@@ -1,6 +1,4 @@
 import 'lodash';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
@@ -35,12 +33,7 @@ export class VenuesService {
     /**
      * Observable available for subscription that emits when venue data is loaded.
      */
-    observable$ : Observable<Subscriber<void>>;
-
-    /**
-     * Observer for observable$ subscription.
-     */
-    private observer : Subscriber<void>;
+    observable$;
 
     /**
      * Constructor. Http injected. Observable initialised and load called().
@@ -48,12 +41,6 @@ export class VenuesService {
      * @param http
      */
     constructor(private http: Http) {
-        //this.observable$ = new Observable((observer) => {
-        //    this.observer = observer;
-        //
-        //    this.load();
-        //}).share();
-
         this.observable$ = new ReplaySubject(1);
 
         this.load();
@@ -68,7 +55,6 @@ export class VenuesService {
         observable.subscribe(data => {
             this.updateOrCreateVenues(data);
 
-            //this.observer.next();
             this.observable$.next();
         }, (error) => {
             console.error('Could not load venues.', error);

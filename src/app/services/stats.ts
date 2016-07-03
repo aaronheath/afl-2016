@@ -1,10 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
-import { Subscriber } from 'rxjs/Subscriber';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/share';
-import 'rxjs/add/operator/skip';
+import 'rxjs/add/operator/skipWhile';
 
 import { zeroUndef } from '../helpers/utils';
 import { Ladder, LadderItem, Match, MatchItem } from '../models/index';
@@ -24,12 +20,9 @@ export class StatsService {
      * Observable available for subscription that emits upon greater than two Matches, Teams or Venues observables have
      * been fired.
      */
-    observable$ : Observable<Subscriber<void>>;
+    observable$;
 
-    /**
-     * Observer for observable$ subscription.
-     */
-    private observer : Subscriber<void>;
+    protected loaded = new Set();
 
     /**
      * Sets up observable for this service. As we're wanting data from three services (Matches, Teams and Venues) we
@@ -48,19 +41,9 @@ export class StatsService {
         private teamsService: TeamsService,
         private venuesService: VenuesService
     ) {
-        //this.observable$ = new Observable((observer) => {
-        //    this.observer = observer;
-        //
-        //    this.loadMatches();
-        //    this.loadTeams();
-        //    this.loadVenues();
-        //}).skip(2).share();
-
-        //this.observable$ = new ReplaySubject(1).skip(2).share();
-        this.observable$ = new ReplaySubject(1);
+        this.observable$ = new ReplaySubject(1).skipWhile(() => this.loaded.size < 3);
 
         this.observable$.subscribe(() => {
-            console.log('this.generateStats()');
             this.generateStats();
         });
 
@@ -75,12 +58,9 @@ export class StatsService {
      *
      * @protected
      */
-    protected loadMatches() : void {
+    public loadMatches() : void {
         this.matchesService.observable$.subscribe(() => {
-            console.log('loadMatches() next');
-            //this.observer.next();
-            //console.log('this.observable$', this.observable$);
-            //console.log('hasObservers()', this.observable$.hasObservers());
+            this.loaded.add('matches');
             this.observable$.next();
         });
     }
@@ -93,8 +73,7 @@ export class StatsService {
      */
     protected loadTeams() : void {
         this.teamsService.observable$.subscribe(() => {
-            console.log('loadTeams() next');
-            //this.observer.next();
+            this.loaded.add('teams');
             this.observable$.next();
         });
     }
@@ -107,8 +86,7 @@ export class StatsService {
      */
     protected loadVenues() : void {
         this.venuesService.observable$.subscribe(() => {
-            console.log('loadVenues() next');
-            //this.observer.next();
+            this.loaded.add('venues');
             this.observable$.next();
         });
     }

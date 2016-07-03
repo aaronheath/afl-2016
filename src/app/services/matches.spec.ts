@@ -70,15 +70,15 @@ describe('MatchesService', () => {
             MatchesService,
             Match,
         ], (matchesService: MatchesService) => {
-                matchesService.observable$.subscribe((data) => {
-                    expect(matchesService.load).toHaveBeenCalledTimes(1);
+            matchesService.observable$.subscribe((data) => {
+                expect(matchesService.load).toHaveBeenCalledTimes(1);
 
-                    expect(testUtils.mockedBackend.connectionsArray.length).toBe(1);
-                    expect(testUtils.mockedBackend.connectionsArray[0].request.method).toBe(0); // GET
-                    expect(testUtils.mockedBackend.connectionsArray[0].request.url).toBe('/data/matches.json');
+                expect(testUtils.mockedBackend.connectionsArray.length).toBe(1);
+                expect(testUtils.mockedBackend.connectionsArray[0].request.method).toBe(0); // GET
+                expect(testUtils.mockedBackend.connectionsArray[0].request.url).toBe('/data/matches.json');
 
-                    expect(Match.updateOrCreate).toHaveBeenCalledTimes(18);
-                });
+                expect(Match.updateOrCreate).toHaveBeenCalledTimes(18);
+            });
         })();
     });
 

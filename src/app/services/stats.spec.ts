@@ -112,11 +112,9 @@ describe('StatsService', () => {
     }
 
     it('should be constructed', inject([StatsService], (service: StatsService) => {
-        service.observable$.subscribe((data) => {
-            console.log('service.observable$.subscribe');
+        service.observable$.subscribe(() => {
             expect(service.observable$).toEqual(jasmine.any(Observable));
         });
-        console.log('subscribed');
     }));
 
     it('on construction observable should not be called if one (or more) `loads` doesn\'t fails', fakeAsync(() => {
