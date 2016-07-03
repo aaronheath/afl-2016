@@ -2,7 +2,7 @@ import {provide} from '@angular/core';
 import {Http, BaseRequestOptions} from '@angular/http';
 import {MockBackend} from '@angular/http/testing';
 import {Observable} from 'rxjs/Observable';
-import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@angular/core/testing';
+import {addProviders, inject, async} from '@angular/core/testing';
 
 import {TestUtils} from '../tests/test-utils';
 import {ReadmeService} from './readme';
@@ -51,9 +51,11 @@ describe('ReadmeService', () => {
         ),
     ];
 
-    beforeEachProviders(() => providers);
+    beforeEach(() => {
+        addProviders(providers);
 
-    beforeEach(testUtils.generateMockBackend(true, {body: mockedReadme}));
+        testUtils.generateMockBackend(true, {body: mockedReadme})();
+    });
 
     it('should be constructed', inject([ReadmeService, Http], (service: ReadmeService, http: Http) => {
         service.observable$.subscribe((data) => {
@@ -90,34 +92,56 @@ describe('ReadmeService', () => {
         return promise;
     }), testUtils.standardTimeout);
 
-    it('load() http call should handle an error response', () => {
-        // Little different this spec as we're needing to overwrite the standard beforeEach so that we can instead
-        // have the http call return an error.
+    //it('load() http call should handle an error response', () => {
+    //    // Little different this spec as we're needing to overwrite the standard beforeEach so that we can instead
+    //    // have the http call return an error.
+    //
+    //    testUtils.resetProviders(providers);
+    //
+    //    testUtils.generateMockBackend()();
+    //
+    //    spyOn(console, 'error');
+    //
+    //    const fn = inject([ReadmeService], (service: ReadmeService) => {
+    //        const promise = new Promise((resolve, reject) => {
+    //            setTimeout(() => {
+    //                expect(console.error).toHaveBeenCalledWith('Could not load readme.', undefined);
+    //
+    //                resolve();
+    //            }, 500);
+    //
+    //            service.observable$.subscribe((data) => {
+    //                reject('should not have been called');
+    //            });
+    //        });
+    //
+    //        return promise;
+    //    });
+    //
+    //    return fn();
+    //}, testUtils.standardTimeout);
 
+    it('load() http call should handle an error response', async(() => {
         testUtils.resetProviders(providers);
 
         testUtils.generateMockBackend()();
 
         spyOn(console, 'error');
 
-        const fn = inject([ReadmeService], (service: ReadmeService) => {
-            const promise = new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    expect(console.error).toHaveBeenCalledWith('Could not load readme.', undefined);
-
-                    resolve();
-                }, 500);
-
-                service.observable$.subscribe((data) => {
-                    reject('should not have been called');
-                });
-            });
-
-            return promise;
+        const promise = new Promise((resolve) => {
+            setTimeout(() => resolve(), 500);
         });
 
-        return fn();
-    }, testUtils.standardTimeout);
+        inject([ReadmeService], (service: ReadmeService) => {
+            service.observable$.subscribe(() => {
+                //
+            });
+
+            promise.then(() => {
+                expect(console.error).toHaveBeenCalledWith('Could not load readme.', undefined);
+            });
+        })();
+    }));
 
     it('getReadme() should return the readme', inject([ReadmeService], (
         service: ReadmeService

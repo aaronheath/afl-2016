@@ -2,7 +2,8 @@ import {provide} from '@angular/core';
 import {Http, BaseRequestOptions, Response, ResponseOptions} from '@angular/http';
 import {MockBackend, MockConnection} from '@angular/http/testing';
 import {Observable} from 'rxjs/Observable';
-import {beforeEachProviders, beforeEach, describe, expect, inject, it, fakeAsync, tick} from '@angular/core/testing';
+//import {beforeEachProviders, beforeEach, describe, expect, inject, it, fakeAsync, tick} from '@angular/core/testing';
+import {addProviders, inject, async, tick, fakeAsync} from '@angular/core/testing';
 
 import {TestUtils} from '../tests/test-utils';
 import {StatsService} from './stats';
@@ -69,17 +70,19 @@ describe('StatsService', () => {
         BaseRequestOptions,
     ];
 
-    beforeEachProviders(() => providers);
+    beforeEach(() => {
+        addProviders(providers);
 
-    beforeEach(inject([MockBackend, Http], (_mockbackend, _http) => {
-        _mockbackend.connections.subscribe((c:MockConnection) => {
-            const baseResponse = new Response(new ResponseOptions({body: createBaseResponse(c.request.url)}));
+        inject([MockBackend, Http], (_mockbackend, _http) => {
+            _mockbackend.connections.subscribe((c:MockConnection) => {
+                const baseResponse = new Response(new ResponseOptions({body: createBaseResponse(c.request.url)}));
 
-            return c.mockRespond(baseResponse);
-        });
+                return c.mockRespond(baseResponse);
+            });
 
-        this.mockedBackend = _mockbackend;
-    }));
+            this.mockedBackend = _mockbackend;
+        })();
+    });
 
     function createBaseResponse(path) {
         const endpoints = [
@@ -110,8 +113,10 @@ describe('StatsService', () => {
 
     it('should be constructed', inject([StatsService], (service: StatsService) => {
         service.observable$.subscribe((data) => {
+            console.log('service.observable$.subscribe');
             expect(service.observable$).toEqual(jasmine.any(Observable));
         });
+        console.log('subscribed');
     }));
 
     it('on construction observable should not be called if one (or more) `loads` doesn\'t fails', fakeAsync(() => {
@@ -121,7 +126,7 @@ describe('StatsService', () => {
 
         spyOn(console, 'error');
 
-        return inject([StatsService], (service: StatsService) => {
+        inject([StatsService], (service: StatsService) => {
             service.observable$.subscribe(() => {
                 expect(false).toBe(true); // This should never be called
             });

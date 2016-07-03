@@ -1,10 +1,7 @@
 import 'lodash';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/share';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 import { Match, MatchItem } from '../models/index';
 
@@ -36,12 +33,7 @@ export class MatchesService {
     /**
      * Observable available for subscription that emits when match data is loaded.
      */
-    observable$ : Observable<Subscriber<void>>;
-
-    /**
-     * Observer for observable$ subscription.
-     */
-    private observer : Subscriber<void>;
+    observable$;
 
     /**
      * Constructor. Http injected. Observable initialised and load called().
@@ -49,11 +41,9 @@ export class MatchesService {
      * @param http
      */
     constructor(private http: Http) {
-        this.observable$ = new Observable((observer) => {
-            this.observer = observer;
+        this.observable$ = new ReplaySubject(1);
 
-            this.load();
-        }).share();
+        this.load();
     }
 
     /**
@@ -65,7 +55,7 @@ export class MatchesService {
         observable.subscribe(data => {
             this.flattenRounds(data).forEach(this.updateOrCreateMatchItem);
 
-            this.observer.next();
+            this.observable$.next();
         }, (error) => {
             console.error('Could not load matches.', error);
         });

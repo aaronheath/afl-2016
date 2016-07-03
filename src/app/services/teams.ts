@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 import 'lodash';
@@ -46,11 +47,15 @@ export class TeamsService {
      * @param http
      */
     constructor(private http: Http) {
-        this.observable$ = new Observable((observer) => {
-            this.observer = observer;
+        //this.observable$ = new Observable((observer) => {
+        //    this.observer = observer;
+        //
+        //    this.load();
+        //}).share();
 
-            this.load();
-        }).share();
+        this.observable$ = new ReplaySubject(1);
+
+        this.load();
     }
 
     /**
@@ -62,7 +67,8 @@ export class TeamsService {
         observable.subscribe(data => {
             this.updateOrCreateTeams(data);
 
-            this.observer.next();
+            //this.observer.next();
+            this.observable$.next();
         }, (error) => {
             console.error('Could not load teams.', error);
         });

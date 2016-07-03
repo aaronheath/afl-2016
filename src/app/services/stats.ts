@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { Subscriber } from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
@@ -47,17 +48,25 @@ export class StatsService {
         private teamsService: TeamsService,
         private venuesService: VenuesService
     ) {
-        this.observable$ = new Observable((observer) => {
-            this.observer = observer;
+        //this.observable$ = new Observable((observer) => {
+        //    this.observer = observer;
+        //
+        //    this.loadMatches();
+        //    this.loadTeams();
+        //    this.loadVenues();
+        //}).skip(2).share();
 
-            this.loadMatches();
-            this.loadTeams();
-            this.loadVenues();
-        }).skip(2).share();
+        //this.observable$ = new ReplaySubject(1).skip(2).share();
+        this.observable$ = new ReplaySubject(1);
 
         this.observable$.subscribe(() => {
+            console.log('this.generateStats()');
             this.generateStats();
         });
+
+        this.loadMatches();
+        this.loadTeams();
+        this.loadVenues();
     }
 
     /**
@@ -68,7 +77,11 @@ export class StatsService {
      */
     protected loadMatches() : void {
         this.matchesService.observable$.subscribe(() => {
-            this.observer.next();
+            console.log('loadMatches() next');
+            //this.observer.next();
+            //console.log('this.observable$', this.observable$);
+            //console.log('hasObservers()', this.observable$.hasObservers());
+            this.observable$.next();
         });
     }
 
@@ -80,7 +93,9 @@ export class StatsService {
      */
     protected loadTeams() : void {
         this.teamsService.observable$.subscribe(() => {
-            this.observer.next();
+            console.log('loadTeams() next');
+            //this.observer.next();
+            this.observable$.next();
         });
     }
 
@@ -92,7 +107,9 @@ export class StatsService {
      */
     protected loadVenues() : void {
         this.venuesService.observable$.subscribe(() => {
-            this.observer.next();
+            console.log('loadVenues() next');
+            //this.observer.next();
+            this.observable$.next();
         });
     }
 

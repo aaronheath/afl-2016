@@ -1,13 +1,13 @@
-import {provide} from '@angular/core';
-import {Http, BaseRequestOptions} from '@angular/http';
-import {MockBackend} from '@angular/http/testing';
-import {Observable} from 'rxjs/Observable';
-import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@angular/core/testing';
+import { provide } from '@angular/core';
+import { BaseRequestOptions, Http } from '@angular/http';
+import { MockBackend } from '@angular/http/testing';
+import { Observable } from 'rxjs/Observable';
+import { addProviders, fakeAsync, inject, tick } from '@angular/core/testing';
 
-import {TestUtils} from '../tests/test-utils';
-import {MatchesService} from './matches';
+import { TestUtils } from '../tests/test-utils';
+import { MatchesService } from './index';
 import { Match, MatchItem } from '../models/index';
-import {getMatches} from '../tests/example-data-matches';
+import { getMatches } from '../tests/example-data-matches';
 
 const testUtils = new TestUtils();
 
@@ -19,11 +19,9 @@ describe('MatchesService', () => {
             MatchesService,
             {
                 useFactory: (backend) => {
-                    const matchesService = new MatchesService(backend);
+                    spyOn(MatchesService.prototype, 'load').and.callThrough();
 
-                    spyOn(matchesService, 'load').and.callThrough();
-
-                    return matchesService;
+                    return new MatchesService(backend);
                 },
                 deps: [Http],
             }
@@ -46,88 +44,55 @@ describe('MatchesService', () => {
         provide(
             Match,
             {
-                useFactory: () => {
-                    console.log('Match', Match);
-
-                    spyOn(Match, 'updateOrCreate').and.callThrough();
-
-                    return Match;
-                },
+                useFactory: () => Match,
                 deps: [],
             }
         ),
     ];
 
-    beforeEachProviders(() => providers);
+    beforeEach(() => {
+        addProviders(providers);
 
-    beforeEach(testUtils.generateMockBackend(true, {body: matches}));
+        testUtils.generateMockBackend(true, {body: matches})();
+
+        spyOn(console, 'error');
+    });
 
     it('should be constructed', inject([MatchesService, Http], (matchesService: MatchesService, http: Http) => {
-        matchesService.observable$.subscribe((data) => {
-            expect(matchesService.load).toHaveBeenCalled();
-            expect(matchesService.observable$).toEqual(jasmine.any(Observable));
-        });
+        expect(MatchesService.prototype.load).toHaveBeenCalled();
+        expect(matchesService.observable$).toEqual(jasmine.any(Observable));
     }));
 
-    it('load() should fetch match data, update Match Model and call next on the observer', inject([
-        MatchesService,
-        Match,
-    ], (matchesService: MatchesService) => {
-        const promise = new Promise((resolve, reject) => {
-            let loadCalls = 0;
+    it('load() should fetch match data, update Match Model and call next on the observer', () => {
+        spyOn(Match, 'updateOrCreate').and.callThrough();
 
-            matchesService.observable$.subscribe((data) => {
-                loadCalls++;
+        inject([
+            MatchesService,
+            Match,
+        ], (matchesService: MatchesService) => {
+                matchesService.observable$.subscribe((data) => {
+                    expect(matchesService.load).toHaveBeenCalledTimes(1);
 
-                if(loadCalls === 1) {
-                    matchesService.load();
-                }
+                    expect(testUtils.mockedBackend.connectionsArray.length).toBe(1);
+                    expect(testUtils.mockedBackend.connectionsArray[0].request.method).toBe(0); // GET
+                    expect(testUtils.mockedBackend.connectionsArray[0].request.url).toBe('/data/matches.json');
 
-                if(loadCalls === 2) {
-                    expect(matchesService.load).toHaveBeenCalledTimes(loadCalls);
+                    expect(Match.updateOrCreate).toHaveBeenCalledTimes(18);
+                });
+        })();
+    });
 
-                    expect(testUtils.mockedBackend.connectionsArray.length).toBe(2);
-                    expect(testUtils.mockedBackend.connectionsArray[1].request.method).toBe(0); // GET
-                    expect(testUtils.mockedBackend.connectionsArray[1].request.url).toBe('/data/matches.json');
-
-                    expect(Match.updateOrCreate).toHaveBeenCalledTimes(loadCalls * 18);
-
-                    resolve();
-                }
-            });
-        });
-
-        return promise;
-    }), testUtils.standardTimeout);
-
-    it('load() http call should handle an error response', () => {
-        // Little different this spec as we're needing to overwrite the standard beforeEach so that we can instead
-        // have the http call return an error.
-
+    it('load() http call should handle an error response', fakeAsync(() => {
         testUtils.resetProviders(providers);
 
         testUtils.generateMockBackend()();
 
-        spyOn(console, 'error');
+        inject([MatchesService], (matchesService: MatchesService) => {
+            tick(500);
 
-        const fn = inject([MatchesService], (matchesService: MatchesService) => {
-            const promise = new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    expect(console.error).toHaveBeenCalledWith('Could not load matches.', undefined);
-
-                    resolve();
-                }, 500);
-
-                matchesService.observable$.subscribe((data) => {
-                    reject('should not have been called');
-                });
-            });
-
-            return promise;
-        });
-
-        return fn();
-    }, testUtils.standardTimeout);
+            expect(console.error).toHaveBeenCalledWith('Could not load matches.', undefined);
+        })();
+    }));
 
     it('getAllMatches() should array of all matches as MatchItem\'s', inject([MatchesService], (
         matchesService: MatchesService
