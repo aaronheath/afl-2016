@@ -104,6 +104,7 @@ export class MatchesService {
      * @param match
      */
     protected updateOrCreateMatchItem(match : MatchObject) : void {
+        //console.log('match', match);
         Match.updateOrCreate([
             {key: 'roundNo', value: match.roundNo},
             {key: 'home', value: match.home},

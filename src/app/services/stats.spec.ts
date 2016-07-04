@@ -3,13 +3,14 @@ import {Http, BaseRequestOptions, Response, ResponseOptions} from '@angular/http
 import {MockBackend, MockConnection} from '@angular/http/testing';
 import {Observable} from 'rxjs/Observable';
 //import {beforeEachProviders, beforeEach, describe, expect, inject, it, fakeAsync, tick} from '@angular/core/testing';
-import {addProviders, inject, async, tick, fakeAsync} from '@angular/core/testing';
+import {addProviders, inject, tick, fakeAsync} from '@angular/core/testing';
 
 import {TestUtils} from '../tests/test-utils';
 import {StatsService} from './stats';
 import {MatchesService} from './matches';
 import {TeamsService} from './teams';
 import {VenuesService} from './venues';
+import {Match, MatchItem} from '../models/index';
 
 import {getTeams} from '../tests/example-data-teams';
 import {getMatches} from '../tests/example-data-matches';
@@ -40,7 +41,7 @@ describe('StatsService', () => {
             MatchesService,
             {
                 useFactory: (backend) => new MatchesService(backend),
-                deps: [Http],
+                deps: [Http, Match],
             }
         ),
         provide(
@@ -68,6 +69,19 @@ describe('StatsService', () => {
         ),
         MockBackend,
         BaseRequestOptions,
+        provide(
+            Match,
+            {
+                useFactory: () => {
+                    //console.log('new MatchModel<MatchItem>(MatchItem)');
+                    //new MatchModel<MatchItem>(MatchItem)
+
+                    Match.reset();
+                    return Match;
+                },
+                deps: [],
+            }
+        ),
     ];
 
     beforeEach(() => {
@@ -82,6 +96,8 @@ describe('StatsService', () => {
 
             this.mockedBackend = _mockbackend;
         })();
+
+        Match.reset();
     });
 
     function createBaseResponse(path) {
@@ -135,32 +151,17 @@ describe('StatsService', () => {
         })();
     }));
 
-    it('getMatchesByRound() should return all matches for round', inject([StatsService], (
+    it('getMatchesByRound() should return all matches for round', inject([StatsService, MatchesService], (
         service: StatsService
     ) => {
-        service.observable$.subscribe((data) => {
+        service.observable$.subscribe(() => {
             const rnd1 = service.getMatchesByRound(1);
 
             expect(Array.isArray(rnd1)).toBe(true);
             expect(rnd1.length).toBe(9);
 
             // Test all matches in round have the expected attrs defined
-            rnd1.forEach((match) => {
-                hasAttrs(match, [
-                    'h_home',
-                    'h_home_abbr',
-                    'h_away',
-                    'h_away_abbr',
-                    'h_venue',
-                    'h_venue_abbr',
-                    'venue_moment',
-                    'local_moment',
-                    'local_datetime',
-                    'h_date',
-                    'h_venue_time',
-                    'h_local_time',
-                ]);
-            });
+            rnd1.forEach((match) => expect(match).toEqual(jasmine.any(MatchItem)));
 
             // Test individual match (round 2, match 2) has matching attrs
             const rnd2 = service.getMatchesByRound(2);
@@ -172,7 +173,6 @@ describe('StatsService', () => {
             expect(r2m2.away().get('abbreviation')).toBe('PA');
             expect(r2m2.venue().get('fullName')).toBe('Adelaide Oval');
             expect(r2m2.venue().get('id')).toBe('AO');
-            //expect(r2m2.venue.get('fullName')).toEqual(jasmine.any(moment));
         });
     }));
 
@@ -218,25 +218,4 @@ describe('StatsService', () => {
             expect(ninth.points()).toBe(4);
         });
     }));
-
-    //it('getSummaryForRound() should return round summary object', inject([StatsService], (
-    //    service: StatsService
-    //) => {
-    //    service.observable$.subscribe((data) => {
-    //        const summary = service.getSummaryForRound(1);
-    //
-    //        expect(summary.matchPlayed).toBe(true);
-    //        expect(summary.goals).toBe(255);
-    //        expect(summary.behinds).toBe(218);
-    //        expect(summary.totalPoints).toBe(1748);
-    //        expect(summary.accuracy).toBe(53.911205073995774);
-    //        expect(summary.attendance).toBe(360850);
-    //    });
-    //}));
 });
-
-function hasAttrs(obj, attrs) {
-    attrs.forEach((attr) => {
-        expect(obj[attr]).toBeDefined();
-    });
-}

@@ -58,7 +58,7 @@ export class StatsService {
      *
      * @protected
      */
-    public loadMatches() : void {
+    protected loadMatches() : void {
         this.matchesService.observable$.subscribe(() => {
             this.loaded.add('matches');
             this.observable$.next();
