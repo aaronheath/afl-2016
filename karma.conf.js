@@ -1,3 +1,8 @@
+/**
+ * KARMA CONFIGURATION
+ * http://karma-runner.github.io/1.0/config/configuration-file.html
+ */
+
 var configuration = {
 
     basePath: '',
@@ -48,14 +53,11 @@ var configuration = {
 
     port: 9876,
 
-    //logLevel: config.LOG_INFO,
-
     colors: true,
 
     autoWatch: true,
 
     browsers: [
-        //'PhantomJS',
         'Chrome',
     ],
 
@@ -100,10 +102,16 @@ var configuration = {
     concurrency: Infinity,
 };
 
+/**
+ * When Travis CI is running this Karma instance, alter the browser array.
+ */
 if (process.env.TRAVIS) {
     configuration.browsers = ['Chrome_travis_ci'];
 }
 
 module.exports = function(config) {
+    // Uncomment the below line if the log level is to be altered
+    //configuration.logLevel = config.LOG_INFO;
+
     config.set(configuration)
 };
