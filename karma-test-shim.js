@@ -42,6 +42,8 @@ Promise.all([
         System.import('base/public/app/services/readme.spec'),
         System.import('base/public/app/services/time.spec'),
         System.import('base/public/app/services/stats.spec'),
+        System.import('base/public/app/models/item.spec'),
+        System.import('base/public/app/models/model.spec'),
     ])
     .then(function() { __karma__.start(); }, function(error) { __karma__.error(error.stack || error); })
     .catch(console.error.bind(console));
