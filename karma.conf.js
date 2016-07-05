@@ -111,6 +111,7 @@ if (process.env.TRAVIS) {
 
 module.exports = function(config) {
     // Uncomment the below line if the log level is to be altered
+    //
     //configuration.logLevel = config.LOG_INFO;
 
     config.set(configuration)
