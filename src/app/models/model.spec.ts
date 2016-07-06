@@ -1,5 +1,5 @@
 import { Item, Model } from './index';
-import {ModelException} from '../exceptions/model';
+import { ModelException } from '../exceptions/index';
 
 declare const Symbol;
 

@@ -1,11 +1,8 @@
 import 'lodash';
+import { Component, OnInit } from '@angular/core';
 
-import {Component, OnInit} from '@angular/core';
-
-import {StatsService} from '../../services/stats';
-import { MatchSummaryService } from '../../services/match-summary';
-import {FormatNumber} from '../../pipes/format-number';
-import {FormatPercentage} from '../../pipes/format-percentage';
+import { MatchSummaryService, StatsService } from '../../services/index';
+import { FormatNumber, FormatPercentage } from '../../pipes/index';
 import { MatchItem } from '../../models/index';
 
 @Component({

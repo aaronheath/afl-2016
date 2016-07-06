@@ -1,16 +1,12 @@
-import {provide} from '@angular/core';
-import {Http, BaseRequestOptions, Response, ResponseOptions} from '@angular/http';
-import {MockBackend, MockConnection} from '@angular/http/testing';
-import {Observable} from 'rxjs/Observable';
-//import {beforeEachProviders, beforeEach, describe, expect, inject, it, fakeAsync, tick} from '@angular/core/testing';
-import {addProviders, inject, tick, fakeAsync} from '@angular/core/testing';
+import { provide } from '@angular/core';
+import { BaseRequestOptions, Http, Response, ResponseOptions } from '@angular/http';
+import { MockBackend, MockConnection } from '@angular/http/testing';
+import { Observable } from 'rxjs/Observable';
+import { addProviders, fakeAsync, inject, tick } from '@angular/core/testing';
 
-import {TestUtils} from '../tests/test-utils';
-import {StatsService} from './stats';
-import {MatchesService} from './matches';
-import {TeamsService} from './teams';
-import {VenuesService} from './venues';
-import {Match, MatchItem} from '../models/index';
+import { TestUtils } from '../tests/test-utils';
+import { MatchesService, StatsService, TeamsService, VenuesService } from './index';
+import { Match, MatchItem } from '../models/index';
 
 import {getTeams} from '../tests/example-data-teams';
 import {getMatches} from '../tests/example-data-matches';

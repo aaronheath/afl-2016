@@ -1,4 +1,12 @@
+/**
+ * Types
+ */
+
 export declare type BasicObj = BasicObjStr | BasicObjNum;
+
+/**
+ * Interfaces
+ */
 
 export interface BasicObjStr {
     [x: string]: any;

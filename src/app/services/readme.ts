@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/share';
 
 /**
  * Readme Service

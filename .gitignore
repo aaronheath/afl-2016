@@ -3,6 +3,6 @@
 node_modules
 public/app
 public/data
-typings
 semantic/dist
+typings
 npm-debug.log

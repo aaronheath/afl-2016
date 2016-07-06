@@ -1,6 +1,6 @@
-import {Http, Response, ResponseOptions, ResponseOptionsArgs} from '@angular/http';
-import {MockBackend, MockConnection} from '@angular/http/testing';
-import {inject, getTestInjector} from '@angular/core/testing';
+import { Http, Response, ResponseOptions, ResponseOptionsArgs } from '@angular/http';
+import { MockBackend, MockConnection } from '@angular/http/testing';
+import { inject, getTestInjector } from '@angular/core/testing';
 
 export class TestUtils {
     public standardTimeout : number = 1000; // 1 second
@@ -29,8 +29,6 @@ export class TestUtils {
     }
 
     public resetProviders(providers) : void {
-        //resetBaseTestProviders();
-
         const testInjector = getTestInjector();
 
         testInjector.reset();

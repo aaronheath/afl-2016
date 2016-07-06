@@ -1,30 +1,16 @@
-import {
-    inject,
-    setBaseTestProviders,
-    addProviders,
-    async,
-} from '@angular/core/testing';
-
-import {TestComponentBuilder} from '@angular/compiler/testing';
-
+import { inject, setBaseTestProviders, addProviders, async } from '@angular/core/testing';
+import { TestComponentBuilder } from '@angular/compiler/testing';
 import {
     TEST_BROWSER_DYNAMIC_APPLICATION_PROVIDERS,
     TEST_BROWSER_DYNAMIC_PLATFORM_PROVIDERS,
 } from '@angular/platform-browser-dynamic/testing';
 
-import {getMatches} from '../../tests/example-data-matches';
-import {getTeams} from '../../tests/example-data-teams';
-import {getVenues} from '../../tests/example-data-venues';
-import {FormatNumber} from '../../pipes/format-number';
-import {ListMatchesComponent} from './list-matches';
-import {StatsService} from "../../services/stats";
-import {MatchesService} from "../../services/matches";
-import {TeamsService} from "../../services/teams";
-import {VenuesService} from "../../services/venues";
-import {Match, Team, Venue} from '../../models/index';
-import {Http, BaseRequestOptions, Response, ResponseOptions} from '@angular/http';
-import {MockBackend, MockConnection} from '@angular/http/testing';
-
+import { getMatches } from '../../tests/example-data-matches';
+import { getTeams } from '../../tests/example-data-teams';
+import { getVenues } from '../../tests/example-data-venues';
+import { FormatNumber } from '../../pipes/index';
+import { Match, Team, Venue } from '../../models/index';
+import { ListMatchesComponent } from './list-matches';
 
 setBaseTestProviders(TEST_BROWSER_DYNAMIC_PLATFORM_PROVIDERS, TEST_BROWSER_DYNAMIC_APPLICATION_PROVIDERS);
 

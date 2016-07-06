@@ -6,8 +6,8 @@ import { addProviders, fakeAsync, inject, tick } from '@angular/core/testing';
 
 import { TestUtils } from '../tests/test-utils';
 import { TeamsService } from './index';
-import { getTeams } from '../tests/example-data-teams';
 import { Team, TeamItem } from '../models/index';
+import { getTeams } from '../tests/example-data-teams';
 
 const testUtils = new TestUtils();
 

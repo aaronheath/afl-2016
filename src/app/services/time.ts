@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 
 declare const moment;
 
+/**
+ * Types
+ */
+
 export declare type Timezone = string;
 
 /**

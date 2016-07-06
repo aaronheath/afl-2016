@@ -3,9 +3,9 @@ import { RouteParams } from '@angular/router-deprecated';
 
 import { MatchesService, StatsService } from '../../services/index';
 import { FormatNumber, FormatPercentage } from '../../pipes/index';
+import { MatchItem } from '../../models/index';
 import { ListMatchesComponent } from '../list-matches/list-matches';
 import { RoundSummaryComponent } from '../round-summary/round-summary';
-import { MatchItem } from '../../models/index';
 
 @Component({
     directives: [

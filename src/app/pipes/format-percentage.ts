@@ -1,5 +1,5 @@
-import { Pipe, PipeTransform } from '@angular/core';
 import 'numeral';
+import { Pipe, PipeTransform } from '@angular/core';
 
 /**
  * Format Percentage Pipe

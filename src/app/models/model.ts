@@ -23,6 +23,9 @@ export interface ModelWhereAttrs {
  * - One to one relationships
  * - One to many relationships
  * - Many to many relationships
+ * - Package up as own NPM module
+ * - Caching of queries
+ * - Usage of web workers
  */
 export class Model<T extends Item> {
     /**

@@ -6,8 +6,8 @@ import { addProviders, fakeAsync, inject, tick } from '@angular/core/testing';
 
 import { TestUtils } from '../tests/test-utils';
 import { VenuesService } from './index';
-import { getVenues } from '../tests/example-data-venues';
 import { Venue, VenueItem } from '../models/index';
+import { getVenues } from '../tests/example-data-venues';
 
 const testUtils = new TestUtils();
 

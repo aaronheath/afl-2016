@@ -1,4 +1,4 @@
-import {Map} from 'immutable';
+import { Map } from 'immutable';
 
 /**
  * Base extender the core JS Error object.
