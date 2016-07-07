@@ -1,14 +1,14 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import {StatsService} from '../../services/stats';
-import {FormatPercentage} from '../../pipes/format-percentage';
+import { zeroUndef } from '../../helpers/utils';
+import { StatsService } from '../../services/index';
+import { FormatPercentage } from '../../pipes/index';
+import { LadderItem } from '../../models/index';
 
 @Component({
     selector: 'ladder',
-    directives: [],
-    inputs: [],
     pipes: [
-        FormatPercentage
+        FormatPercentage,
     ],
     template: `
         <table class="ui celled table structured compact striped">
@@ -35,27 +35,26 @@ import {FormatPercentage} from '../../pipes/format-percentage';
             </thead>
             <tbody>
                 <tr *ngFor="let team of ladder; let i = index" [class.positive]="i < 8">
-                    <td>{{ team.h_name }}</td>
-                    <td>{{ team.played }}</td>
-                    <td><strong>{{ team.wins }}</strong></td>
-                    <td><strong>{{ team.losses }}</strong></td>
-                    <td><strong>{{ team.draws }}</strong></td>
-                    <td>{{ team.goalsFor }}</td>
-                    <td>{{ team.behindsFor }}</td>
-                    <td>{{ team.pointsFor }}</td>
-                    <td>{{ team.goalsAgainst }}</td>
-                    <td>{{ team.behindsAgainst }}</td>
-                    <td>{{ team.pointsAgainst }}</td>
-                    <td><strong>{{ team.percentage | formatPercentage }}</strong></td>
-                    <td><strong>{{ team.points }}</strong></td>
+                    <td><span *ngIf="team.team()">{{ team.team().get('fullName') }}</span></td>
+                    <td>{{ team.played() }}</td>
+                    <td><strong>{{ teamAttr(team, 'wins') }}</strong></td>
+                    <td><strong>{{ teamAttr(team, 'losses') }}</strong></td>
+                    <td><strong>{{ teamAttr(team, 'draws') }}</strong></td>
+                    <td>{{ teamAttr(team, 'goalsFor') }}</td>
+                    <td>{{ teamAttr(team, 'behindsFor') }}</td>
+                    <td>{{ team.pointsFor() }}</td>
+                    <td>{{ teamAttr(team, 'goalsAgainst') }}</td>
+                    <td>{{ teamAttr(team, 'behindsAgainst') }}</td>
+                    <td>{{ team.pointsAgainst() }}</td>
+                    <td><strong>{{ team.percentage() | formatPercentage }}</strong></td>
+                    <td><strong>{{ team.points() }}</strong></td>
                 </tr>
             </tbody>
         </table>
     `,
 })
-
 export class LadderComponent implements OnInit {
-    ladder : ILadderTeam[];
+    ladder : LadderItem[];
 
     constructor(
         private _statsService: StatsService
@@ -67,5 +66,9 @@ export class LadderComponent implements OnInit {
         this._statsService.observable$.subscribe((data) => {
             this.ladder = this._statsService.getLadder();
         });
+    }
+
+    teamAttr(team, attr) {
+        return zeroUndef(team.get(attr));
     }
 }

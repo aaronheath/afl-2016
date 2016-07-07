@@ -33,15 +33,19 @@ window.afl2016 = afl2016;
 System.config(window.afl2016);
 
 Promise.all([
-        System.import('base/public/app/helpers/utils.spec'),
-        System.import('base/public/app/components/list-matches/list-matches.spec'),
-        System.import('base/public/app/pipes/format-number.spec'),
-        System.import('base/public/app/services/matches.spec'),
-        System.import('base/public/app/services/teams.spec'),
-        System.import('base/public/app/services/venues.spec'),
-        System.import('base/public/app/services/readme.spec'),
-        System.import('base/public/app/services/time.spec'),
-        System.import('base/public/app/services/stats.spec'),
-    ])
-    .then(function() { __karma__.start(); }, function(error) { __karma__.error(error.stack || error); })
-    .catch(console.error.bind(console));
+    System.import('base/public/app/helpers/utils.spec'),
+    System.import('base/public/app/components/list-matches/list-matches.spec'),
+    System.import('base/public/app/pipes/format-number.spec'),
+    System.import('base/public/app/services/matches.spec'),
+    System.import('base/public/app/services/teams.spec'),
+    System.import('base/public/app/services/venues.spec'),
+    System.import('base/public/app/services/readme.spec'),
+    System.import('base/public/app/services/time.spec'),
+    System.import('base/public/app/services/stats.spec'),
+    System.import('base/public/app/models/item.spec'),
+    System.import('base/public/app/models/model.spec'),
+]).then(function() {
+    __karma__.start();
+}, function(error) {
+    __karma__.error(error.stack || error);
+}).catch(console.error.bind(console));

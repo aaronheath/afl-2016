@@ -1,6 +1,4 @@
-import {it, describe, beforeEach, expect} from '@angular/core/testing';
-
-import {FormatNumber} from './format-number';
+import { FormatNumber } from './index';
 
 describe('FormatNumber Pipe', function() {
     let pipe : FormatNumber;

@@ -1,45 +1,46 @@
-import {Component, OnInit, OnChanges} from '@angular/core';
-import {Router, RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from '@angular/router-deprecated';
-import {HTTP_PROVIDERS} from '@angular/http';
+import { Component, OnChanges, OnInit } from '@angular/core';
+import { RouteConfig, Router, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from '@angular/router-deprecated';
+import { HTTP_PROVIDERS } from '@angular/http';
 
-import {MatchesService} from '../../services/matches';
-import {TeamsService} from '../../services/teams';
-import {VenuesService} from '../../services/venues';
-import {StatsService} from '../../services/stats';
-import {ReadmeService} from '../../services/readme';
-import {TimeService} from '../../services/time';
+// Haven't looked into why yet, however we're unable use barreled imports at this point.
+import { MatchesService } from '../../services/matches';
+import { MatchSummaryService } from '../../services/match-summary';
+import { ReadmeService } from '../../services/readme';
+import { StatsService } from '../../services/stats';
+import { TeamsService } from '../../services/teams';
+import { TimeService } from '../../services/time';
+import { VenuesService } from '../../services/venues';
 
-import {ListMatchesComponent} from '../list-matches/list-matches';
-import {PageLadderComponent} from '../page-ladder/page-ladder';
-import {PageRoundComponent} from '../page-round/page-round';
-import {LadderComponent} from '../ladder/ladder';
-import {PageReadmeComponent} from '../page-readme/page-readme';
-import {FooterComponent} from '../footer/footer';
+import { FooterComponent } from '../footer/footer';
+import { LadderComponent } from '../ladder/ladder';
+import { ListMatchesComponent } from '../list-matches/list-matches';
+import { PageLadderComponent } from '../page-ladder/page-ladder';
+import { PageReadmeComponent } from '../page-readme/page-readme';
+import { PageRoundComponent } from '../page-round/page-round';
 
-import {SortMatches} from '../../pipes/sort-matches';
-import {FormatNumber} from '../../pipes/format-number';
-import {FormatPercentage} from '../../pipes/format-percentage';
+import { FormatNumber } from '../../pipes/format-number';
+import { FormatPercentage } from '../../pipes/format-percentage';
 
 declare const $;
 
 @Component({
     selector: 'my-app',
     directives: [
-        ROUTER_DIRECTIVES,
         FooterComponent,
+        ROUTER_DIRECTIVES,
     ],
     providers: [
-        ROUTER_PROVIDERS,
         HTTP_PROVIDERS,
+        ROUTER_PROVIDERS,
         // Services
         MatchesService,
-        TeamsService,
-        VenuesService,
-        StatsService,
+        MatchSummaryService,
         ReadmeService,
+        StatsService,
+        TeamsService,
         TimeService,
+        VenuesService,
         // Pipes
-        SortMatches,
         FormatNumber,
         FormatPercentage,
     ],

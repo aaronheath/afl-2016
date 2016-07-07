@@ -1,7 +1,8 @@
 declare const moment;
 
-import {loopMatches} from '../helpers/matches';
-import {getVenues} from './example-data-venues';
+//import {loopMatches} from '../helpers/matches';
+import { getVenues } from './example-data-venues';
+import { loopObj } from '../helpers/utils';
 
 const timezone = 'Australia/Adelaide';
 
@@ -247,6 +248,21 @@ function _assignTimes(_matches) {
         match.h_local_time = match.local_moment.format('HH:mm');
 
         return match;
+    });
+}
+
+/**
+ * Provides the ability to loop through all matches in the format provided by matches.json
+ *
+ * @param data
+ * @param callback
+ * @returns {IBasicObj}
+ */
+function loopMatches(data, callback : Function) {
+    return loopObj(data, (round) => {
+        return round.map((match, i) => {
+            return callback(match);
+        });
     });
 }
 

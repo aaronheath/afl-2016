@@ -1,11 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {RouteParams} from '@angular/router-deprecated';
+import { Component, OnInit } from '@angular/core';
+import { RouteParams } from '@angular/router-deprecated';
 
-import {StatsService} from '../../services/stats';
-import {ListMatchesComponent} from '../list-matches/list-matches';
-import {RoundSummaryComponent} from '../round-summary/round-summary';
-import {FormatNumber} from '../../pipes/format-number';
-import {FormatPercentage} from '../../pipes/format-percentage';
+import { MatchesService, StatsService } from '../../services/index';
+import { FormatNumber, FormatPercentage } from '../../pipes/index';
+import { MatchItem } from '../../models/index';
+import { ListMatchesComponent } from '../list-matches/list-matches';
+import { RoundSummaryComponent } from '../round-summary/round-summary';
 
 @Component({
     directives: [
@@ -27,14 +27,14 @@ import {FormatPercentage} from '../../pipes/format-percentage';
         </div>
     `,
 })
-
 export class PageRoundComponent implements OnInit {
     roundNumber : number;
-    matches : IMatch[];
+    matches : MatchItem[];
 
     constructor(
         private _routeParams: RouteParams,
-        private _statsService: StatsService
+        private _statsService: StatsService,
+        private _matchesService: MatchesService
     ) {
     }
 
@@ -43,10 +43,10 @@ export class PageRoundComponent implements OnInit {
 
         this.roundNumber = parseInt(roundNumber, 10);
 
-        this.matches = this._statsService.getMatchesByRound(this.roundNumber);
+        this.matches = this._matchesService.getByRound(this.roundNumber);
 
         this._statsService.observable$.subscribe(() => {
-            this.matches = this._statsService.getMatchesByRound(this.roundNumber);
+            this.matches = this._matchesService.getByRound(this.roundNumber);
         });
     }
 
@@ -55,7 +55,7 @@ export class PageRoundComponent implements OnInit {
      *
      * @returns {any}
      */
-    getMatches() : IMatch[] {
+    getMatches() : MatchItem[] {
         return this.matches;
     }
 }

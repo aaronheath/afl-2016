@@ -98,3 +98,6 @@ This is not a complete project. Here's my (very) rough TODO's.
 - UI Improvements
 - Optimise performance (currently unpacked results in ~400 asset downloads per page load)
 - More Stats
+- Consolidate config for unit test list in karama-test-shim.js and unit-tests.html.
+- Output code coverage via Karma tests.
+- Restructure Components file structure.

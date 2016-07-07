@@ -16,6 +16,7 @@
     <script src="node_modules/es6-shim/es6-shim.min.js"></script>
     <script src="node_modules/zone.js/dist/zone.js"></script>
     <script src="node_modules/zone.js/dist/fake-async-test.js"></script>
+    <script src="node_modules/zone.js/dist/async-test.js"></script>
     <script src="node_modules/reflect-metadata/Reflect.js"></script>
     <script src="node_modules/systemjs/dist/system.src.js"></script>
 </head>
@@ -26,6 +27,9 @@
 <script src="system.config.js"></script>
 
 <script>
+    var onloads = 0;
+    window.addEventListener('load', onloadHandler);
+
     System.config(window.afl2016);
 
     Promise.all([
@@ -38,9 +42,28 @@
             System.import('app/services/readme.spec'),
             System.import('app/services/time.spec'),
             System.import('app/services/stats.spec'),
+            System.import('app/models/item.spec'),
+            System.import('app/models/model.spec'),
         ])
-        .then(window.onload)
+        .then(dispatchOnload)
         .catch(console.error.bind(console));
+
+    function dispatchOnload() {
+        window.dispatchEvent(new Event('load'));
+    }
+
+    function onloadHandler(e) {
+        onloads++;
+
+        console.log('window "load" event fired!');
+
+        if(onloads !== 2) {
+            e.preventDefault();
+            return;
+        }
+
+        console.log('Start Tests!');
+    }
 </script>
 
 </body>

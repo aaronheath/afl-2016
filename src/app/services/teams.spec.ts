@@ -1,14 +1,17 @@
-import {provide} from '@angular/core';
-import {Http, BaseRequestOptions} from '@angular/http';
-import {MockBackend} from '@angular/http/testing';
-import {Observable} from 'rxjs/Observable';
-import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@angular/core/testing';
+import { provide } from '@angular/core';
+import { BaseRequestOptions, Http } from '@angular/http';
+import { MockBackend } from '@angular/http/testing';
+import { Observable } from 'rxjs/Observable';
+import { addProviders, fakeAsync, inject, tick } from '@angular/core/testing';
 
-import {TestUtils} from '../tests/test-utils';
-import {TeamsService} from './teams';
-import {getTeams} from '../tests/example-data-teams';
+import { TestUtils } from '../tests/test-utils';
+import { TeamsService } from './index';
+import { Team, TeamItem } from '../models/index';
+import { getTeams } from '../tests/example-data-teams';
 
 const testUtils = new TestUtils();
+
+const seededTeams = getTeams();
 
 describe('TeamsService', () => {
     const providers = [
@@ -16,11 +19,9 @@ describe('TeamsService', () => {
             TeamsService,
             {
                 useFactory: (backend) => {
-                    const service = new TeamsService(backend);
+                    spyOn(TeamsService.prototype, 'load').and.callThrough();
 
-                    spyOn(service, 'load').and.callThrough();
-
-                    return service;
+                    return new TeamsService(backend);
                 },
                 deps: [Http],
             }
@@ -40,106 +41,76 @@ describe('TeamsService', () => {
                 deps: [MockBackend, BaseRequestOptions],
             }
         ),
+        provide(
+            Team,
+            {
+                useFactory: () => Team,
+                deps: [],
+            }
+        ),
     ];
 
-    beforeEachProviders(() => providers);
+    beforeEach(() => {
+        addProviders(providers);
 
-    beforeEach(testUtils.generateMockBackend(true, {body: getTeams()}));
+        testUtils.generateMockBackend(true, {body: seededTeams})();
+
+        spyOn(console, 'error');
+    });
 
     it('should be constructed', inject([TeamsService, Http], (service: TeamsService, http: Http) => {
-        service.observable$.subscribe((data) => {
-            expect(service.load).toHaveBeenCalled();
-            expect(service.observable$).toEqual(jasmine.any(Observable));
-        });
+        expect(TeamsService.prototype.load).toHaveBeenCalled();
+        expect(service.observable$).toEqual(jasmine.any(Observable));
     }));
 
-    it('load() should fetch team data and call next on the observer', inject([
-        TeamsService,
-    ], (service: TeamsService) => {
-        const promise = new Promise((resolve, reject) => {
-            let loadCalls = 0;
+    it('load() should fetch team data, update Team Model and call next on the observer', () => {
+        spyOn(Team, 'updateOrCreate').and.callThrough();
 
+        inject([
+            TeamsService,
+            Team,
+        ], (service: TeamsService) => {
             service.observable$.subscribe((data) => {
-                loadCalls++;
+                expect(service.load).toHaveBeenCalledTimes(1);
 
-                if(loadCalls === 1) {
-                    service.load();
-                }
+                expect(testUtils.mockedBackend.connectionsArray.length).toBe(1);
+                expect(testUtils.mockedBackend.connectionsArray[0].request.method).toBe(0); // GET
+                expect(testUtils.mockedBackend.connectionsArray[0].request.url).toBe('/data/teams.json');
 
-                if(loadCalls === 2) {
-                    expect(service.load).toHaveBeenCalledTimes(loadCalls);
-
-                    expect(testUtils.mockedBackend.connectionsArray.length).toBe(2);
-                    expect(testUtils.mockedBackend.connectionsArray[1].request.method).toBe(0); // GET
-                    expect(testUtils.mockedBackend.connectionsArray[1].request.url).toBe('/data/teams.json');
-
-                    resolve();
-                }
+                expect(Team.updateOrCreate).toHaveBeenCalledTimes(18);
             });
-        });
+        })();
+    });
 
-        return promise;
-    }), testUtils.standardTimeout);
-
-    it('load() http call should handle an error response', () => {
-        // Little different this spec as we're needing to overwrite the standard beforeEach so that we can instead
-        // have the http call return an error.
-
+    it('load() http call should handle an error response', fakeAsync(() => {
         testUtils.resetProviders(providers);
 
         testUtils.generateMockBackend()();
 
-        spyOn(console, 'error');
+        inject([TeamsService], (service: TeamsService) => {
+            tick(500);
+            expect(console.error).toHaveBeenCalledWith('Could not load teams.', undefined);
+        })();
+    }));
 
-        const fn = inject([TeamsService], (service: TeamsService) => {
-            const promise = new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    expect(console.error).toHaveBeenCalledWith('Could not load teams.', undefined);
-
-                    resolve();
-                }, 500);
-
-                service.observable$.subscribe((data) => {
-                    reject('should not have been called');
-                });
-            });
-
-            return promise;
-        });
-
-        return fn();
-    }, testUtils.standardTimeout);
-
-    it('getTeams() should return all teams', inject([TeamsService], (
+    it('getTeams() should array of all teams as TeamItem\'s', inject([TeamsService], (
         service: TeamsService
     ) => {
-        service.observable$.subscribe((data) => {
-            const allTeams = service.getTeams();
-            let team;
+        service.observable$.subscribe(() => {
+            const teams = service.getTeams();
 
-            // Adelaide
-            team = allTeams['ADL'];
-            expect(team).toBeDefined();
-            expect(team.fullName).toBe('Adelaide');
-            expect(team.abbreviation).toBe('ADL');
-            expect(team.city).toBe('Adelaide');
-            expect(team.state).toBe('SA');
+            teams.forEach((item) => {
+                expect(item).toEqual(jasmine.any(TeamItem));
+            });
 
-            // Essendon
-            team = allTeams['ESS'];
-            expect(team).toBeDefined();
-            expect(team.fullName).toBe('Essendon');
-            expect(team.abbreviation).toBe('ESS');
-            expect(team.city).toBe('Melbourne');
-            expect(team.state).toBe('VIC');
+            // Match the second game
+            const item = teams[4];
+            const seeded = seededTeams.ESS;
 
-            // Port Adelaide
-            team = allTeams['PA'];
-            expect(team).toBeDefined();
-            expect(team.fullName).toBe('Port Adelaide');
-            expect(team.abbreviation).toBe('PA');
-            expect(team.city).toBe('Adelaide');
-            expect(team.state).toBe('SA');
+            expect(item.get('fullName')).toBe(seeded.fullName);
+            expect(item.get('abbreviation')).toBe(seeded.abbreviation);
+            expect(item.get('city')).toBe(seeded.city);
+            expect(item.get('state')).toBe(seeded.state);
         });
     }));
 });

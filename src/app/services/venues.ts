@@ -1,47 +1,97 @@
+import 'lodash';
 import { Injectable } from '@angular/core';
-import {Http} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
-import {Subscriber} from 'rxjs/Subscriber';
+import { Http } from '@angular/http';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/share';
 
+import { Venue, VenueItem } from '../models/index';
+
+/**
+ * Interfaces
+ */
+
+export interface IndividualVenue {
+    fullName: string;
+    abbreviation: string;
+    city: string;
+    state: string;
+    timezone: string;
+}
+
+export interface VenueList {
+    [id: string]: IndividualVenue;
+}
+
+/**
+ * Venues Service
+ *
+ * Repository and HTTP handler for venue data.
+ */
 @Injectable()
 export class VenuesService {
-    observable$ : Observable<Subscriber<IVenues>>;
-    private _observer : Subscriber<IVenues>;
-    private _dataStore : IVenuesDataStore;
+    /**
+     * Observable available for subscription that emits when venue data is loaded.
+     */
+    observable$;
 
-    constructor(private _http: Http) {
-        this._dataStore = { venues: {} };
+    /**
+     * Constructor. Http injected. Observable initialised and load called().
+     *
+     * @param http
+     */
+    constructor(private http: Http) {
+        this.observable$ = new ReplaySubject(1);
 
-        // Create Observable Stream to output our data
-        this.observable$ = new Observable((observer) => {
-            this._observer = observer;
-
-            this.load();
-        }).share();
+        this.load();
     }
 
     /**
      * Fetch venues data and calls next on observer
      */
-    load() {
-        let observable = this._http.get('/data/venues.json').map(response => response.json());
+    load() : void {
+        let observable = this.http.get('/data/venues.json').map(response => response.json());
 
         observable.subscribe(data => {
-            this._dataStore.venues = data;
-            this._observer.next(this._dataStore.venues);
+            this.updateOrCreateVenues(data);
+
+            this.observable$.next();
         }, (error) => {
             console.error('Could not load venues.', error);
         });
     }
 
     /**
-     * Returns venues in datastore
+     * Loops venue json data and calls updateOrCreate().
      *
-     * @returns {IVenues}
+     * @param data
      */
-    getVenues() {
-        return this._dataStore.venues;
+    private updateOrCreateVenues(data : VenueList) : void {
+        _.forEach(data, this.updateOrCreate);
+    }
+
+    /**
+     * Creates new or updates existing individual venue on Venue Model.
+     *
+     * @param attrs
+     * @param id
+     */
+    private updateOrCreate(attrs : IndividualVenue, id : string) : void {
+        Venue.updateOrCreate([{key: 'id', value: id}], {
+            id: id,
+            fullName: attrs.fullName,
+            abbreviation: attrs.abbreviation,
+            city: attrs.city,
+            state: attrs.state,
+            timezone: attrs.timezone,
+        });
+    }
+
+    /**
+     * Returns array of Venue Items.
+     *
+     * @returns {VenueItem[]}
+     */
+    getVenues() : VenueItem[] {
+        return Venue.all();
     }
 }

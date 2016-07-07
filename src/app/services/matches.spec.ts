@@ -1,16 +1,17 @@
-import {provide} from '@angular/core';
-import {Http, BaseRequestOptions} from '@angular/http';
-import {MockBackend} from '@angular/http/testing';
-import {Observable} from 'rxjs/Observable';
-import {beforeEachProviders, beforeEach, describe, expect, inject, it} from '@angular/core/testing';
+import { provide } from '@angular/core';
+import { BaseRequestOptions, Http } from '@angular/http';
+import { MockBackend } from '@angular/http/testing';
+import { Observable } from 'rxjs/Observable';
+import { addProviders, fakeAsync, inject, tick } from '@angular/core/testing';
 
-import {TestUtils} from '../tests/test-utils';
-import {MatchesService} from './matches';
-import {getMatches, getMatchesWithPointsAndTimes} from '../tests/example-data-matches';
+import { TestUtils } from '../tests/test-utils';
+import { MatchesService } from './index';
+import { Match, MatchItem } from '../models/index';
+import { getMatches } from '../tests/example-data-matches';
 
 const testUtils = new TestUtils();
 
-const matchesExpected = getMatchesWithPointsAndTimes();
+const matches = getMatches();
 
 describe('MatchesService', () => {
     const providers = [
@@ -18,11 +19,9 @@ describe('MatchesService', () => {
             MatchesService,
             {
                 useFactory: (backend) => {
-                    const matchesService = new MatchesService(backend);
+                    spyOn(MatchesService.prototype, 'load').and.callThrough();
 
-                    spyOn(matchesService, 'load').and.callThrough();
-
-                    return matchesService;
+                    return new MatchesService(backend);
                 },
                 deps: [Http],
             }
@@ -42,116 +41,82 @@ describe('MatchesService', () => {
                 deps: [MockBackend, BaseRequestOptions],
             }
         ),
+        provide(
+            Match,
+            {
+                useFactory: () => Match,
+                deps: [],
+            }
+        ),
     ];
 
-    beforeEachProviders(() => providers);
+    beforeEach(() => {
+        addProviders(providers);
 
-    beforeEach(testUtils.generateMockBackend(true, {body: getMatches()}));
+        testUtils.generateMockBackend(true, {body: matches})();
+
+        spyOn(console, 'error');
+    });
 
     it('should be constructed', inject([MatchesService, Http], (matchesService: MatchesService, http: Http) => {
-        matchesService.observable$.subscribe((data) => {
-            expect(matchesService.load).toHaveBeenCalled();
-            expect(matchesService.observable$).toEqual(jasmine.any(Observable));
-        });
+        expect(MatchesService.prototype.load).toHaveBeenCalled();
+        expect(matchesService.observable$).toEqual(jasmine.any(Observable));
     }));
 
-    it('load() should fetch match data, add match attrs and call next on the observer', inject([
-        MatchesService,
-    ], (matchesService: MatchesService) => {
-        const promise = new Promise((resolve, reject) => {
-            let loadCalls = 0;
+    it('load() should fetch match data, update Match Model and call next on the observer', () => {
+        spyOn(Match, 'updateOrCreate').and.callThrough();
 
+        inject([
+            MatchesService,
+            Match,
+        ], (matchesService: MatchesService) => {
             matchesService.observable$.subscribe((data) => {
-                loadCalls++;
+                expect(matchesService.load).toHaveBeenCalledTimes(1);
 
-                if(loadCalls === 1) {
-                    matchesService.load();
-                }
+                expect(testUtils.mockedBackend.connectionsArray.length).toBe(1);
+                expect(testUtils.mockedBackend.connectionsArray[0].request.method).toBe(0); // GET
+                expect(testUtils.mockedBackend.connectionsArray[0].request.url).toBe('/data/matches.json');
 
-                if(loadCalls === 2) {
-                    expect(matchesService.load).toHaveBeenCalledTimes(loadCalls);
-
-                    expect(testUtils.mockedBackend.connectionsArray.length).toBe(2);
-                    expect(testUtils.mockedBackend.connectionsArray[1].request.method).toBe(0); // GET
-                    expect(testUtils.mockedBackend.connectionsArray[1].request.url).toBe('/data/matches.json');
-
-                    resolve();
-                }
+                expect(Match.updateOrCreate).toHaveBeenCalledTimes(18);
             });
-        });
+        })();
+    });
 
-        return promise;
-    }), testUtils.standardTimeout);
-
-    it('load() http call should handle an error response', () => {
-        // Little different this spec as we're needing to overwrite the standard beforeEach so that we can instead
-        // have the http call return an error.
-
+    it('load() http call should handle an error response', fakeAsync(() => {
         testUtils.resetProviders(providers);
 
         testUtils.generateMockBackend()();
 
-        spyOn(console, 'error');
+        inject([MatchesService], (matchesService: MatchesService) => {
+            tick(500);
 
-        const fn = inject([MatchesService], (matchesService: MatchesService) => {
-            const promise = new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    expect(console.error).toHaveBeenCalledWith('Could not load matches.', undefined);
+            expect(console.error).toHaveBeenCalledWith('Could not load matches.', undefined);
+        })();
+    }));
 
-                    resolve();
-                }, 500);
-
-                matchesService.observable$.subscribe((data) => {
-                    reject('should not have been called');
-                });
-            });
-
-            return promise;
-        });
-
-        return fn();
-    }, testUtils.standardTimeout);
-
-    it('getAllMatches() should return all matches with calculated attrs', inject([MatchesService], (
+    it('getAllMatches() should array of all matches as MatchItem\'s', inject([MatchesService], (
         matchesService: MatchesService
     ) => {
-        matchesService.observable$.subscribe((data) => {
-            const allMatches = matchesService.getAllMatches();
+        matchesService.observable$.subscribe(() => {
+            const all = matchesService.getAllMatches();
 
-            // Round 1 Match 1
-            const receivedRound1Match1 = allMatches[1][0];
-            const expectedRound1Match1 = matchesExpected[1][0];
-            compareMatches(receivedRound1Match1, expectedRound1Match1);
+            all.forEach((item) => {
+                expect(item).toEqual(jasmine.any(MatchItem));
+            });
 
-            // Round 2 Match 2
-            const receivedRound2Match2 = allMatches[2][1];
-            const expectedRound2Match2 = matchesExpected[2][1];
-            compareMatches(receivedRound2Match2, expectedRound2Match2);
+            // Match the second game
+            const item = all[1];
+            const seeded = matches[1][1];
 
-            // Round 2 Match 3 (Match not played yet)
-            const receivedRound2Match3 = allMatches[2][2];
-            const expectedRound2Match3 = matchesExpected[2][2];
-            compareMatches(receivedRound2Match3, expectedRound2Match3);
+            expect(item.get('home')).toBe(seeded.home);
+            expect(item.get('homeGoals')).toBe(seeded.homeGoals);
+            expect(item.get('away')).toBe(seeded.away);
+            expect(item.get('awayGoals')).toBe(seeded.awayGoals);
+            expect(item.get('awayBehinds')).toBe(seeded.awayBehinds);
+            expect(item.get('venue')).toBe(seeded.venue);
+            expect(item.get('date')).toBe(seeded.date);
+            expect(item.get('time')).toBe(seeded.time);
+            expect(item.get('attendance')).toBe(seeded.attendance);
         });
     }));
 });
-
-function compareMatches(received, expected) {
-    expect(received.attendance).toBe(expected.attendance);
-    expect(received.away).toBe(expected.away);
-    expect(received.awayGoals).toBe(expected.awayGoals);
-    expect(received.awayBehinds).toBe(expected.awayBehinds);
-    expect(received.awayPoints).toBe(expected.awayPoints);
-    expect(received.date).toBe(expected.date);
-    expect(received.h_date).toBe(expected.h_date);
-    expect(received.h_local_time).toBe(expected.h_local_time);
-    expect(received.h_venue_time).toBe(expected.h_venue_time);
-    expect(received.home).toBe(expected.home);
-    expect(received.homeGoals).toBe(expected.homeGoals);
-    expect(received.homeBehinds).toBe(expected.homeBehinds);
-    expect(received.homePoints).toBe(expected.homePoints);
-    expect(received.margin).toBe(expected.margin);
-    expect(received.result).toBe(expected.result);
-    expect(received.time).toBe(expected.time);
-    expect(received.venue).toBe(expected.venue);
-}

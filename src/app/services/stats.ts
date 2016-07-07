@@ -1,140 +1,191 @@
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import {Subscriber} from 'rxjs/Subscriber';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/share';
-import 'rxjs/add/operator/skip';
-import {generateLadder} from '../helpers/ladder';
-import {generateMatches} from '../helpers/matches';
-import {generateSummaries} from '../helpers/summaries';
+import { Injectable } from '@angular/core';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
+import 'rxjs/add/operator/skipWhile';
+
+import { zeroUndef } from '../helpers/utils';
+import { Ladder, LadderItem, Match, MatchItem } from '../models/index';
+import { MatchesService, TeamsService, VenuesService } from '../services/index';
 
 declare const moment;
 
-import {MatchesService} from './matches';
-import {TeamsService} from './teams';
-import {VenuesService} from './venues';
-import {TimeService} from './time';
-
+/**
+ * Stats Service
+ *
+ * Observes data services, upon them having data, triggers aggregate statistic generators. Also, provides access to
+ * aggregated statistics.
+ */
 @Injectable()
 export class StatsService {
-    observable$ : Observable<Subscriber<IStatsDataStore>>;
-    private _observer : Subscriber<IStatsDataStore>;
-    private _dataStore : IStatsDataStore;
-    private _tempDataStore : IStatsTempDataStore;
+    /**
+     * Observable available for subscription that emits upon greater than two Matches, Teams or Venues observables have
+     * been fired.
+     */
+    observable$;
 
+    protected loaded = new Set();
+
+    /**
+     * Sets up observable for this service. As we're wanting data from three services (Matches, Teams and Venues) we
+     * skip the first two (n-1) next() calls. Upon any of these observables being called a second or more time, the
+     * observable for this method will recieve a next() call. The setting up of the observable assumes that the first
+     * three calls of next() will be from the three services. This can be assumed as all services are initialised
+     * upon app initialisation.
+     *
+     * @param matchesService
+     * @param teamsService
+     * @param venuesService
+     * @param timeService
+     */
     constructor(
-        private _matchesService: MatchesService,
-        private _teamsService: TeamsService,
-        private _venuesService: VenuesService,
-        private _timeService: TimeService
+        private matchesService: MatchesService,
+        private teamsService: TeamsService,
+        private venuesService: VenuesService
     ) {
-        this._dataStore = {
-            ladder: [],
-            matches: {},
-            summaries: {},
-            teams: {},
-            venues: {},
-        };
+        this.observable$ = new ReplaySubject(1).skipWhile(() => this.loaded.size < 3);
 
-        this._tempDataStore = {
-            matches: {},
-            teams: {},
-            venues: {},
-        };
+        this.observable$.subscribe(() => {
+            this.generateStats();
+        });
 
-        this.observable$ = new Observable((observer) => {
-            //debugger;
-            this._observer = observer;
-
-            this._loadMatches();
-            this._loadTeams();
-            this._loadVenues();
-        }).skip(2).share();
+        this.loadMatches();
+        this.loadTeams();
+        this.loadVenues();
     }
 
     /**
      * Subscribes to the MatchesService observable and when next called:
-     * - updates the temporary datastore
-     * - generates stats
-     * - emit update datastore
+     * - calls next() on stats observer
      *
-     * @private
+     * @protected
      */
-    private _loadMatches() : void {
-        this._matchesService.observable$.subscribe((data) => {
-            this._tempDataStore.matches = this._matchesService.getAllMatches();
-
-            this._generateStats();
-
-            this._observer.next(this._dataStore);
+    protected loadMatches() : void {
+        this.matchesService.observable$.subscribe(() => {
+            this.loaded.add('matches');
+            this.observable$.next();
         });
     }
 
     /**
      * Subscribes to the TeamsService observable and when next called:
-     * - updates the temporary datastore
-     * - generates stats
-     * - emit update datastore
+     * - calls next() on stats observer
      *
-     * @private
+     * @protected
      */
-    private _loadTeams() : void {
-        this._teamsService.observable$.subscribe((data) => {
-            this._tempDataStore.teams = this._teamsService.getTeams();
-
-            this._generateStats();
-
-            this._observer.next(this._dataStore);
+    protected loadTeams() : void {
+        this.teamsService.observable$.subscribe(() => {
+            this.loaded.add('teams');
+            this.observable$.next();
         });
     }
 
     /**
      * Subscribes to the VenuesService observable and when next called:
-     * - updates the temporary datastore
-     * - generates stats
-     * - emit update datastore
+     * - calls next() on stats observer
      *
-     * @private
+     * @protected
      */
-    private _loadVenues() : void {
-        this._venuesService.observable$.subscribe((data) => {
-            this._tempDataStore.venues = this._venuesService.getVenues();
-
-            this._generateStats();
-
-            this._observer.next(this._dataStore);
+    protected loadVenues() : void {
+        this.venuesService.observable$.subscribe(() => {
+            this.loaded.add('venues');
+            this.observable$.next();
         });
     }
 
     /**
      * Populates datastore with passed through or generated stats
      *
-     * @private
+     * @protected
      */
-    private _generateStats() : void {
-        this._dataStore.venues = this._tempDataStore.venues;
+    protected generateStats() : void {
+        this.generateLadder();
+    }
 
-        this._dataStore.teams = this._tempDataStore.teams;
+    /**
+     * Resets, Ladder model and re-populates LadderItems from played MatchItems.
+     */
+    generateLadder() : void {
+        Ladder.reset();
 
-        if(!Object.keys(this._tempDataStore.matches).length) {
-            return;
-        }
+        Match.wherePlayed().forEach((match) => {
+            const homeTeam = this.createTeamIfNotFound(match.get('home'));
+            const awayTeam = this.createTeamIfNotFound(match.get('away'));
 
-        this._dataStore.matches = generateMatches(
-            this._tempDataStore.matches,
-            this._dataStore.teams,
-            this._tempDataStore.venues,
-            this._timeService.getTimezone()
-        );
+            // Increment Win/Loss/Draw
+            if(match.result() === match.get('home')) {
+                this.addResultToTeamAttr(homeTeam, 'wins');
+                this.addResultToTeamAttr(awayTeam, 'losses');
+            } else if(match.result() === match.get('away')) {
+                this.addResultToTeamAttr(homeTeam, 'losses');
+                this.addResultToTeamAttr(awayTeam, 'wins');
+            } else {
+                this.addResultToTeamAttr(homeTeam, 'draws');
+                this.addResultToTeamAttr(awayTeam, 'draws');
+            }
 
-        this._dataStore.ladder = generateLadder(
-            this._dataStore.teams,
-            this._dataStore.matches
-        );
+            // Increment Game Points
+            this.addScoreToTeamAttr(homeTeam, 'goalsFor', match, 'homeGoals');
+            this.addScoreToTeamAttr(homeTeam, 'goalsAgainst', match, 'awayGoals');
+            this.addScoreToTeamAttr(homeTeam, 'behindsFor', match, 'homeBehinds');
+            this.addScoreToTeamAttr(homeTeam, 'behindsAgainst', match, 'awayBehinds');
 
-        this._dataStore.summaries = generateSummaries(
-            this._dataStore.matches
-        );
+            this.addScoreToTeamAttr(awayTeam, 'goalsFor', match, 'awayGoals');
+            this.addScoreToTeamAttr(awayTeam, 'goalsAgainst', match, 'homeGoals');
+            this.addScoreToTeamAttr(awayTeam, 'behindsFor', match, 'awayBehinds');
+            this.addScoreToTeamAttr(awayTeam, 'behindsAgainst', match, 'homeBehinds');
+        });
+    }
+
+    /**
+     * Creates team on Ladder model if not found. Returns this teams LadderItem.
+     *
+     * @param team
+     * @returns {LadderItem}
+     */
+    protected createTeamIfNotFound(team : string) : LadderItem {
+        return Ladder.firstOrCreate([{key: 'id', value: team}], {id: team});
+    }
+
+    /**
+     * Adds one.
+     *
+     * @param value
+     * @returns {any}
+     */
+    protected plusOne(value : any) : number {
+        return zeroUndef(value) + 1;
+    }
+
+    /**
+     * Adds X.
+     *
+     * @param value
+     * @param x
+     * @returns {any}
+     */
+    protected plusX(value : any, x) : number {
+        return zeroUndef(value) + x;
+    }
+
+    /**
+     * Increments LadderItem attr.
+     *
+     * @param team
+     * @param key
+     */
+    protected addResultToTeamAttr(team : LadderItem, key : 'wins' | 'losses' | 'draws') : void {
+        team.set(key, this.plusOne(team.get(key)));
+    }
+
+    /**
+     * Adds MatchItem attr to to existing corresponding LadderItem attr.
+     *
+     * @param team
+     * @param key
+     * @param match
+     * @param matchAttr
+     */
+    protected addScoreToTeamAttr(team : LadderItem, key : string, match : MatchItem, matchAttr : string) {
+        team.set(key, this.plusX(team.get(key), match.get(matchAttr)));
     }
 
     /**
@@ -143,12 +194,8 @@ export class StatsService {
      * @param round
      * @returns {any}
      */
-    getMatchesByRound(round) : IMatch[] {
-        if(typeof this._dataStore.matches[round] === 'undefined') {
-            return [];
-        }
-
-        return this._dataStore.matches[round];
+    getMatchesByRound(round : number) : MatchItem[] {
+        return Match.where([{key: 'roundNo', value: round}]).get();
     }
 
     /**
@@ -157,7 +204,7 @@ export class StatsService {
      * @returns {number[]}
      */
     getRoundNumbers() : number[] {
-        return Object.keys(this._dataStore.matches).map(key => parseInt(key, 10));
+        return Match.roundNumbers();
     }
 
     /**
@@ -165,21 +212,7 @@ export class StatsService {
      *
      * @returns {ILadderTeam[]}
      */
-    getLadder() : ILadderTeam[] {
-        return this._dataStore.ladder;
-    }
-
-    /**
-     * Returns calculated summary for individual round
-     *
-     * @param round
-     * @returns {any}
-     */
-    getSummaryForRound(round) : IRoundSummary {
-        if(!this._dataStore.summaries.rounds || !this._dataStore.summaries.rounds[round]) {
-            return;
-        }
-
-        return this._dataStore.summaries.rounds[round];
+    getLadder() : LadderItem[] {
+        return Ladder.ranked();
     }
 }

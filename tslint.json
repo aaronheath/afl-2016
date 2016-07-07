@@ -28,7 +28,6 @@
     "no-trailing-whitespace": true,
     "trailing-comma": [true, {"multiline": "always", "singleline": "never"}],
     "class-name": true,
-    "interface-name": true,
     "jsdoc-format": true,
     "no-consecutive-blank-lines": true,
     "quotemark": [true, "single"],

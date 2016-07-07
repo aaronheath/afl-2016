@@ -1,83 +1,133 @@
-import {Injectable} from '@angular/core';
-import {Http} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
-import {Subscriber} from 'rxjs/Subscriber';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/share';
-import {loopMatches} from '../helpers/matches';
+import 'lodash';
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 
+import { Match, MatchItem } from '../models/index';
+
+/**
+ * Interface
+ */
+
+export interface MatchObject {
+    home: string;
+    homeGoals?: number;
+    homeBehinds?: number;
+    away: string;
+    awayGoals?: number;
+    awayBehinds?: number;
+    venue: string;
+    date: string;
+    time: string;
+    attendance?: number;
+    roundNo: number;
+}
+
+/**
+ * Matches Service
+ *
+ * Repository and HTTP handler for match data.
+ */
 @Injectable()
 export class MatchesService {
-    observable$ : Observable<Subscriber<IMatches>>;
-    private _observer : Subscriber<IMatches>;
-    private _dataStore : IMatchesDataStore;
+    /**
+     * Observable available for subscription that emits when match data is loaded.
+     */
+    observable$;
 
-    constructor(private _http: Http) {
-        this._dataStore = { matches: {} };
+    /**
+     * Constructor. Http injected. Observable initialised and load called().
+     *
+     * @param http
+     */
+    constructor(private http: Http) {
+        this.observable$ = new ReplaySubject(1);
 
-        this.observable$ = new Observable((observer) => {
-            this._observer = observer;
-
-            this.load();
-        }).share();
+        this.load();
     }
 
     /**
-     * Fetch matches data and calls next on observer
+     * Fetch matches data, updates MatchModel and calls next on observer.
      */
     load() : void {
-        let observable = this._http.get('/data/matches.json').map(response => response.json());
+        let observable = this.http.get('/data/matches.json').map(response => response.json());
 
         observable.subscribe(data => {
-            this._dataStore.matches = this._calculateAttrs(data);
+            this.flattenRounds(data).forEach(this.updateOrCreateMatchItem);
 
-            this._observer.next(this._dataStore.matches);
+            this.observable$.next();
         }, (error) => {
             console.error('Could not load matches.', error);
         });
     }
 
     /**
-     * Calculates team points and result if goals and points are supplied for both teams.
-     * Where a draw has occurred the result attr will be set to 'DRAW'
+     * Flattens data provided by matches.json in array.
      *
      * @param data
-     * @returns {any|({}&any)}
-     * @private
+     * @returns {any}
      */
-    private _calculateAttrs(data : IMatches) : IMatches {
-        return loopMatches(data, (match : IMatch) => {
-            // Calculate Points
-            if(typeof match.homeGoals !== 'undefined'
-                && typeof match.homeBehinds !== 'undefined'
-                && typeof match.awayGoals !== 'undefined'
-                && typeof match.awayBehinds !== 'undefined'
-            ) {
-                match.homePoints = match.homeGoals * 6 + match.homeBehinds;
-                match.awayPoints = match.awayGoals * 6 + match.awayBehinds;
-
-                match.margin = Math.abs(match.homePoints - match.awayPoints);
-
-                // Result
-                if(match.homePoints > match.awayPoints) {
-                    match.result = match.home;
-                } else if(match.homePoints < match.awayPoints) {
-                    match.result = match.away;
-                } else {
-                    match.result = 'DRAW';
-                }
-            }
-
-            return match;
+    protected flattenRounds(data) {
+        return _.flatMap(data, (matches, roundNo) => {
+            return matches.map((match) => this.generateMatchItemData(match, roundNo));
         });
     }
 
     /**
-     * Returns matches in datastore
+     * With match data provided by matches.json and round number that groups an array of matches, returns JS object,
+     * with this data merged.
+     *
+     * @param match
+     * @param roundNo
+     * @returns {{home: string, homeGoals: number, homeBehinds: number, away: string, awayGoals: number,
+     * awayBehinds: number, venue: string, date: string, time: string, attendance: number, roundNo: number}}
+     */
+    protected generateMatchItemData(match : MatchObject, roundNo : string) : MatchObject {
+        return {
+            home: match.home,
+            homeGoals: match.homeGoals,
+            homeBehinds: match.homeBehinds,
+            away: match.away,
+            awayGoals: match.awayGoals,
+            awayBehinds: match.awayBehinds,
+            venue: match.venue,
+            date: match.date,
+            time: match.time,
+            attendance: match.attendance,
+            roundNo: +roundNo,
+        };
+    }
+
+    /**
+     * Create new or updates if already exists MatchItem for individual match.
+     *
+     * @param match
+     */
+    protected updateOrCreateMatchItem(match : MatchObject) : void {
+        //console.log('match', match);
+        Match.updateOrCreate([
+            {key: 'roundNo', value: match.roundNo},
+            {key: 'home', value: match.home},
+            {key: 'away', value: match.away},
+        ], match);
+    }
+
+    /**
+     * Returns all matches.
      *
      * @returns {IMatches}
      */
-    getAllMatches() : IMatches {
-        return this._dataStore.matches;
+    getAllMatches() : MatchItem[] {
+        return Match.all();
+    }
+
+    /**
+     * All matches from specific AFL Premiership Round.
+     *
+     * @param roundNo
+     * @returns {any}
+     */
+    getByRound(roundNo : number) : MatchItem[] {
+        return Match.where([{key: 'roundNo', value: +roundNo}]).get();
     }
 }

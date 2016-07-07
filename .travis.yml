@@ -1,3 +1,8 @@
+# Instructs Travis to use Ubuntu 14.04 not the default 12.04.
+# Ref: https://docs.travis-ci.com/user/ci-environment/
+sudo: required
+dist: trusty
+
 language: node_js
 
 node_js:
@@ -5,3 +10,13 @@ node_js:
 
 notifications:
   webhooks: http://ci.changi.aaronheath.io/webhook/travisci
+
+# Installs latest Chrome (stable) and sets up for Karma use.
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y libappindicator1 fonts-liberation
+  - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+  - sudo dpkg -i google-chrome*.deb
+  - export CHROME_BIN=google-chrome
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
