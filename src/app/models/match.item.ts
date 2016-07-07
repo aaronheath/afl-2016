@@ -164,4 +164,13 @@ export class MatchItem extends Item {
             this.venue().get('timezone')
         );
     }
+
+    /**
+     * Boolean response indicating whether the match has a result.
+     *
+     * @returns {boolean}
+     */
+    played() : boolean {
+        return !!this.result();
+    }
 }

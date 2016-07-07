@@ -37,7 +37,7 @@ export class MatchSummaryService {
      * @param roundNo
      */
     getSummaryForRound(roundNo : number) : SummaryOfMatches {
-        const where = [{key: 'roundNo', value: +roundNo}];
+        const where = [{key: 'roundNo', value: +roundNo}, {key: 'played', value: true}];
 
         return this.summaryForQuery(where);
     }
@@ -105,6 +105,8 @@ export class MatchSummaryService {
             }
 
             attendance = match.get('attendance');
+
+            return true;
         });
     }
 
@@ -125,6 +127,8 @@ export class MatchSummaryService {
             }
 
             attendance = match.get('attendance');
+
+            return true;
         });
     }
 
@@ -221,7 +225,7 @@ export class MatchSummaryService {
      * @returns {MatchItem[]|TValue[]}
      */
     protected highestScores(matches : MatchItem[], fn : string) : MatchItem[] {
-        let highestScore;
+        let highestScore = 0;
 
         return _.takeWhile(matches, (match : MatchItem) => {
             if (!match[fn]() || highestScore > match[fn]()) {
@@ -229,6 +233,8 @@ export class MatchSummaryService {
             }
 
             highestScore = match[fn]();
+
+            return true;
         });
     }
 
@@ -240,24 +246,46 @@ export class MatchSummaryService {
      */
     protected takeHighestScore(matches : MatchItem[]) : MatchItem[] {
         let response = [];
-        let notableScore;
+        let notableScore = 0;
 
         matches.forEach((match) => {
-            if(!response.length && notableScore > match.get('homePoints') && notableScore > match.get('awayPoints')) {
+            if(response.length && notableScore > match.homePoints() && notableScore > match.awayPoints()) {
                 return;
             }
 
-            const matchNotableScore = match.get('homePoints') > match.get('awayPoints')
-                ? match.get('homePoints') : match.get('awayPoints');
+            const matchNotableScore = match.homePoints() > match.awayPoints()
+                ? match.homePoints() : match.awayPoints();
 
             if(matchNotableScore !== notableScore) {
                 response = [];
             }
 
+            notableScore = matchNotableScore;
+
             response.push(match);
         });
 
-        return response;
+        return this.uniqueByUid(response);
+    }
+
+    /**
+     * Parses list of items and only returns
+     *
+     * @param matches
+     * @returns {MatchItem[]|T[]}
+     */
+    protected uniqueByUid(matches : MatchItem[]) : MatchItem[] {
+        const knownUids = [];
+
+        return matches.filter((match) => {
+            if(knownUids.includes(match.uid())) {
+                return false;
+            }
+
+            knownUids.push(match.uid());
+
+            return true;
+        });
     }
 
     /**
@@ -287,14 +315,16 @@ export class MatchSummaryService {
      * @returns {TValue[]}
      */
     protected lowestScores(matches : MatchItem[], fn : string) : MatchItem[] {
-        let lowestScore;
+        let lowestScore = 0;
 
         return _.takeWhile(matches, (match) => {
-            if (!match[fn]() || lowestScore < match[fn]()) {
+            if (!match[fn]() || (lowestScore && lowestScore < match[fn]())) {
                 return false;
             }
 
             lowestScore = match[fn]();
+
+            return true;
         });
     }
 
@@ -306,24 +336,26 @@ export class MatchSummaryService {
      */
     protected takeLowestScore(matches : MatchItem[]) : MatchItem[] {
         let response = [];
-        let notableScore;
+        let notableScore = 0;
 
         matches.forEach((match) => {
-            if(!response.length && notableScore < match.get('homePoints') && notableScore < match.get('awayPoints')) {
+            if(response.length && notableScore < match.homePoints() && notableScore < match.awayPoints()) {
                 return;
             }
 
-            const matchNotableScore = match.get('homePoints') < match.get('awayPoints')
-                ? match.get('homePoints') : match.get('awayPoints');
+            const matchNotableScore = match.homePoints() < match.awayPoints()
+                ? match.homePoints() : match.awayPoints();
 
-            if(matchNotableScore !== matchNotableScore) {
+            if(matchNotableScore !== notableScore) {
                 response = [];
             }
+
+            notableScore = matchNotableScore;
 
             response.push(match);
         });
 
-        return response;
+        return this.uniqueByUid(response);
     }
 
     /**

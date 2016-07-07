@@ -1,5 +1,6 @@
 import 'lodash';
 import { Component, OnInit } from '@angular/core';
+import { DomSanitizationService, SafeHtml } from '@angular/platform-browser';
 
 import { MatchSummaryService, StatsService } from '../../services/index';
 import { FormatNumber, FormatPercentage } from '../../pipes/index';
@@ -17,13 +18,13 @@ import { MatchItem } from '../../models/index';
     <div class="ui one column grid">
         <h2>Summary</h2>
 
-        <div class="row" *ngIf="!getSummaryOf('matchPlayed')">
+        <div class="row" *ngIf="!getSummaryOf('played')">
             <div class="column sixteen wide">
                 Matches are yet to be played.
             </div>
         </div>
 
-        <div class="row" *ngIf="getSummaryOf('matchPlayed')">
+        <div class="row" *ngIf="getSummaryOf('played')">
             <div class="column sixteen wide">
                 <div class="ui small five statistics">
                     <div class="ui statistic">
@@ -58,7 +59,7 @@ import { MatchItem } from '../../models/index';
             </div>
         </div>
 
-        <div class="row" *ngIf="getSummaryOf('matchPlayed')">
+        <div class="row" *ngIf="getSummaryOf('played')">
             <div class="column sixteen wide">
                 <div class="ui tiny two statistics">
                     <div class="statistic" *ngIf="getHighestScore()">
@@ -74,16 +75,16 @@ import { MatchItem } from '../../models/index';
             </div>
         </div>
 
-        <div class="row" *ngIf="getSummaryOf('matchPlayed')">
+        <div class="row" *ngIf="getSummaryOf('played')">
             <div class="column sixteen wide">
                 <div class="ui tiny two statistics">
-                    <div class="statistic" *ngIf="getHighestAttendance()">
-                        <div class="value" [innerHTML]="getHighestAttendance()"></div>
+                    <div class="statistic" *ngIf="highestAttendance">
+                        <div class="value" [innerHTML]="highestAttendance"></div>
                         <div class="label">Highest Attendance</div>
                     </div>
 
-                    <div class="statistic" *ngIf="getLowestAttendance()">
-                        <div class="value" [innerHTML]="getLowestAttendance()"></div>
+                    <div class="statistic" *ngIf="lowestAttendance">
+                        <div class="value" [innerHTML]="lowestAttendance"></div>
                         <div class="label">Lowest Attendance</div>
                     </div>
                 </div>
@@ -95,18 +96,22 @@ import { MatchItem } from '../../models/index';
 
 export class RoundSummaryComponent implements OnInit {
     roundNumber : number;
+    highestAttendance : SafeHtml;
+    lowestAttendance : SafeHtml;
     summary;
 
     constructor(
+        private sanitizer: DomSanitizationService,
         private _statsService: StatsService,
         private _matchSummaryService: MatchSummaryService
     ) {}
 
     ngOnInit() {
-        this.summary = this._matchSummaryService.getSummaryForRound(this.roundNumber);
-
         this._statsService.observable$.subscribe(() => {
             this.summary = this._matchSummaryService.getSummaryForRound(this.roundNumber);
+
+            this.highestAttendance = this.getHighestAttendance();
+            this.lowestAttendance = this.getLowestAttendance();
         });
     }
 
@@ -242,7 +247,7 @@ export class RoundSummaryComponent implements OnInit {
      *
      * @returns {string}
      */
-    getHighestAttendance() : string {
+    getHighestAttendance() : SafeHtml {
         return this._getAttendance('highestAttendance');
     }
 
@@ -251,7 +256,7 @@ export class RoundSummaryComponent implements OnInit {
      *
      * @returns {string}
      */
-    getLowestAttendance() : string {
+    getLowestAttendance() : SafeHtml {
         return this._getAttendance('lowestAttendance');
     }
 
@@ -262,7 +267,7 @@ export class RoundSummaryComponent implements OnInit {
      * @returns {any}
      * @private
      */
-    private _getAttendance(key : string) : string {
+    private _getAttendance(key : string) : SafeHtml {
         const matches = this.getSummaryOf(key);
 
         if(!matches || _.isEmpty(matches)) {
@@ -273,18 +278,18 @@ export class RoundSummaryComponent implements OnInit {
 
         const strings = matches.map((match) => {
             if(!attendance) {
-                attendance = match.attendance;
+                attendance = match.get('attendance');
             }
 
-            return `<small>at</small> ${match.h_venue_abbr} <small>for</small> ${match.h_home_abbr} <small>v</small>
-            ${match.h_away_abbr}`;
+            return `<small>at</small> ${match.venue().get('abbreviation')} <small>for</small> ${match.home().get('abbreviation')} <small>v</small>
+            ${match.away().get('abbreviation')}`;
         });
 
         let formattedAttendance = this._formatAttendance(attendance);
 
         const iconColor = this._iconColor(key);
 
-        return `<i class="users icon ${iconColor}"></i> ${formattedAttendance} ${strings.join(' & ')}`;
+        return this.toSafeHtml(`<i class="users icon ${iconColor}"></i> ${formattedAttendance} ${strings.join(' & ')}`);
     }
 
     /**
@@ -313,5 +318,15 @@ export class RoundSummaryComponent implements OnInit {
         ];
 
         return beGreen.includes(key) ? 'green' : 'red';
+    }
+
+    /**
+     * Converts string input to SafeHtml
+     *
+     * @param input
+     * @returns {SafeHtml}
+     */
+    private toSafeHtml(input : string) : SafeHtml {
+        return this.sanitizer.bypassSecurityTrustHtml(input);
     }
 }

@@ -230,7 +230,7 @@ export class Model<T extends Item> {
      * method.
      *
      * TODO:
-     * - Support direction. Currently always descending.
+     * - Support sorting by text not just numeric values.
      * - Support sorting by multiple keys with given priority (sort by 'a' asc then by 'b' desc).
      *
      * @param methodOrKey Name of Item method or data 'key'
@@ -238,37 +238,60 @@ export class Model<T extends Item> {
      * @returns {Model}
      */
     orderBy(methodOrKey : string, direction : 'asc' | 'desc' = 'asc') : this {
-        this.transitoryModels = this.transitory().sort((a, b) => {
+        this.transitory().sort((a, b) => {
             const dynamicAttr = this.isItemMethod(methodOrKey);
 
+            let aValue, bValue;
+
             if(dynamicAttr) {
-                if(a[methodOrKey]() < b[methodOrKey]()) {
-                    return -1;
-                }
-
-                if(a[methodOrKey]() > b[methodOrKey]()) {
-                    return 1;
-                }
-
-                return 0;
+                aValue = a[methodOrKey]();
+                bValue = b[methodOrKey]();
+            } else {
+                aValue = a.get(methodOrKey);
+                bValue = b.get(methodOrKey);
             }
 
-            if(!dynamicAttr) {
-                if(a.get(methodOrKey) < b.get(methodOrKey)) {
-                    return -1;
-                }
-
-                if(a.get(methodOrKey) > b.get(methodOrKey)) {
-                    return 1;
-                }
-
-                return 0;
-            }
-
-            return 0;
+            return direction === 'asc' ? this.sortAsc(aValue, bValue) : this.sortDesc(aValue, bValue);
         });
 
         return this;
+    }
+
+    /**
+     * Compares values a & b ascending for Array.sort() callback.
+     *
+     * @param a
+     * @param b
+     * @returns {number}
+     */
+    protected sortAsc(a : any, b : any) : number {
+        if(a < b) {
+            return -1;
+        }
+
+        if(a > b) {
+            return 1;
+        }
+
+        return 0;
+    };
+
+    /**
+     * Compares values a & b descending for Array.sort() callback.
+     * @param a
+     * @param b
+     * @returns {number}
+     */
+    protected sortDesc(a : any, b : any) : number {
+        if(a > b) {
+            return -1;
+        }
+
+        if(a < b) {
+            return 1;
+        }
+
+        return 0;
     }
 
     /**
@@ -311,6 +334,7 @@ export class Model<T extends Item> {
      */
     get() : T[] {
         const response = this.transitoryModels;
+        //const response = Array.from(this.transitoryModels);
 
         this.resetTransitory();
 
@@ -357,11 +381,11 @@ export class Model<T extends Item> {
      * @returns {T[]}
      */
     protected transitory() : T[] {
-        const response = this.transitoryUse ? this.transitoryModels : this.models;
+        this.transitoryModels = this.transitoryUse ? this.transitoryModels : this.models;
 
         this.startTransitory();
 
-        return response;
+        return this.transitoryModels;
     }
 
     /**
