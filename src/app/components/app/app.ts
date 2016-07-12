@@ -1,6 +1,6 @@
 import { Component, OnChanges, OnInit } from '@angular/core';
-import { RouteConfig, Router, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from '@angular/router-deprecated';
 import { HTTP_PROVIDERS } from '@angular/http';
+import { ROUTER_DIRECTIVES } from '@angular/router';
 
 // Haven't looked into why yet, however we're unable use barreled imports at this point.
 import { MatchesService } from '../../services/matches';
@@ -31,7 +31,6 @@ declare const $;
     ],
     providers: [
         HTTP_PROVIDERS,
-        ROUTER_PROVIDERS,
         // Services
         MatchesService,
         MatchSummaryService,
@@ -60,16 +59,16 @@ declare const $;
     template: `
         <div id="header" class="ui fixed menu inverted">
             <div class="ui container">
-                <a [routerLink]="['Ladder']"  class="header item nohighlight">AFL 2016</a>
+                <a [routerLink]="['ladder']"  class="header item nohighlight">AFL 2016</a>
 
-                <a [routerLink]="['Ladder']" class="item">Ladder</a>
+                <a [routerLink]="['ladder']" class="item">Ladder</a>
 
                 <div id="popup-rounds-trigger" class="item dropdown">
                     Round
                     <i class="dropdown icon"></i>
                 </div>
 
-                <a [routerLink]="['Readme']" class="item">Readme</a>
+                <a [routerLink]="['readme']" class="item">Readme</a>
 
                 <div class="right menu"><!-- --></div>
             </div>
@@ -80,7 +79,7 @@ declare const $;
                 <div class="column">
                     <div class="ui link list inverted">
                         <div *ngFor="let item of rounds[0]" class="item">
-                            <a [routerLink]="['Round', {roundNumber: item}]" class="inverted">Round {{ item }}</a>
+                            <a [routerLink]="['round', item]" class="inverted">Round {{ item }}</a>
                         </div>
                     </div>
                 </div>
@@ -88,7 +87,7 @@ declare const $;
                 <div class="column">
                     <div class="ui link list inverted">
                         <div *ngFor="let item of rounds[1]" class="item">
-                            <a [routerLink]="['Round', {roundNumber: item}]" class="inverted">Round {{ item }}</a>
+                            <a [routerLink]="['round', item]" class="inverted">Round {{ item }}</a>
                         </div>
                     </div>
                 </div>
@@ -96,7 +95,7 @@ declare const $;
                 <div class="column">
                     <div class="ui link list inverted">
                         <div *ngFor="let item of rounds[2]" class="item">
-                            <a [routerLink]="['Round', {roundNumber: item}]">Round {{ item }}</a>
+                            <a [routerLink]="['round', item]">Round {{ item }}</a>
                         </div>
                     </div>
                 </div>
@@ -111,29 +110,10 @@ declare const $;
     `,
 })
 
-@RouteConfig([
-    {
-        path: '/round/:roundNumber',
-        name: 'Round',
-        component: PageRoundComponent,
-    },
-    {
-        path: '/ladder',
-        name: 'Ladder',
-        component: PageLadderComponent,
-        useAsDefault: true,
-    },
-    {
-        path: '/readme',
-        name: 'Readme',
-        component: PageReadmeComponent,
-    }
-])
 export class AppComponent implements OnInit, OnChanges {
     rounds : [number[]];
 
     constructor(
-        private _router : Router,
         private _statsService: StatsService,
         private _timeService: TimeService
     ) {}
