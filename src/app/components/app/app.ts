@@ -110,29 +110,10 @@ declare const $;
     `,
 })
 
-//@RouteConfig([
-//    {
-//        path: '/round/:roundNumber',
-//        name: 'Round',
-//        component: PageRoundComponent,
-//    },
-//    {
-//        path: '/ladder',
-//        name: 'Ladder',
-//        component: PageLadderComponent,
-//        useAsDefault: true,
-//    },
-//    {
-//        path: '/readme',
-//        name: 'Readme',
-//        component: PageReadmeComponent,
-//    }
-//])
 export class AppComponent implements OnInit, OnChanges {
     rounds : [number[]];
 
     constructor(
-        //private _router : Router,
         private _statsService: StatsService,
         private _timeService: TimeService
     ) {}
