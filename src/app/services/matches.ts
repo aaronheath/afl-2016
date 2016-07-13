@@ -130,4 +130,8 @@ export class MatchesService {
     getByRound(roundNo : number) : MatchItem[] {
         return Match.where([{key: 'roundNo', value: +roundNo}]).get();
     }
+
+    hasRound(roundNo : number) : boolean {
+        return Match.roundNumbers().includes(+roundNo);
+    };
 }

@@ -78,9 +78,14 @@ function zeroUndef(value: any) {
     return value || 0;
 }
 
+function dashUndef(value: any) {
+    return value || '-';
+}
+
 export {
     loopObj,
     copy,
     applyMixins,
     zeroUndef,
+    dashUndef,
 };

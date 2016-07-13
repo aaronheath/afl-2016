@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { TimeService } from '../../services/index';
 import { FormatNumber } from '../../pipes/index';
 import { MatchItem } from '../../models/index';
+import { dashUndef } from '../../helpers/utils';
 
 @Component({
     selector: 'list-matches',
@@ -36,17 +37,17 @@ import { MatchItem } from '../../models/index';
             <tr *ngFor="let match of matches">
                 <td>{{ match.date() }}</td>
                 <td [class.positive]="positive(match, 'home')">{{ match.home().get('fullName') }}</td>
-                <td>{{ match.get('homeGoals') }}</td>
-                <td>{{ match.get('homeBehinds') }}</td>
-                <td>{{ match.homePoints() }}</td>
+                <td>{{ dashUndef(match.get('homeGoals')) }}</td>
+                <td>{{ dashUndef(match.get('homeBehinds')) }}</td>
+                <td>{{ dashUndef(match.homePoints()) }}</td>
                 <td [class.positive]="positive(match, 'away')">{{ match.away().get('fullName') }}</td>
-                <td>{{ match.get('awayGoals') }}</td>
-                <td>{{ match.get('awayBehinds') }}</td>
-                <td>{{ match.awayPoints() }}</td>
+                <td>{{ dashUndef(match.get('awayGoals')) }}</td>
+                <td>{{ dashUndef(match.get('awayBehinds')) }}</td>
+                <td>{{ dashUndef(match.awayPoints()) }}</td>
                 <td>{{ match.venue().get('fullName') }}</td>
                 <td>{{ match.time() }}</td>
                 <td>{{ localTime(match) }}</td>
-                <td>{{ match.get('attendance') | formatNumber }}</td>
+                <td>{{ dashUndef(match.get('attendance') | formatNumber) }}</td>
             </tr>
         </tbody>
     </table>
@@ -69,5 +70,9 @@ export class ListMatchesComponent implements OnInit {
 
     localTime(match) {
         return match.timeTz(this.getTimezone());
+    }
+
+    dashUndef(value) {
+        return dashUndef(value);
     }
 }
